@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
+import re
 
 
 class BooksSpider(scrapy.Spider):
@@ -10,6 +11,15 @@ class BooksSpider(scrapy.Spider):
     def parse(self, response):
         booktitle = response.xpath('//*[@id="productTitle"]/text()').extract_first().strip()
         print(booktitle)
+
+        #regex = re.compile('<span class="a-size-medium a-color-secondary a-text-normal">Paperback</span>|<span class="a-size-medium a-color-secondary a-text-normal">Hardcover</span>')
+        regex = re.compile('(Paperback|Hardcover)')
+        formats = response.xpath('//div[@id="tmmSwatches"]').extract_first()
+        result = regex.search(formats)
+
+        if not result:
+            print('            Not a book!')
+            return
 
         links = response.css('li.a-carousel-card > div:first-child > a:first-child::attr(href)').extract()
         #print(links)
