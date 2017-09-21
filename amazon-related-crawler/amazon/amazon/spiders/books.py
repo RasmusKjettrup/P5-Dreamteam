@@ -13,5 +13,6 @@ class BooksSpider(scrapy.Spider):
 
         links = response.css('li.a-carousel-card > div:first-child > a:first-child::attr(href)').extract()
         #print(links)
-        next_page = response.urljoin(links[0])
-        yield scrapy.Request(next_page, callback=self.parse)
+        for link in links:
+            next_page = response.urljoin(link)
+            yield scrapy.Request(next_page, callback=self.parse)
