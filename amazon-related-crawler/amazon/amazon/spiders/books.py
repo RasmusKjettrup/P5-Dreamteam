@@ -8,7 +8,7 @@ class BooksSpider(scrapy.Spider):
     start_urls = ['https://www.amazon.com/gp/product/1787300080/']
 
     def parse(self, response):
-        booktitle = response.xpath('//*[@id="productTitle"]/text()').extract_first()
+        booktitle = response.xpath('//*[@id="productTitle"]/text()').extract_first().strip()
         print(booktitle)
 
         links = response.css('li.a-carousel-card > div:first-child > a:first-child::attr(href)').extract()
