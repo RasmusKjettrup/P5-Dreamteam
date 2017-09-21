@@ -5,13 +5,13 @@ import scrapy
 class BooksSpider(scrapy.Spider):
     name = 'books'
     allowed_domains = ['amazon.com']
-    start_urls = ['https://www.amazon.co.uk/gp/product/1787300080/']
+    start_urls = ['https://www.amazon.com/gp/product/1787300080/']
 
     def parse(self, response):
         booktitle = response.xpath('//*[@id="productTitle"]/text()').extract_first()
         print(booktitle)
 
-        next_page = response.css("li.a-carousel-card a::attr(href)").extract_first()
-        if next_page is not None:
-            next_page = response.urljoin(next_page)
-            yield scrapy.Request(next_page, callback=self.parse)
+        links = response.css('li.a-carousel-card > div:first-child > a:first-child::attr(href)').extract()
+        #print(links)
+        next_page = response.urljoin(links[0])
+        yield scrapy.Request(next_page, callback=self.parse)
