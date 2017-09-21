@@ -12,7 +12,6 @@ class BooksSpider(scrapy.Spider):
         booktitle = response.xpath('//*[@id="productTitle"]/text()').extract_first().strip()
         print(booktitle)
 
-        #regex = re.compile('<span class="a-size-medium a-color-secondary a-text-normal">Paperback</span>|<span class="a-size-medium a-color-secondary a-text-normal">Hardcover</span>')
         regex = re.compile('(Paperback|Hardcover)')
         formats = response.xpath('//div[@id="tmmSwatches"]').extract_first()
         result = regex.search(formats)
