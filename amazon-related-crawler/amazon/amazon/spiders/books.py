@@ -18,7 +18,7 @@ class BooksSpider(scrapy.Spider):
         global l
         global i
         booktitle = response.xpath('//*[@id="productTitle"]/text()').extract_first().strip()
-        print(booktitle)
+        #print(booktitle)
 
         regex = re.compile('(Paperback|Hardcover)')
         formats = response.xpath('//div[@id="tmmSwatches"]').extract_first()
@@ -29,10 +29,16 @@ class BooksSpider(scrapy.Spider):
             return
 
         links = response.css('li.a-carousel-card > div:first-child > a:first-child::attr(href)').extract()
+        names = response.css('li.a-carousel-card > div:first-child > a:first-child > div:nth-child(2)::text').extract()
+        for number in range(len(names)):
+            names[number] = names[number].strip()
         #print(links)
+        #print(names)
+        nameCount = 0
         for link in links:
             next_page = response.urljoin(link)
-            l.append((booktitle, response))
-            #print(l[i][0])
+            l.append((booktitle, names[nameCount]))
+            print(l[i])
             i += 1
+            nameCount += 1
             yield scrapy.Request(next_page, callback=self.parse)
