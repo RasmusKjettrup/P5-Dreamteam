@@ -7,8 +7,16 @@ class BooksSpider(scrapy.Spider):
     name = 'books'
     allowed_domains = ['amazon.com']
     start_urls = ['https://www.amazon.com/gp/product/1787300080/']
-
+    
+    def __init__(self):
+        global l 
+        global i
+        l = []
+        i = 0
+    
     def parse(self, response):
+        global l
+        global i
         booktitle = response.xpath('//*[@id="productTitle"]/text()').extract_first().strip()
         print(booktitle)
 
@@ -24,4 +32,7 @@ class BooksSpider(scrapy.Spider):
         #print(links)
         for link in links:
             next_page = response.urljoin(link)
+            l.append((booktitle, response))
+            #print(l[i][0])
+            i += 1
             yield scrapy.Request(next_page, callback=self.parse)
