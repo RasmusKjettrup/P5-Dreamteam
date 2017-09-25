@@ -8,44 +8,92 @@ from collections import deque
 class BooksSpider(scrapy.Spider):
     name = 'books'
     allowed_domains = ['amazon.com']
-    start_urls = ['https://www.amazon.com/gp/product/1787300080/']
+    start_urls = ['https://www.amazon.com/Thirst-Harry-Hole-Novel/dp/0385352166/']
 
     def __init__(self):
-        global relation_list 
-        global relation_list_length
         global queue
+        global book_list
+        global crawled_book_list
+        global file_items
+        global visited_product_ids
+        global file_relations
+
         queue = deque()
-        relation_list = []
-        relation_list_length = 0
+        book_list = []
+        crawled_book_list = []
+        visited_product_ids = ['/dp/0385352166/']
 
-    def parse(page,response):
-        global relation_list 
-        global relation_list_length
-        global queue
-        booktitle = response.xpath('//*[@id="productTitle"]/text()').extract_first().strip()
-        print(booktitle)
+        file_items = open('items.txt', 'w')
+        file_items.write('')
+        file_items = open('items.txt', 'a')
 
-        regex = re.compile('(Paperback|Hardcover)')
-        formats = response.xpath('//div[@id="tmmSwatches"]').extract_first()
-        result = regex.search(formats)
+        file_relations = open('relations.txt', 'w')
+        file_relations.write('')
+        file_relations = open('relations.txt', 'a')
 
-        if not result:
-            print('            Not a book!')
+    def parse(self,response):
+
+        def next_request(self):
+            next_link = queue.popleft()
+            return scrapy.Request(next_link, callback=self.parse)
+
+        def add_relation(book_one, book_two):
+
+            def add_book(book):
+                file_items.write(str(len(book_list))+", "+book+"\n")
+                book_list.append(book)
+
+            if not(book_one in book_list):
+                add_book(book_one)
+
+            if not(book_two in book_list):
+                add_book(book_two)
+
+            file_relations.write(str(book_list.index(book_one))+", "+str(book_list.index(book_two))+"\n")
             return
 
-        links = response.css('li.a-carousel-card > div:first-child > a:first-child::attr(href)').extract()
-        names = response.css('li.a-carousel-card > div:first-child > a:first-child > div:nth-child(2)::text').extract()
+        booktitle = response.xpath('//*[@id="productTitle"]/text()').extract_first().strip()
+        if (booktitle in crawled_book_list):            
+            result = next_request(self)
+            yield result
+            return
+        crawled_book_list.append(booktitle)
+        print(booktitle+" ("+str(len(queue))+")")
+
+        book_regex = re.compile('(Paperback|Hardcover)')
+        formats = response.xpath('//div[@id="tmmSwatches"]').extract_first()
+        if (formats == None) and not (book_regex.search(formats)):
+            print('            Not a book!')
+            result = next_request(self)
+            yield result
+            return
+
+        links = response.css('li.a-carousel-card > div:first-child > a:first-child::attr(href)').extract()[:6]
+        names = response.css('li.a-carousel-card > div:first-child > a:first-child > div:nth-child(2)::text').extract()[:6]
 
         for i in range(len(names)):
             names[i] = names[i].strip()
 
+        if (len(links) != len(names)):
+            print("FAULT: Amount of links does not equal amount of names ("+ str(len(links))+" "+str(len(names))+")")
+
+        id_regex = re.compile('/dp/[0-9A-Z]+/')
         nameCount = 0
         for link in links:
-            queue.append(response.urljoin(link))
-            relation_list.append((booktitle, names[nameCount]))
-            print(relation_list[relation_list_length])
-            relation_list_length += 1
+            new_link = response.urljoin(link)
+
+            id_result = id_regex.search(new_link)
+            if not id_result:
+                print("FAULT: "+new_link+" did not match id_regex")
+                continue
+
+            new_link_product_id = id_result.group(0)
+            if not(new_link_product_id in visited_product_ids):
+                queue.append(response.urljoin(link))
+                visited_product_ids.append(new_link_product_id)
+            
+            add_relation(booktitle, names[nameCount])
             nameCount += 1
 
-        while (len(queue) != 0):
-            yield scrapy.Request(queue.popleft(), callback=page.parse)
+        result = next_request(self)
+        yield result
