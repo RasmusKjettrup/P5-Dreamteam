@@ -1,7 +1,8 @@
+import org.omg.CosNaming.NamingContextPackage.NotFound;
 import processing.core.PApplet;
 
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
+import java.util.ArrayList;
 
 /**
  * The graph which includes nodes and edges.
@@ -65,5 +66,31 @@ public class Graph implements Iterable<Node> {
     @Override
     public Iterator<Node> iterator() {
         return nodes.iterator();
+    }
+
+    void addEdge(Edge edge) {
+        edges.add(edge);
+    }
+
+    void addNode(Node node) {
+        nodes.add(node);
+    }
+
+    void removeEdge(Edge edge) {
+        if (edges.contains(edge)) {
+            edges.remove(edge);
+        } else throw new NoSuchElementException("No edge.");
+    }
+
+    void removeNode(Node node) {
+        if (nodes.contains(node)) {
+            nodes.remove(node);
+        } else throw new NoSuchElementException("No node.");
+    }
+
+    void removeAllEdges() {
+        for (Edge edge : edges) {
+            edges.remove(edge);
+        }
     }
 }

@@ -25,17 +25,22 @@ public class MainApp extends PApplet{
         graph.getNodes().add(new Node(this, "C"));
         graph.getNodes().add(new Node(this, "D"));
         graph.getNodes().add(new Node(this, "E"));
+        graph.getNodes().add(new Node(this, "F"));
 
-        graph.getEdges().add(new Edge(this, graph.findNodeByName("A"), graph.findNodeByName("B")));
-        graph.getEdges().add(new Edge(this, graph.findNodeByName("B"), graph.findNodeByName("A")));
-        graph.getEdges().add(new Edge(this, graph.findNodeByName("B"), graph.findNodeByName("C")));
-        graph.getEdges().add(new Edge(this, graph.findNodeByName("C"), graph.findNodeByName("D")));
-        graph.getEdges().add(new Edge(this, graph.findNodeByName("D"), graph.findNodeByName("A")));
+        graph.getEdges().add(new Edge(this, graph.findNodeByName("A"), graph.findNodeByName("D"), 3));
+        graph.getEdges().add(new Edge(this, graph.findNodeByName("A"), graph.findNodeByName("F"), 2));
+        graph.getEdges().add(new Edge(this, graph.findNodeByName("F"), graph.findNodeByName("B"), 1));
+        graph.getEdges().add(new Edge(this, graph.findNodeByName("A"), graph.findNodeByName("C"), 1));
+        graph.getEdges().add(new Edge(this, graph.findNodeByName("C"), graph.findNodeByName("E"), 5));
+        graph.getEdges().add(new Edge(this, graph.findNodeByName("C"), graph.findNodeByName("B"), 8));
 
-        graph.setStartNode(graph.findNodeByName("A"));
-        graph.setEndNode(graph.findNodeByName("E"));
+//        graph.setStartNode(graph.findNodeByName("A"));
+//        graph.setEndNode(graph.findNodeByName("E"));
 
         graphDisplay = new GraphDisplay(this, graph);
+
+        Christofides christofides = new Christofides(this, graph);
+        christofides.CreateMinimumSpanningTree(graph);
     }
 
     /**

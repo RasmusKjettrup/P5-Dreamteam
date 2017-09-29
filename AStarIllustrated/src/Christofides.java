@@ -1,5 +1,7 @@
 import processing.core.PApplet;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Christofides {
     private PApplet p;
@@ -23,8 +25,16 @@ public class Christofides {
         return H;
     }
 
-    private Graph CreateMinimumSpanningTree(Graph graph) {
-        return null;
+    public Graph CreateMinimumSpanningTree(Graph graph) {
+        Graph newGraph = graph;
+        List<Edge> sortedEdges = new ArrayList<>(graph.getEdges());
+
+        Collections.sort(sortedEdges);
+
+        newGraph.removeAllEdges();
+        ArrayList<Node> emptyNodes = new ArrayList<>(newGraph.getNodes());
+
+        return newGraph;
     }
 
     private ArrayList<Node> CalculateVerticesWithOddDegree(Graph t) {
