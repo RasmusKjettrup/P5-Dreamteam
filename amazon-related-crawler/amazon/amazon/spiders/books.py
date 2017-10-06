@@ -59,7 +59,7 @@ class BooksSpider(scrapy.Spider):
         time.sleep(random.random()*5.0+1)
         book_response = response.xpath('//*[@id="productTitle"]/text()').extract_first()
         if book_response == None:
-            print('            Title not found!')
+            print('ERROR: Title not found!')
             result = next_request(self)
             yield result
             return
@@ -74,7 +74,7 @@ class BooksSpider(scrapy.Spider):
         book_regex = re.compile('(Paperback|Hardcover)')
         formats = response.xpath('//div[@id="tmmSwatches"]').extract_first()
         if (formats == None) and not (book_regex.search(formats)):
-            print('            Not a book!')
+            print('ERROR: Not a book!')
             result = next_request(self)
             yield result
             return
@@ -86,7 +86,7 @@ class BooksSpider(scrapy.Spider):
             names[i] = names[i].strip()
 
         if (len(links) != len(names)):
-            print("FAULT: Amount of links does not equal amount of names ("+ str(len(links))+" "+str(len(names))+")")
+            print("ERROR: Amount of links does not equal amount of names ("+ str(len(links))+" "+str(len(names))+")")
 
         id_regex = re.compile('/dp/[0-9A-Z]+/')
         nameCount = 0
@@ -95,7 +95,7 @@ class BooksSpider(scrapy.Spider):
 
             id_result = id_regex.search(new_link)
             if not id_result:
-                print("FAULT: "+new_link+" did not match id_regex")
+                print("ERROR: "+new_link+" did not match id_regex")
                 continue
 
             new_link_product_id = id_result.group(0)
