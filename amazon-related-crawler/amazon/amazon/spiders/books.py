@@ -2,6 +2,8 @@
 import scrapy
 import re
 import time
+import random
+import datetime
 from collections import deque
 
 
@@ -31,6 +33,8 @@ class BooksSpider(scrapy.Spider):
         file_relations.write('')
         file_relations = open('relations.txt', 'a')
 
+        random.seed(datetime.datetime.now())
+
     def parse(self,response):
 
         def next_request(self):
@@ -52,7 +56,7 @@ class BooksSpider(scrapy.Spider):
             file_relations.write(str(book_list.index(book_one))+", "+str(book_list.index(book_two))+"\n")
             return
 
-        time.sleep(1)
+        time.sleep(random.random()*5.0+1)
         book_response = response.xpath('//*[@id="productTitle"]/text()').extract_first()
         if book_response == None:
             print('            Title not found!')
