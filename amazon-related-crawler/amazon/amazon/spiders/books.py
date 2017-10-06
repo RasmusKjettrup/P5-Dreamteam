@@ -2,13 +2,15 @@
 import scrapy
 import re
 import time
+import random
+import datetime
 from collections import deque
 
 
 class BooksSpider(scrapy.Spider):
     name = 'books'
-    allowed_domains = ['amazon.com']
-    start_urls = ['https://www.amazon.com/Thirst-Harry-Hole-Novel/dp/0385352166/']
+    allowed_domains = ['amazon.co.uk']
+    start_urls = ['https://www.amazon.co.uk/Hobbit-J-R-Tolkien/dp/0007458428/ref=sr_1_1?s=books&ie=UTF8&qid=1507280075&sr=1-1&keywords=the+hobbit']
 
     def __init__(self):
         global queue
@@ -21,7 +23,7 @@ class BooksSpider(scrapy.Spider):
         queue = deque()
         book_list = []
         crawled_book_list = []
-        visited_product_ids = ['/dp/0385352166/']
+        visited_product_ids = ['/dp/0007458428/']
 
         file_items = open('items.txt', 'w')
         file_items.write('')
@@ -30,6 +32,8 @@ class BooksSpider(scrapy.Spider):
         file_relations = open('relations.txt', 'w')
         file_relations.write('')
         file_relations = open('relations.txt', 'a')
+
+        random.seed(datetime.datetime.now())
 
     def parse(self,response):
 
@@ -52,8 +56,15 @@ class BooksSpider(scrapy.Spider):
             file_relations.write(str(book_list.index(book_one))+", "+str(book_list.index(book_two))+"\n")
             return
 
-        booktitle = response.xpath('//*[@id="productTitle"]/text()').extract_first().strip()
-        if (booktitle in crawled_book_list):            
+        time.sleep(random.random()*5.0+1)
+        book_response = response.xpath('//*[@id="productTitle"]/text()').extract_first()
+        if book_response == None:
+            print('            Title not found!')
+            result = next_request(self)
+            yield result
+            return
+        booktitle = book_response.strip()
+        if (booktitle in crawled_book_list):
             result = next_request(self)
             yield result
             return
