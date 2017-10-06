@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace WarehouseAI
 {
-    class Arc
+    internal class Arc
     {
         /// <summary>
-        /// 
+        /// The first item in the relation.
         /// </summary>
         public Item Item1 { get; set; }
         /// <summary>
-        /// The 
+        /// An item frequently bought with the first item.
         /// </summary>
         public Item Item2 { get; set; }
 

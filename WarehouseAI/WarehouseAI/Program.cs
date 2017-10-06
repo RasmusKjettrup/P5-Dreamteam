@@ -7,19 +7,24 @@ using System.Threading.Tasks;
 
 namespace WarehouseAI
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
         }
 
-        public List<Item> LoadAllItemsFromFile(string filePath)
+        /// <summary>
+        /// Loads the Item database from a file.
+        /// </summary>
+        /// <param name="filePath">The path to the file</param>
+        /// <returns></returns>
+        private List<Item> LoadAllItemsFromFile(string filePath)
         {
             List<Item> items = new List<Item>();
             StringBuilder sb = new StringBuilder();
-            string[] k = File.ReadAllLines(filePath);
+            string[] setOfAllItems = File.ReadAllLines(filePath);
 
-            foreach (string s in k)
+            foreach (string s in setOfAllItems)
             {
                 string[] tempString = s.Split(',');
                 for (int i = 1; i < tempString.Length; i++)
@@ -32,27 +37,41 @@ namespace WarehouseAI
             return items;
         }
 
-        public List<Arc> LoadAllRelationsFromFile(string filePath, List<Item> items)
+        /// <summary>
+        /// Loads the Relation database from a file
+        /// </summary>
+        /// <param name="filePath">The path to the file.</param>
+        /// <param name="items">The list over all files that are related.</param>
+        /// <returns></returns>
+        private List<Arc> LoadAllRelationsFromFile(string filePath, List<Item> items)
         {
             List<Arc> arcs = new List<Arc>();
-            string[] k = File.ReadAllLines(filePath);
+            string[] setOfAllRelations = File.ReadAllLines(filePath);
 
-            foreach (string s in k)
+            foreach (string s in setOfAllRelations)
             {
                 string[] tempString = s.Split(',');
-
                 arcs.Add(new Arc(items.Find(item1 => item1.ID == tempString[0]), items.Find(item2 => item2.ID == tempString[1])));
             }
             return arcs;
         }
 
-        public float ImportanceCoefficientAlgorithm(List<Item> relation, List<Arc> arcs)
+        /// <summary>
+        /// Calculates the importance coefficient.
+        /// </summary>
+        /// <param name="setOfItems">The set of items to calculate upon.</param>
+        /// <param name="relations">The list of all related items in the system.</param>
+        /// <returns></returns>
+        private float ImportanceCoefficientAlgorithm(List<Item> setOfItems, List<Arc> relations)
         {
             float a = 0; // Number of Arcs
-            int n = relation.Count; // Number of nodes in the relation
-            foreach (Item item in relation)
+            int n = setOfItems.Count; // Number of nodes in the setOfItems
+            foreach (Item item in setOfItems)
             {
-                a += arcs.Where(arc => arc.Item1 == item).Count(ar => relation.Contains(ar.Item2));
+                // Adds all relations where both items in the arc are in the setOfItems.
+                a += relations
+                    .Where(arc => arc.Item1 == item)
+                    .Count(ar => setOfItems.Contains(ar.Item2));
             }
             return a / n;
         }
