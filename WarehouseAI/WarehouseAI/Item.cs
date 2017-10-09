@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WarehouseAI
 {
-    internal class Item
+    public class Item
     {
         /// <summary>
         /// The ID of the item.

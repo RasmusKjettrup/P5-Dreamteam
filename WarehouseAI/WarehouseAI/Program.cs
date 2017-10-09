@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WarehouseAI
 {
-    internal class Program
+    public class Program
     {
         private static void Main(string[] args)
         {
@@ -63,7 +63,7 @@ namespace WarehouseAI
         /// <param name="setOfItems">The set of items to calculate upon.</param>
         /// <param name="relations">The list of all related items in the system.</param>
         /// <returns></returns>
-        private float ImportanceCoefficientAlgorithm(List<Item> setOfItems, List<Arc> relations)
+        public static float ImportanceCoefficientAlgorithm(List<Item> setOfItems, List<Arc> relations)
         {
             float a = 0; // Number of Arcs
             int n = setOfItems.Count; // Number of nodes in the setOfItems

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WarehouseAI
 {
-    internal class Arc
+    public class Arc
     {
         /// <summary>
         /// The first item in the relation.
