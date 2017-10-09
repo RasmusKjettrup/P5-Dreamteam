@@ -17,7 +17,7 @@ namespace WarehouseAI
         /// Loads the Item database from a file.
         /// </summary>
         /// <param name="filePath">The path to the file</param>
-        /// <returns></returns>
+        /// <returns>returns a list of items</returns>
         private List<Item> LoadAllItemsFromFile(string filePath)
         {
             List<Item> items = new List<Item>();
@@ -27,6 +27,7 @@ namespace WarehouseAI
             foreach (string s in setOfAllItems)
             {
                 string[] tempString = s.Split(',');
+                // if a name contains "," then it puts them together to form one string.
                 for (int i = 1; i < tempString.Length; i++)
                 {
                     sb.Append(tempString[i]);
@@ -42,7 +43,7 @@ namespace WarehouseAI
         /// </summary>
         /// <param name="filePath">The path to the file.</param>
         /// <param name="items">The list over all files that are related.</param>
-        /// <returns></returns>
+        /// <returns>returns a list of arcs</returns>
         private List<Arc> LoadAllRelationsFromFile(string filePath, List<Item> items)
         {
             List<Arc> arcs = new List<Arc>();
