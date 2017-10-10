@@ -17,10 +17,18 @@ namespace WarehouseAI
         /// </summary>
         public string Name { get; set; }
 
+        public List<Item> Relations  { get; }
+
         public Item(string id, string name)
         {
             ID = id;
             Name = name;
+            Relations = new List<Item>();
+        }
+
+        public void AddRelation(Item relatedItem)
+        {
+            Relations.Add(relatedItem);
         }
     }
 }
