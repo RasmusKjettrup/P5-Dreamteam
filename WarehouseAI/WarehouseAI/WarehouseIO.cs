@@ -43,7 +43,7 @@ namespace WarehouseAI
             {
                 string[] tempString = s.Split(',');
                 var item1 = items.Find(item => item.ID == tempString[0]);
-                item1.AddRelation(items.Find(item => item.ID == tempString[1]));
+                item1.AddOutgoingRelation(items.Find(item => item.ID == tempString[1]));
             }
         }
     }
