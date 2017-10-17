@@ -17,19 +17,14 @@ namespace WarehouseAI
         public static List<Item> LoadAllItemsFromFile(string filePath)
         {
             List<Item> items = new List<Item>();
-            StringBuilder sb = new StringBuilder();
             string[] setOfAllItems = File.ReadAllLines(filePath);
 
             foreach (string s in setOfAllItems)
             {
-                string[] tempString = s.Split(',');
-                // if a name contains "," then it puts them together to form one string.
-                for (int i = 1; i < tempString.Length; i++)
-                {
-                    sb.Append(tempString[i]);
-                }
-                items.Add(new Item(tempString[0], tempString[1]));
-                sb.Clear();
+                int commaIndex = s.IndexOf(',');
+                string identifier = s.Substring(0, commaIndex);
+                string name = s.Substring(commaIndex + 2);
+                items.Add(new Item(identifier, name));
             }
             return items;
         }

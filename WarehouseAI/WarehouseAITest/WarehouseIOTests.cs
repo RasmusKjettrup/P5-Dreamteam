@@ -19,7 +19,7 @@ namespace WarehouseAITest
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < itemNames.Length; i++)
             {
-                sb.Append(i + "," + itemNames[i] + "\n");
+                sb.Append(i + ", " + itemNames[i] + "\n");
             }
             File.Create(path).Close();
             File.WriteAllText(path, sb.ToString());
