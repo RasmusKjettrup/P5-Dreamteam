@@ -20,7 +20,7 @@ namespace WarehouseAITest
             }
             for (int i = 0; i < numberOfRelations; i++)
             {
-                items[i % numberOfItems].AddRelation(items.Find(item => item.ID == ((i + 1) % numberOfItems).ToString()));
+                items[i % numberOfItems].AddOutgoingRelation(items.Find(item => item.ID == ((i + 1) % numberOfItems).ToString()));
             }
             return items;
         }

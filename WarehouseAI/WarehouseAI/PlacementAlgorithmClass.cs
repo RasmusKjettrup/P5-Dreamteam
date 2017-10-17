@@ -22,9 +22,15 @@ namespace WarehouseAI
             foreach (Item item in setOfItems)
             {
                 // Adds the number of relations from each item to any other items in setOfItems to the number of arcs
-                a += item.Relations.Count(setOfItems.Contains);
+                a += item.OutgoingRelations.Count(setOfItems.Contains);
             }
             return a / n;
+        }
+
+
+        public static void PlacementAlgorithm()
+        {
+            throw new NotImplementedException();
         }
     }
 }

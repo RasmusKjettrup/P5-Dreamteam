@@ -17,18 +17,27 @@ namespace WarehouseAI
         /// </summary>
         public string Name { get; set; }
 
-        public List<Item> Relations  { get; }
+        public List<Item> IngoingRelations { get; }
+
+        public List<Item> OutgoingRelations  { get; }
 
         public Item(string id, string name)
         {
             ID = id;
             Name = name;
-            Relations = new List<Item>();
+            OutgoingRelations = new List<Item>();
+            IngoingRelations = new List<Item>();
         }
 
-        public void AddRelation(Item relatedItem)
+        public void AddOutgoingRelation(Item relatedItem)
         {
-            Relations.Add(relatedItem);
+            OutgoingRelations.Add(relatedItem);
+            relatedItem.AddIngoingRelations(this);
+        }
+
+        public void AddIngoingRelations(Item relatedItem)
+        {
+            IngoingRelations.Add(relatedItem);
         }
     }
 }
