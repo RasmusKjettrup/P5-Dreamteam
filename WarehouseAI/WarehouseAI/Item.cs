@@ -17,6 +17,8 @@ namespace WarehouseAI
         /// </summary>
         public string Name { get; set; }
 
+        public int Priority { get; set; } = 0;
+
         public List<Item> IngoingRelations { get; }
 
         public List<Item> OutgoingRelations  { get; }
@@ -33,6 +35,7 @@ namespace WarehouseAI
         {
             OutgoingRelations.Add(relatedItem);
             relatedItem.AddIngoingRelations(this);
+            Priority++;
         }
 
         public void AddIngoingRelations(Item relatedItem)

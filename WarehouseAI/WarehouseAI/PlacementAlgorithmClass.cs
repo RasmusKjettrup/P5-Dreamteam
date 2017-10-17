@@ -28,9 +28,29 @@ namespace WarehouseAI
         }
 
 
-        public static void PlacementAlgorithm()
+        public static void PlacementAlgorithm(List<Item> setOfItems)
         {
+            foreach (Item item in setOfItems)
+            {
+                // Place Book | AddBook
+                UpdatePriorities(item);
+                // setOfItems.Sort by priority
+            }
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Reduces the priority of given item by a constant k, and enhances priority on al of the items' relations.
+        /// </summary>
+        /// <param name="item">The most recently placed item.</param>
+        public static void UpdatePriorities(Item item)
+        {
+            const int k = 1;
+            item.Priority -= k;
+            foreach (Item outgoingRelation in item.OutgoingRelations)
+            {
+                outgoingRelation.Priority++;
+            }
         }
     }
 }
