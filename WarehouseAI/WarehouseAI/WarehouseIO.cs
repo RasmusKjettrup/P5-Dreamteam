@@ -39,11 +39,11 @@ namespace WarehouseAI
         {
             string[] setOfAllRelations = File.ReadAllLines(filePath);
 
-            foreach (string s in setOfAllRelations)
+            foreach (string relation in setOfAllRelations)
             {
-                string[] tempString = s.Split(',');
-                var item1 = items.Find(item => item.ID == tempString[0]);
-                item1.AddOutgoingRelation(items.Find(item => item.ID == tempString[1]));
+                string[] nodes = relation.Split(',').Select(s => s.Trim()).ToArray();
+                var item1 = items.Find(item => item.ID == nodes[0]);
+                item1.AddOutgoingRelation(items.Find(item => item.ID == nodes[1]));
             }
         }
     }
