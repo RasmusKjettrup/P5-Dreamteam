@@ -34,7 +34,7 @@ namespace WarehouseAI
             {
                 // Place Book | AddBook
                 UpdatePriorities(item);
-                // setOfItems.Sort by priority
+                setOfItems = SortByPriority(setOfItems, item);
             }
             throw new NotImplementedException();
         }
@@ -51,6 +51,26 @@ namespace WarehouseAI
             {
                 outgoingRelation.Priority++;
             }
+        }
+
+        /// <summary>
+        /// Removes an item from a given set and sorts the set by highest priority.
+        /// </summary>
+        /// <param name="setOfItems">The set of items to be sorted</param>
+        /// <param name="lastPlacedItem">The most recently placed item that is to be removed.</param>
+        /// <returns></returns>
+        public static List<Item> SortByPriority(List<Item> setOfItems, Item lastPlacedItem)
+        {
+            if (!setOfItems.Contains(lastPlacedItem))
+                throw new ArgumentException("The set of items didn't contain the last placed item.");
+            setOfItems.Remove(lastPlacedItem);
+            List<Item> items = setOfItems.OrderBy(i => i.Priority).Reverse().ToList();
+            return items;
+        }
+
+        public static void AddBook(List<Shelf> shelves, Item item)
+        {
+
         }
     }
 }

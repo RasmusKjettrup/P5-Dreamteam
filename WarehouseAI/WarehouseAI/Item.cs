@@ -17,7 +17,7 @@ namespace WarehouseAI
         /// </summary>
         public string Name { get; set; }
 
-        public int Priority { get; set; } = 0;
+        public int Priority { get; set; }
 
         public List<Item> IngoingRelations { get; }
 
