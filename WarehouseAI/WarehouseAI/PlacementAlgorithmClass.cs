@@ -73,23 +73,33 @@ namespace WarehouseAI
 
         }
 
-        public static float Weightcalculation(Frontier G)
+        public static float Weightcalculation(List<Item> i)
         {
             float TotalWeight=0;
+            List<Frontier> ListOfFrontiers =new List<Frontier>();
             List<Item> ExploredEdges;
             Frontier ResultingFrontier;
             Item ResultingEdge;
 
             while (true)
             {
-                ResultingFrontier = null;
+                ResultingFrontier = new Frontier(null,null,int.MaxValue);
                 ResultingEdge = null;
-                foreach (var frontier in G.route)
+                foreach (var frontier in ListOfFrontiers)
                 {
-                    
+                   Item fl = frontier.route.Last();
+                    if (frontier.books.Count<1) 
+                    {
+                        foreach (var neighbour in fl.Neighbours())
+                        {
+                            
+                        }   
+                    }
                 }
-
+                
             }
+
+
 
             return TotalWeight;
         }

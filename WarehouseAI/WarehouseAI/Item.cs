@@ -42,5 +42,24 @@ namespace WarehouseAI
         {
             IngoingRelations.Add(relatedItem);
         }
+
+        public List<Item> Neighbours()
+        {
+            List<Item> neighbours = new List<Item>();
+
+            foreach (var ingoing in IngoingRelations )
+            {
+                foreach (var outgoing in OutgoingRelations)
+                {
+                    if (ingoing != outgoing && !neighbours.Contains(ingoing) && !neighbours.Contains(outgoing)) {
+                        neighbours.Add(ingoing);
+                        neighbours.Add(outgoing);
+                    }
+                }
+            }
+
+            return neighbours;
+        }
+
     }
 }
