@@ -72,5 +72,27 @@ namespace WarehouseAI
         {
 
         }
+
+        public static float Weightcalculation(Frontier G)
+        {
+            float TotalWeight=0;
+            List<Item> ExploredEdges;
+            Frontier ResultingFrontier;
+            Item ResultingEdge;
+
+            while (true)
+            {
+                ResultingFrontier = null;
+                ResultingEdge = null;
+                foreach (var frontier in G.route)
+                {
+                    
+                }
+
+            }
+
+            return TotalWeight;
+        }
+
     }
 }
