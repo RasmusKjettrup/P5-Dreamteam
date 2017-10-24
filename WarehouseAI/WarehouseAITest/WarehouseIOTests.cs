@@ -13,7 +13,7 @@ namespace WarehouseAITest
     [TestFixture]
     class WarehouseIOTests
     {
-        public string GenerateFile(params string[] itemNames)
+        public string GenerateItemFile(params string[] itemNames)
         {
             int j = 0;
             return GenerateFileFromLines("TestItems", itemNames.Select(s => j++ + ", " + s).ToArray());
@@ -42,7 +42,7 @@ namespace WarehouseAITest
         public void LoadAllItemsFromFileCountTest(params string[] itemNames)
         {
             // Arrange 
-            string path = GenerateFile(itemNames);
+            string path = GenerateItemFile(itemNames);
 
             // Act
             List<Item> items = WarehouseIO.LoadAllItemsFromFile(path);
@@ -64,7 +64,7 @@ namespace WarehouseAITest
         public void LoadAllItemsFromFileDataTest(params string[] itemNames)
         {
             // Arrange 
-            string path = GenerateFile(itemNames);
+            string path = GenerateItemFile(itemNames);
 
             // Act
             List<Item> items = WarehouseIO.LoadAllItemsFromFile(path);
@@ -84,10 +84,10 @@ namespace WarehouseAITest
         [TestCase("0, 2", "1, 3", "2, 0", "3, 1")]
         [TestCase("0, 2", "0, 3", "1, 3", "1, 0", "2, 0", "2, 1", "3, 1", "3, 2")]
         [TestCase("0, 2", "1, 3", "2, 0", "3, 1")]
-        public void LoadAllReationsFromFileTest(params string[] itemRelations)
+        public void LoadAllRelationsFromFileTest(params string[] itemRelations)
         {
             // Arrange
-            string itemPath = GenerateFile("test", "Test", "TEST", "tEst");
+            string itemPath = GenerateItemFile("test", "Test", "TEST", "tEst");
             string relationPath = GenerateFileFromLines("RelationTest", itemRelations);
 
             // Act
