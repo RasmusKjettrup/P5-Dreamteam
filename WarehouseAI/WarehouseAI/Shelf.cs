@@ -6,13 +6,18 @@ using System.Threading.Tasks;
 
 namespace WarehouseAI
 {
-    public class Shelf
+    public class Shelf : Node
     {
         public string ID;
 
         public int MaxItemCapacity { get; set; } = 5;
 
         private readonly List<Item> _items = new List<Item>();
+
+        public Item[] Items
+        {
+            get { return _items.ToArray(); }
+        }
 
         /// <summary>
         /// Adds an item to the shelf.
@@ -40,7 +45,7 @@ namespace WarehouseAI
         /// <returns></returns>
         public bool Contains(Item item)
         {
-            return _items.Count(i => i.ID == item.ID) < 1;
+            return _items.Contains(item);
         }
 
     }

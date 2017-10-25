@@ -73,35 +73,87 @@ namespace WarehouseAI
 
         }
 
-        public static float Weightcalculation(List<Item> i)
+        private static Node[] minimalNetwork;
+
+        public static void InitializeWeight(params Node[] nodes)
         {
-            float TotalWeight=0;
-            List<Frontier> ListOfFrontiers =new List<Frontier>();
-            List<Item> ExploredEdges;
-            Frontier ResultingFrontier;
-            Item ResultingEdge;
+            List<Node> g = new List<Node>();
+
+            foreach (Node n_i in nodes)
+            {
+                if (!(n_i is Shelf /*or n_i is the dropoff point*/))
+                {
+                    continue;
+                }
+
+                Node g_i = new Node();
+                List<Edge> g_edges = new List<Edge>();
+                foreach (Node n_j in nodes)
+                {
+                    if (n_j is Shelf /*or n_j is the dropoff point*/)
+                    {
+                        g_edges.Add(new Edge()
+                        {
+                            weight = 0, //TODO: Implement a pathfinding algorithm and set the weight to be weight of the resulting path from n_i to n_j
+                            to = n_j
+                        });
+                    }
+                }
+                g_i.Edges = g_edges.ToArray();
+                g.Add(g_i);
+            }
+
+            minimalNetwork = g.ToArray();
+        }
+
+        public static float Weight(params Item[] i)
+        {
+            float TotalWeight = 0;
+            List<Frontier> frontiers = new List<Frontier>();
+            frontiers.Add(new Frontier(new[] { minimalNetwork[0] }, i, 0));
+            List<Node[]> exploredRoutes = new List<Node[]>();
 
             while (true)
             {
-                ResultingFrontier = new Frontier(null,null,int.MaxValue);
-                ResultingEdge = null;
-                foreach (var frontier in ListOfFrontiers)
+                Frontier resultingFrontier = new Frontier(null, null, int.MaxValue);
+                Node[] resultingRoute = null;
+                foreach (var f_i in frontiers)
                 {
-                   Item fl = frontier.route.Last();
-                    if (frontier.books.Count<1) 
+                    Node f_l = f_i.route.Last();
+                    if (f_i.books.Length >= 1)
                     {
-                        foreach (var neighbour in fl.Neighbours())
+                        foreach (Shelf g_i in f_l.Neighbours.Cast<Shelf>())
                         {
-                            
-                        }   
+                            if (g_i.Items.Any(item => f_i.books.Contains(item)))
+                            {
+                                if (!exploredRoutes.Contains(f_i.route.Concat(new[] { g_i }))
+                                    && f_i.weight/*+dist(f_l, g_i)*/< resultingFrontier.weight)
+                                {
+                                    resultingFrontier = new Frontier(f_i.route.Concat(new[] { g_i }).ToArray(),
+                                        f_i.books.Where(item => !g_i.Items.Contains(item)).ToArray(),
+                                        f_i.weight/*+dist(f_l, g_i)*/);
+                                    resultingRoute = resultingFrontier.route;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Node g_0 = minimalNetwork[0];
+                        if (f_i.weight/*+dist(f_l, g_i)*/< resultingFrontier.weight)
+                        {
+                            resultingFrontier = new Frontier(f_i.route.Concat(new[] { g_0 }).ToArray(),
+                                f_i.books, f_i.weight/*+dist(f_l, g_i)*/);
+                        }
                     }
                 }
-                
+                frontiers.Add(resultingFrontier);
+                exploredRoutes.Add(resultingRoute);
+                if (resultingRoute.Last() == minimalNetwork[0])
+                {
+                    return resultingFrontier.weight;
+                }
             }
-
-
-
-            return TotalWeight;
         }
 
     }

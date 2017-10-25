@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Frontier.cs" />
     <Compile Include="Item.cs" />
+    <Compile Include="Node.cs" />
     <Compile Include="PlacementAlgorithmClass.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
