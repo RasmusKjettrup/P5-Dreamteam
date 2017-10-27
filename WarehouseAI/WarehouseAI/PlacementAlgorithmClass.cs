@@ -111,13 +111,11 @@ namespace WarehouseAI
             float TotalWeight = 0;
             List<Frontier> frontiers = new List<Frontier>();
             frontiers.Add(new Frontier(new[] { minimalNetwork[0] }, i, 0));
-            List<Node[]> exploredRoutes = new List<Node[]>();
 
             while (true)
             {
                 Frontier resultingFrontier = new Frontier(null, null, int.MaxValue);
-                Node[] resultingRoute = null;
-                foreach (var f_i in frontiers)
+                foreach (Frontier f_i in frontiers)
                 {
                     Node f_l = f_i.route.Last();
                     if (f_i.books.Length >= 1)
@@ -126,13 +124,12 @@ namespace WarehouseAI
                         {
                             if (g_i.Items.Any(item => f_i.books.Contains(item)))
                             {
-                                if (!exploredRoutes.Contains(f_i.route.Concat(new[] { g_i }))
+                                if (!frontiers.Select(f => f.route).Contains(f_i.route.Concat(new[] { g_i }))
                                     && f_i.weight/*+dist(f_l, g_i)*/< resultingFrontier.weight)
                                 {
                                     resultingFrontier = new Frontier(f_i.route.Concat(new[] { g_i }).ToArray(),
                                         f_i.books.Where(item => !g_i.Items.Contains(item)).ToArray(),
                                         f_i.weight/*+dist(f_l, g_i)*/);
-                                    resultingRoute = resultingFrontier.route;
                                 }
                             }
                         }
@@ -148,13 +145,11 @@ namespace WarehouseAI
                     }
                 }
                 frontiers.Add(resultingFrontier);
-                exploredRoutes.Add(resultingRoute);
-                if (resultingRoute.Last() == minimalNetwork[0])
+                if (resultingFrontier.route.Last() == minimalNetwork[0])
                 {
                     return resultingFrontier.weight;
                 }
             }
         }
-
     }
 }
