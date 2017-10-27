@@ -13,3 +13,11 @@ D:\Code project dropbox\Dropbox\Code Project\GameSocket\GameSocket\obj\Debug\Gam
 D:\Code project dropbox\Dropbox\Code Project\GameSocket\GameSocket\obj\Debug\GameSocket.pdb
 D:\Code project dropbox\Dropbox\Code Project\GameSocket\GameSocket\obj\Debug\GameSocket.csprojResolveAssemblyReference.cache
 D:\Code project dropbox\Dropbox\Code Project\GameSocket\GameSocket\obj\Debug\GameSocket.SocketT2h.resources
+C:\Users\kenne\P5-Dreamteam\DemoConnection\GameSocket\bin\Debug\GameSocket.exe
+C:\Users\kenne\P5-Dreamteam\DemoConnection\GameSocket\bin\Debug\GameSocket.pdb
+C:\Users\kenne\P5-Dreamteam\DemoConnection\GameSocket\obj\Debug\GameSocket.csprojResolveAssemblyReference.cache
+C:\Users\kenne\P5-Dreamteam\DemoConnection\GameSocket\obj\Debug\GameSocket.SocketT2h.resources
+C:\Users\kenne\P5-Dreamteam\DemoConnection\GameSocket\obj\Debug\GameSocket.Properties.Resources.resources
+C:\Users\kenne\P5-Dreamteam\DemoConnection\GameSocket\obj\Debug\GameSocket.csproj.GenerateResource.Cache
+C:\Users\kenne\P5-Dreamteam\DemoConnection\GameSocket\obj\Debug\GameSocket.exe
+C:\Users\kenne\P5-Dreamteam\DemoConnection\GameSocket\obj\Debug\GameSocket.pdb

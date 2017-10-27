@@ -55,7 +55,7 @@ namespace GameSocket
             __ClientSockets.Add(new SocketT2h(socket));
             list_Client.Items.Add(socket.RemoteEndPoint.ToString());
 
-            lb_soluong.Text = "Số client đang kết nối: " + __ClientSockets.Count.ToString();
+            lb_soluong.Text = "Number of faggets connected: " + __ClientSockets.Count.ToString();
             lb_stt.Text = "Client connected. . .";
             socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), socket);
             _serverSocket.BeginAccept(new AsyncCallback(AppceptCallback), null);
@@ -80,7 +80,7 @@ namespace GameSocket
                         if (__ClientSockets[i]._Socket.RemoteEndPoint.ToString().Equals(socket.RemoteEndPoint.ToString()))
                         {
                             __ClientSockets.RemoveAt(i);
-                            lb_soluong.Text = "Số client đang kết nối: "+__ClientSockets.Count.ToString();
+                            lb_soluong.Text = "Number of clients connected: " + __ClientSockets.Count.ToString();
                         }
                     }
                     // xóa trong list
@@ -123,7 +123,7 @@ namespace GameSocket
                     {
                         return;
                     }
-                    reponse = "server da nhan" + text;
+                    reponse = "dick recieved" + text;
                     Sendata(socket, reponse);
                 }
                 else
@@ -133,7 +133,7 @@ namespace GameSocket
                         if (__ClientSockets[i]._Socket.RemoteEndPoint.ToString().Equals(socket.RemoteEndPoint.ToString()))
                         {
                             __ClientSockets.RemoveAt(i);
-                            lb_soluong.Text = "Số client đang kết nối: " + __ClientSockets.Count.ToString();
+                            lb_soluong.Text = "Number of clients connected: " + __ClientSockets.Count.ToString();
                         }
                     }
                 }
