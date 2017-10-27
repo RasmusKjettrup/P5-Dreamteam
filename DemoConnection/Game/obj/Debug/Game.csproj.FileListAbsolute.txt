@@ -1,0 +1,15 @@
+C:\Users\hieu\Documents\Visual Studio 2015\Projects\GameSocket\Game\bin\Debug\Game.exe
+C:\Users\hieu\Documents\Visual Studio 2015\Projects\GameSocket\Game\bin\Debug\Game.pdb
+C:\Users\hieu\Documents\Visual Studio 2015\Projects\GameSocket\Game\obj\Debug\Game.frm_Main.resources
+C:\Users\hieu\Documents\Visual Studio 2015\Projects\GameSocket\Game\obj\Debug\Game.Properties.Resources.resources
+C:\Users\hieu\Documents\Visual Studio 2015\Projects\GameSocket\Game\obj\Debug\Game.csproj.GenerateResource.Cache
+C:\Users\hieu\Documents\Visual Studio 2015\Projects\GameSocket\Game\obj\Debug\Game.exe
+C:\Users\hieu\Documents\Visual Studio 2015\Projects\GameSocket\Game\obj\Debug\Game.pdb
+D:\Code project dropbox\Dropbox\Code Project\GameSocket\Game\bin\Debug\Game.exe
+D:\Code project dropbox\Dropbox\Code Project\GameSocket\Game\bin\Debug\Game.pdb
+D:\Code project dropbox\Dropbox\Code Project\GameSocket\Game\obj\Debug\Game.csprojResolveAssemblyReference.cache
+D:\Code project dropbox\Dropbox\Code Project\GameSocket\Game\obj\Debug\Game.frm_Main.resources
+D:\Code project dropbox\Dropbox\Code Project\GameSocket\Game\obj\Debug\Game.Properties.Resources.resources
+D:\Code project dropbox\Dropbox\Code Project\GameSocket\Game\obj\Debug\Game.csproj.GenerateResource.Cache
+D:\Code project dropbox\Dropbox\Code Project\GameSocket\Game\obj\Debug\Game.exe
+D:\Code project dropbox\Dropbox\Code Project\GameSocket\Game\obj\Debug\Game.pdb
