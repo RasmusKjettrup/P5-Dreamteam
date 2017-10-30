@@ -10,22 +10,61 @@ namespace WarehouseAI
 {
     public class Program
     {
+        private const string CommandList = "\\help";
+        private static readonly Dictionary<string, Delegate> Commands = new Dictionary<string, Delegate>();
+        private static WarehouseServerIO _server;
+        private static bool _running = true;
+
         private static void Main(string[] args)
         {
-            WarehouseServerIO server = new WarehouseServerIO();
-            server.SetupServer();
-            server.MessageRecieved += ServerOnMessageRecieved;
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Setting up _server...");
+            _server = new WarehouseServerIO();
+            _server.SetupServer();
+            _server.MessageRecieved += ServerOnMessageRecieved;
+            _server.ErrorOccured += ServerOnErrorOccured;
 
-            bool running = true;
-            while (running)
+            Console.WriteLine("Server setup complete");
+            Console.WriteLine($"Type {CommandList} for all commands");
+
+            CommandSetup();
+            while (_running)
             {
+                Console.Write("Please enter a command: ");
+                Console.ForegroundColor = ConsoleColor.White;
                 string input = Console.ReadLine()?.ToLower();
-                switch (input)
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                if (input != null && Commands.ContainsKey(input))
                 {
-                    case "\\list-clients": ListAllClients(server); break;
-                    case "\\stop": running = false; break;
-                    default: Console.WriteLine($"Unknown command {input}"); break;
+                    Commands[input].DynamicInvoke();
                 }
+                else
+                {
+                    Console.WriteLine($"Unknown command {input}");
+                }
+            }
+        }
+
+        private static void CommandSetup()
+        {
+            Commands.Add(CommandList, new Action(PrintAllCommands));
+            Commands.Add("\\list-clients", new Action(ListAllClients));
+            Commands.Add("\\exit", new Action(() => { _running = false; }));
+        }
+
+        private static void ServerOnErrorOccured(string s)
+        {
+            ConsoleColor currentConsoleColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(s);
+            Console.ForegroundColor = currentConsoleColor;
+        }
+
+        private static void PrintAllCommands()
+        {
+            foreach (string commandsKey in Commands.Keys)
+            {
+                Console.WriteLine(commandsKey);
             }
         }
 
@@ -34,9 +73,14 @@ namespace WarehouseAI
             throw new NotImplementedException();
         }
 
-        private static void ListAllClients(WarehouseServerIO server)
+        private static void ListAllClients()
         {
-            foreach (Socket serverClientSocket in server.ClientSockets)
+            if (_server.ClientSockets.Count < 1)
+            {
+                Console.WriteLine("There is currently no clients connected to the server");
+                return;
+            }
+            foreach (Socket serverClientSocket in _server.ClientSockets)
             {
                 Console.WriteLine(serverClientSocket.RemoteEndPoint.ToString());
             }

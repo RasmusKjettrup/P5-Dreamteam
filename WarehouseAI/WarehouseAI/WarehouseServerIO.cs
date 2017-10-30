@@ -16,6 +16,7 @@ namespace WarehouseAI
         private const int Port = 100;
         private readonly IPAddress _ipAddress;
         public event Action<string> MessageRecieved;
+        public event Action<string> ErrorOccured;
 
         public WarehouseServerIO()
         {
@@ -64,7 +65,7 @@ namespace WarehouseAI
                     // Ends a pending async read and stores the number of bytes recieved
                     received = socket.EndReceive(asyncResult);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     // Removes connection to the client causing an exception
                     // Todo: Maybe this can simply be done by ClientSockets.Remove(socket);
@@ -76,6 +77,7 @@ namespace WarehouseAI
                             clientSocket.Close();
                         }
                     }
+                    ErrorOccured?.Invoke(e.Message);
                     return;
                 }
                 if (received != 0)
