@@ -3,7 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/QR_reader.iml" filepath="$PROJECT_DIR$/QR_reader.iml" />
+      <module fileurl="file://C:\Users\kenne\P5-Dreamteam\QR_reader\QR_reader.iml" filepath="C:\Users\kenne\P5-Dreamteam\QR_reader\QR_reader.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:\Users\kenne\P5-Dreamteam\QR_reader\app\app.iml" filepath="C:\Users\kenne\P5-Dreamteam\QR_reader\app\app.iml" />
     </modules>
   </component>
 </project>
