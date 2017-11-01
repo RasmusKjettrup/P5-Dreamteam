@@ -14,10 +14,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private SurfaceHolder mHolder;
     private Camera mCamera;
 
-    public CameraPreview(Context context, Camera mCamera) {
+    public CameraPreview(Context context, Camera mCamera, int orientation) {
         super(context);
         this.mCamera = mCamera;
-        mCamera.setDisplayOrientation(90);
+        mCamera.setDisplayOrientation(orientation);
 
         mHolder = getHolder();
         mHolder.addCallback(this);
