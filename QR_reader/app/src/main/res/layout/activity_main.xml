@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.jmkjaer.android.p5_qr_reader.MainActivity">
-    <FrameLayout
-        android:id="@+id/camera_preview"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:padding="5dp"
+              android:gravity="center"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent">
+    <Button
+        android:id="@+id/scan_btn"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:onClick="launchScanner"
+        android:text="Scan" />
 
-</android.support.constraint.ConstraintLayout>
+    <Button
+        android:id="@+id/qrscan_btn"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:onClick="launchQRScanner"
+        android:text="Only QR" />
+</LinearLayout>
