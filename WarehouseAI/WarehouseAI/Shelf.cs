@@ -14,7 +14,7 @@ namespace WarehouseAI
 
         private readonly List<Item> _items = new List<Item>();
 
-        public Item[] Items
+        public virtual Item[] Items
         {
             get { return _items.ToArray(); }
         }

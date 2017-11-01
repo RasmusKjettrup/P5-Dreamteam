@@ -68,9 +68,36 @@ namespace WarehouseAI
             return items;
         }
 
-        public static void AddBook(List<Shelf> shelves, Item item)
+        private static List<Item> _addedBooks;
+
+        private class FilterShelf : Shelf
+        {
+            private Shelf _parentShelf;
+            private Item _filterItem;
+
+            private int Capacity;
+
+            public FilterShelf(Shelf parent, Item filter)
+            {
+                _parentShelf = parent;
+                _filterItem = filter;
+            }
+
+            public override Item[] Items {
+                get { return _parentShelf.Items.Where(i => i != _filterItem).ToArray(); }
+            }
+        }
+
+        private static float EvaluationFunction(Node[] network)
         {
 
+            return 0;
+        }
+
+        public static void AddBook(Item item)
+        {
+            FilterShelf[] subNetwork = minimalNetwork.Skip(1).Select(n => new FilterShelf((Shelf) n, item)).ToArray();
+            Node currentNode = minimalNetwork[0];
         }
 
         private static Node[] minimalNetwork;
@@ -101,6 +128,11 @@ namespace WarehouseAI
                 }
                 g_i.Edges = g_edges.ToArray();
                 g.Add(g_i);
+            }
+
+            foreach (Node node in g)
+            {
+                node.Edges = node.Edges.OrderBy(e => e.weight).ToArray();
             }
 
             minimalNetwork = g.ToArray();

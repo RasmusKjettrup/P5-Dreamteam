@@ -25,7 +25,7 @@ namespace WarehouseAI
             get { return edges.Select(e => e.to).ToArray(); }
         }
 
-        public Edge[] Edges
+        public virtual Edge[] Edges
         {
             get { return edges; }
             set { edges = value; }
