@@ -10,12 +10,13 @@ import com.jmkjaer.android.p5_qr_reader.events.DisconnectEventListener;
 import com.jmkjaer.android.p5_qr_reader.events.InputEventListener;
 import com.jmkjaer.android.p5_qr_reader.events.RecievedInputEvent;
 
+
 /**
  * Created by kenne on 31-10-2017.
  */
 
 public class ConnectionHandler {
-    private String _serverIP = "197.72.43.150";
+    private String _serverIP = "192.168.43.197";
     private int _serverPort = 100;
     private String _endSignal = "bye";
 
