@@ -9,11 +9,6 @@ android {
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
-
-        dexOptions {
-            multiDexEnabled true
-            preDexLibraries false
-        }
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
