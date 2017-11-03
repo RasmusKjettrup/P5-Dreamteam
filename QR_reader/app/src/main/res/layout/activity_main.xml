@@ -6,16 +6,28 @@
               android:layout_width="fill_parent"
               android:layout_height="fill_parent">
     <Button
-        android:id="@+id/scan_btn"
+        android:id="@+id/btn_allScan"
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
         android:onClick="launchScanner"
-        android:text="Scan" />
+        android:text="Scan for all supported codes" />
 
     <Button
-        android:id="@+id/qrscan_btn"
+        android:id="@+id/btn_qrScan"
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
         android:onClick="launchQRScanner"
         android:text="Only QR" />
+
+    <Button
+        android:id="@+id/btn_barcodeScan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="launchBarcodeScanner"
+        android:text="Scan "/>
+
+    <TextView
+        android:id="@+id/txt_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 </LinearLayout>

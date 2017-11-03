@@ -6,58 +6,21 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import net.sourceforge.zbar.Symbol;
 
-
 public class MainActivity extends AppCompatActivity {
-//    Camera mCamera;
-//    CameraPreview mPreview;
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-//
-//        mCamera = getCameraInstance();
-//        Camera.Parameters params = mCamera.getParameters();
-//        params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-//        mCamera.setParameters(params);
-//        mPreview = new CameraPreview(this, mCamera, 90);
-//        FrameLayout preview = (FrameLayout)findViewById(R.id.camera_preview);
-//        preview.addView(mPreview);
-//    }
-//
-////    private boolean checkCameraHardware() {
-////        if (this.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
-////            Toast toast = Toast.makeText(this, "Device has camera!", Toast.LENGTH_LONG);
-////            toast.show();
-////            return true;
-////        } else {
-////            Toast toast = Toast.makeText(this, "Device does not have camera!", Toast.LENGTH_LONG);
-////            toast.show();
-////            return false;
-////        }
-////    }
-//
-//    private static Camera getCameraInstance() {
-//        Camera c = null;
-//        try {
-//            c = Camera.open(0); // back camera
-//        } catch (Exception e) {
-//            Log.d("","Camera sucks.");
-//        }
-//        return c;
-//    }
-
     private static final int ZBAR_SCANNER_REQUEST = 0;
     private static final int ZBAR_QR_SCANNER_REQUEST = 1;
+    private TextView _txtView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        _txtView = findViewById(R.id.txt_message);
     }
 
     public void launchScanner(View v) {
@@ -79,9 +42,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+//    public void launchBarcodeScanner(View v) {
+//        if (isCameraAvailable()) {
+//            Intent intent = new Intent(this, ZBarScannerActivity.class);
+//            startActivityForResult(intent, );
+//        }
+//    }
+
     public boolean isCameraAvailable() {
-        PackageManager pm = getPackageManager();
-        return pm.hasSystemFeature(PackageManager.FEATURE_CAMERA);
+        return getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
     }
 
     @Override
@@ -90,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
             case ZBAR_SCANNER_REQUEST:
             case ZBAR_QR_SCANNER_REQUEST:
                 if (resultCode == RESULT_OK) {
-                    Toast.makeText(this, "Scan Result = " + data.getStringExtra(ZBarConstants.SCAN_RESULT), Toast.LENGTH_SHORT).show();
+                    _txtView.setText(data.getStringExtra(ZBarConstants.SCAN_RESULT));
                 } else if(resultCode == RESULT_CANCELED && data != null) {
                     String error = data.getStringExtra(ZBarConstants.ERROR_INFO);
                     if(!TextUtils.isEmpty(error)) {

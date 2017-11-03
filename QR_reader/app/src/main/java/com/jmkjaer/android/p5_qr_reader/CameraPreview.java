@@ -15,60 +15,6 @@ import java.util.List;
 /**
  * TODO: Add a class header comment!
  */
-//public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
-//    private static final String TAG = "CameraPreview";
-//    private SurfaceHolder mHolder;
-//    private Camera mCamera;
-//
-//    public CameraPreview(Context context, Camera mCamera, int orientation) {
-//        super(context);
-//        this.mCamera = mCamera;
-//        mCamera.setDisplayOrientation(orientation);
-//
-//        mHolder = getHolder();
-//        mHolder.addCallback(this);
-//    }
-//
-//
-//    @Override
-//    public void surfaceCreated(SurfaceHolder holder) {
-//        try {
-//            mCamera.setPreviewDisplay(holder);
-//        } catch (Exception e) {
-//            Log.d(TAG, "Error setting camera preview: " + e.getMessage());
-//        }
-//    }
-//
-//    /**
-//     * Release camera so that other apps can use it
-//     * @param holder
-//     */
-//    @Override
-//    public void surfaceDestroyed(SurfaceHolder holder) {
-//        mCamera.stopPreview();
-//        mCamera.release();
-//        mCamera = null;
-//    }
-//
-//    @Override
-//    public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-//        if (mHolder.getSurface() == null) {
-//            return;
-//        }
-//
-//        try {
-//            mCamera.stopPreview();
-//        } catch (Exception e) {
-//        }
-//
-//        try {
-//            mCamera.setPreviewDisplay(mHolder);
-//            mCamera.startPreview();
-//        } catch (Exception e) {
-//            Log.d(TAG, "Error starting camera preview: " + e.getMessage());
-//        }
-//    }
-//}
 class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
     private final String TAG = "CameraPreview";
 
@@ -94,6 +40,7 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
         mHolder.addCallback(this);
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
+
 
     public void setCamera(Camera camera) {
         mCamera = camera;
