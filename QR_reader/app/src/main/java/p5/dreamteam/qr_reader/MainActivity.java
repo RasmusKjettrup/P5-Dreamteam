@@ -1,4 +1,4 @@
-package p5.dreamteam.awesome.p5_qr_reader;
+package p5.dreamteam.qr_reader;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
