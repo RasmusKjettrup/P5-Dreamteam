@@ -1,15 +1,10 @@
-package com.jmkjaer.android.p5_qr_reader;
+package p5.dreamteam.awesome.p5_qr_reader;
 
-import android.app.Activity;
 import android.content.Context;
 import android.hardware.Camera;
-import android.hardware.Camera.Size;
 import android.util.Log;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
-import android.view.ViewGroup;
 
 import java.io.IOException;
 import java.util.List;

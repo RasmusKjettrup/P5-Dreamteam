@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion '26.0.2'
     defaultConfig {
-        applicationId "com.jmkjaer.android.p5_qr_reader"
+        applicationId "P5.Dreamteam.awesome.p5_qr_reader"
         minSdkVersion 16
         targetSdkVersion 26
         versionCode 1
