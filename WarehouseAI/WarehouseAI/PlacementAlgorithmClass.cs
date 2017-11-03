@@ -90,7 +90,7 @@ namespace WarehouseAI
 
         private static float EvaluationFunction(Node[] network)
         {
-
+            
             return 0;
         }
 
@@ -185,3 +185,4 @@ namespace WarehouseAI
         }
     }
 }
+
