@@ -15,6 +15,15 @@ namespace WarehouseAITest
 
             int[][] result = testCase.Power().ToArray();
 
+            foreach (int[] ints in result)
+            {
+                foreach (int i in ints)
+                {
+                    Console.Write(i + " ");
+                }
+                Console.WriteLine("-");
+            }
+
             int[][] expectedResult = new[]
             {
                 new int[0],

@@ -6,6 +6,23 @@ namespace WarehouseAI
     public static class Extensions
     {
         /// <summary>
+        /// Appends the set to the end of an object
+        /// </summary>
+        /// <typeparam name="T">Object type</typeparam>
+        /// <param name="x">Base object</param>
+        /// <param name="y">Set to add</param>
+        /// <returns></returns>
+        public static IEnumerable<T> Append<T>(this T x, IEnumerable<T> y)
+        {
+            yield return x;
+
+            foreach (T t in y)
+            {
+                yield return t;
+            }
+        }
+
+        /// <summary>
         /// Gets the powerset of the enumeration
         /// </summary>
         /// <typeparam name="T">The type of the data getting enumerated</typeparam>
@@ -13,14 +30,8 @@ namespace WarehouseAI
         /// <returns>result</returns>
         public static IEnumerable<T[]> Power<T>(this IEnumerable<T> x)
         {
-            //Returns the empty set
-            yield return new T[0];
-
-            //Return all sets in the power set of length 1 and higher
-            foreach (T[] t in Power(x, 1))
-            {
-                yield return t;
-            }
+            //Return the power set of length 0 and higher
+            return Power(x, 0);
         }
 
         private static IEnumerable<T[]> Power<T>(this IEnumerable<T> x, int length)
@@ -43,7 +54,7 @@ namespace WarehouseAI
                 picks[i] = i;
             }
 
-            //While new values are still being found
+            //While new sets are still being found
             while (true)
             {
                 //Return all items in the set, where the index is found in "picks"
@@ -76,13 +87,13 @@ namespace WarehouseAI
                         break;
                     }
                 }
-                //No new values can be found of the given length
+                //No new sets can be found of the given length
                 if (brea)
                 {
                     break;
                 }
             }
-
+            
             //Return all sets of this length, plus one.
             foreach (T[] t in Power(fullSet, length + 1))
             {

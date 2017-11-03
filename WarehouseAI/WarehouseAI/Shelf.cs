@@ -23,7 +23,7 @@ namespace WarehouseAI
         /// Adds an item to the shelf.
         /// </summary>
         /// <param name="item">The item to be added.</param>
-        public void Add_Book(Item item)
+        public void AddBook(Item item)
         {
             if (Contains(item))
             {

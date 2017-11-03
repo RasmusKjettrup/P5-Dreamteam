@@ -68,39 +68,99 @@ namespace WarehouseAI
             return items;
         }
 
-        private static List<Item> _addedBooks;
+        private static Item[] allItems;
+        private static Node[] minimalNetwork;
+        private static Dictionary<Item[], CacheElement> weightCache;
 
+        private class CacheElement
+        {
+            public bool marked;
+            public float weight;
+        }
+
+        private static float EvaluationFunction(Node[] network, Item[][] itemSets)
+        {
+
+            return 0;
+        }
+
+        /// <summary>
+        /// A shelf that inherits all relevant properties from its Parent, but filters out a specific book from the list of books.
+        /// </summary>
         private class FilterShelf : Shelf
         {
-            private Shelf _parentShelf;
+            public Shelf Parent;
             private Item _filterItem;
+            public bool ContainsFilteredBook = false;
 
-            private int Capacity;
+            public int Capacity;
 
             public FilterShelf(Shelf parent, Item filter)
             {
-                _parentShelf = parent;
+                this.Parent = parent;
                 _filterItem = filter;
             }
 
             public override Item[] Items {
-                get { return _parentShelf.Items.Where(i => i != _filterItem).ToArray(); }
+                get {
+                    IEnumerable<Item> items = Parent.Items.Where(i => i != _filterItem);
+                    return (ContainsFilteredBook ? _filterItem.Append(items) : items).ToArray();
+                }
             }
-        }
-
-        private static float EvaluationFunction(Node[] network)
-        {
-            
-            return 0;
         }
 
         public static void AddBook(Item item)
         {
-            FilterShelf[] subNetwork = minimalNetwork.Skip(1).Select(n => new FilterShelf((Shelf) n, item)).ToArray();
-            Node currentNode = minimalNetwork[0];
-        }
+            //Create a subnetwork, where each node except the dropoff point is a new FilterShelf node created from the original node
+            Node[] subNetwork = minimalNetwork[0].Append(minimalNetwork.Skip(1).Select(n => new FilterShelf((Shelf)n, item))).ToArray();
+            //The first node of the greedy descent algorithm
+            Node currentNode = subNetwork[0];
+            //All sets in the powerset of all items, where "item" is represented.
+            Item[][] itemSets = allItems.Power().Where(items => items.Contains(item)).ToArray();
+            //The lowest evaluation score between all neighbours are initialized to the max value of float
+            float lowestEvaluation = float.MaxValue;
 
-        private static Node[] minimalNetwork;
+            //While lowestEvaluation is still being reassigned, new neighboirs are still being found
+            while (lowestEvaluation == float.MaxValue)
+            {
+                //In the beginning of all loops, the lE is set to the max value of float
+                lowestEvaluation = float.MaxValue;
+                //The 5 first neighbours of the current node, casted to a FilterShelf, where there is still space for new books.
+                //The neighbours are sorted with lowest weight first, so te first 5 is the 5 closest.
+                FilterShelf[] neighbours = currentNode.Neighbours.Where(node => node is FilterShelf).Cast<FilterShelf>()
+                    .Where(shelf => shelf.Capacity != 0).Take(5).ToArray();
+
+                //Check through each neighbour to detect better candidates to place the book in.
+                foreach (FilterShelf shelf in neighbours)
+                {
+                    //First set the filterShelf to contain the new book...
+                    shelf.ContainsFilteredBook = true;
+                    //Then evaluate the placement of the new book.
+                    float eval = EvaluationFunction(subNetwork, itemSets);
+                    //Unequip the book from the shelf again.
+                    shelf.ContainsFilteredBook = false;
+
+                    //Set the new currentNode, if appropriate
+                    if (eval < lowestEvaluation)
+                    {
+                        currentNode = shelf;
+                        lowestEvaluation = eval;
+                    }
+                }
+            }
+
+            //the new book is added to the appropriate node
+            ((FilterShelf)currentNode).Parent.AddBook(item);
+
+            //Set each value with the new item as "marked", and their values need to be updated when caching the weights again.
+            foreach (KeyValuePair<Item[], CacheElement> pair in weightCache)
+            {
+                if (pair.Key.Contains(item))
+                {
+                    pair.Value.marked = true;
+                }
+            }
+        }
 
         public static void InitializeWeight(params Node[] nodes)
         {
@@ -136,6 +196,22 @@ namespace WarehouseAI
             }
 
             minimalNetwork = g.ToArray();
+
+            weightCache = new Dictionary<Item[], CacheElement>();
+            foreach (Item[] subset in allItems.Power())
+            {
+                weightCache.Add(subset, new CacheElement()
+                {
+                    marked = true,
+                    weight = 0,
+                });
+            }
+            CacheElement emptyElement;
+            if (weightCache.TryGetValue(new Item[0], out emptyElement))
+            {
+                emptyElement.marked = false;
+            }
+
         }
 
         public static float Weight(params Item[] i)
