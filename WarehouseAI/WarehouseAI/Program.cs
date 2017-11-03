@@ -44,14 +44,19 @@ namespace WarehouseAI
                 }
             }
         }
-
+        /// <summary>
+        /// Sets up the CLI
+        /// </summary>
         private static void CommandSetup()
         {
             Commands.Add(CommandList, new Action(PrintAllCommands));
             Commands.Add("\\list-clients", new Action(ListAllClients));
             Commands.Add("\\exit", new Action(() => { _running = false; }));
         }
-
+        /// <summary>
+        /// Marks the error with red
+        /// </summary>
+        /// <param name="s">Error occured</param>
         private static void ServerOnErrorOccured(string s)
         {
             ConsoleColor currentConsoleColor = Console.ForegroundColor;
@@ -59,7 +64,9 @@ namespace WarehouseAI
             Console.WriteLine(s);
             Console.ForegroundColor = currentConsoleColor;
         }
-
+        /// <summary>
+        /// Prints all commands available
+        /// </summary>
         private static void PrintAllCommands()
         {
             foreach (string commandsKey in Commands.Keys)
@@ -72,7 +79,9 @@ namespace WarehouseAI
         {
             throw new NotImplementedException();
         }
-
+        /// <summary>
+        /// Prints the list of clients
+        /// </summary>
         private static void ListAllClients()
         {
             if (_server.ClientSockets.Count < 1)

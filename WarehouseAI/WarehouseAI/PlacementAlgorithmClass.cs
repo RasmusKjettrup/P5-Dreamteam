@@ -67,7 +67,11 @@ namespace WarehouseAI
             List<Item> items = setOfItems.OrderBy(i => i.Priority).Reverse().ToList();
             return items;
         }
-
+        /// <summary>
+        /// Adds the item to the shelf
+        /// </summary>
+        /// <param name="shelves">A container of items</param>
+        /// <param name="item">A item represents a product in the system</param>
         public static void AddBook(List<Shelf> shelves, Item item)
         {
 

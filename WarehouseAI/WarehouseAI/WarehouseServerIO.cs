@@ -10,7 +10,7 @@ namespace WarehouseAI
 {
     internal class WarehouseServerIO
     {
-        private readonly byte[] _buffer = new byte[1024]; // Weird ass buffer
+        private readonly byte[] _buffer = new byte[1024]; // An array of type Byte that is the storage location for the received data.
         public List<Socket> ClientSockets { get; set; }
         private readonly Socket _serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         private const int Port = 100;
@@ -21,8 +21,8 @@ namespace WarehouseAI
         public WarehouseServerIO()
         {
             ClientSockets = new List<Socket>();
-            // Provides an IP address that indicates that the server must listen for client activity on all network interfaces. This field is read-only.
-            _ipAddress = IPAddress.Any; 
+            
+            _ipAddress = IPAddress.Any; // Provides an IP address that indicates that the server must listen for client activity on all network interfaces. This field is read-only. 
         }
 
         /// <summary>
@@ -39,23 +39,24 @@ namespace WarehouseAI
         /// <summary>
         /// Accepts a connection from a client, prepares to recieve data from the client and prepares for another client.
         /// </summary>
-        /// <param name="asyncResult"></param> Todo: Write what this thing does when we are sure.
+        /// <param name="asyncResult"> An IAsyncResult that stores state information for this asynchronous operation as well as any user defined data.</param>
         private void AcceptCallback(IAsyncResult asyncResult)
         {
             Socket socket = _serverSocket.EndAccept(asyncResult);
             ClientSockets.Add(socket);
             // socket.RemoteEndPoint.ToString(); <- IP address of Client
-            
-            socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, ReceiveCallback, socket); // Todo: Add exceptionhandling
+            //An System.AsyncCallback delegate that references the method to invoke when the operation is complete.
+            socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, ReceiveCallback, socket); // Todo: Add exceptionhandling 
             _serverSocket.BeginAccept(AcceptCallback, null);
         }
 
         /// <summary>
         /// Stops a recieve call and reads the data from a client and gives it to the MessageRecieved event.
         /// </summary>
-        /// <param name="asyncResult"></param> Todo: Write what this thing does when we are sure.
+        /// <param name="asyncResult">Status of operation</param> Todo: Write what this thing does when we are sure.
         private void ReceiveCallback(IAsyncResult asyncResult)
         {
+            int offset = 0;
             Socket socket = (Socket)asyncResult.AsyncState; // Todo: Implement casting exception handling
             if (socket.Connected)
             {
@@ -117,7 +118,7 @@ namespace WarehouseAI
                     }
                 }
             }
-            socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, ReceiveCallback, socket);
+            socket.BeginReceive(_buffer, offset, _buffer.Length, SocketFlags.None, ReceiveCallback, socket);
         }
 
         /// <summary>
@@ -127,15 +128,16 @@ namespace WarehouseAI
         /// <param name="message">The message that will be sent to the specified socket.</param>
         private void SendData(Socket socket, string message)
         {
+            int offset = 0;
             byte[] data = Encoding.ASCII.GetBytes(message);
-            socket.BeginSend(data, 0, data.Length, SocketFlags.None, SendCallback, socket); // Todo: Add exceptionhandling
+            socket.BeginSend(data, offset, data.Length, SocketFlags.None, SendCallback, socket); // Todo: Add exceptionhandling
             _serverSocket.BeginAccept(AcceptCallback, null);
         }
 
         /// <summary>
         /// Ends a pending async send.
         /// </summary>
-        /// <param name="ascyncResult"></param> Todo: Write what this thing does when we are sure.
+        /// <param name="ascyncResult">Status of operation</param> Todo: Write what this thing does when we are sure.
         private static void SendCallback(IAsyncResult ascyncResult)
         {
             Socket socket = (Socket)ascyncResult.AsyncState; // Todo: Implement some casting exception handling

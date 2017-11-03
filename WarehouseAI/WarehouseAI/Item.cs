@@ -30,19 +30,28 @@ namespace WarehouseAI
             OutgoingRelations = new List<Item>();
             IngoingRelations = new List<Item>();
         }
-
+        /// <summary>
+        /// Adds an out going relation between to items
+        /// </summary>
+        /// <param name="relatedItem">Item that is related</param>
         public void AddOutgoingRelation(Item relatedItem)
         {
             OutgoingRelations.Add(relatedItem);
             relatedItem.AddIngoingRelations(this);
             Priority++;
         }
-
+        /// <summary>
+        /// Adds an out going relation between to items
+        /// </summary>
+        /// <param name="relatedItem">Item that is related</param>
         public void AddIngoingRelations(Item relatedItem)
         {
             IngoingRelations.Add(relatedItem);
         }
-
+        /// <summary>
+        /// Finds an item´s neighbours
+        /// </summary>
+        /// <returns>A list of neighbours</returns>
         public List<Item> Neighbours()
         {
             List<Item> neighbours = new List<Item>();

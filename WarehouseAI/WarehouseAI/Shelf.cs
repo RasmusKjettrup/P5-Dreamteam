@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace WarehouseAI
-{
+{/// <summary>
+/// Container of items. Can contain a maximum of 5 item types. 
+/// </summary>
     public class Shelf : Node
     {
         public string ID;
