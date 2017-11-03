@@ -1,9 +1,11 @@
 package com.jmkjaer.android.p5_qr_reader;
 
+import android.app.Activity;
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.util.Log;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -15,163 +17,69 @@ import java.util.List;
 /**
  * TODO: Add a class header comment!
  */
-class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
-    private final String TAG = "CameraPreview";
+class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
+    private static final String TAG = "CameraPreview";
 
-    SurfaceView mSurfaceView;
-    SurfaceHolder mHolder;
-    Size mPreviewSize;
-    List<Size> mSupportedPreviewSizes;
-    Camera mCamera;
-    Camera.PreviewCallback mPreviewCallback;
-    Camera.AutoFocusCallback mAutoFocusCallback;
+    private Camera _camera;
+    private int _orientation;
+    private Camera.PreviewCallback _previewCallback;
+    private Camera.AutoFocusCallback _autofocusCallback;
 
-    CameraPreview(Context context, Camera.PreviewCallback previewCallback, Camera.AutoFocusCallback autoFocusCb) {
+    public CameraPreview(Context context, Camera.PreviewCallback previewCallback, Camera
+            .AutoFocusCallback autoFocusCallback) {
         super(context);
 
-        mPreviewCallback = previewCallback;
-        mAutoFocusCallback = autoFocusCb;
-        mSurfaceView = new SurfaceView(context);
-        addView(mSurfaceView);
+        this._previewCallback = previewCallback;
+        this._autofocusCallback = autoFocusCallback;
 
-        // Install a SurfaceHolder.Callback so we get notified when the
-        // underlying surface is created and destroyed.
-        mHolder = mSurfaceView.getHolder();
-        mHolder.addCallback(this);
-        mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        SurfaceHolder holder = getHolder();
+        holder.addCallback(this);
+        holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
 
-
     public void setCamera(Camera camera) {
-        mCamera = camera;
-        if (mCamera != null) {
-            mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
+        _camera = camera;
+        if (_camera != null) {
             requestLayout();
         }
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        // We purposely disregard child measurements because act as a
-        // wrapper to a SurfaceView that centers the camera preview instead
-        // of stretching it.
-        final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
-        final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
-        setMeasuredDimension(width, height);
-
-        if (mSupportedPreviewSizes != null) {
-            mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, width, height);
-        }
-    }
-
-    @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        if (changed && getChildCount() > 0) {
-            final View child = getChildAt(0);
-
-            final int width = r - l;
-            final int height = b - t;
-
-            int previewWidth = width;
-            int previewHeight = height;
-            if (mPreviewSize != null) {
-                previewWidth = mPreviewSize.width;
-                previewHeight = mPreviewSize.height;
-            }
-
-            // Center the child SurfaceView within the parent.
-            if (width * previewHeight > height * previewWidth) {
-                final int scaledChildWidth = previewWidth * height / previewHeight;
-                child.layout((width - scaledChildWidth) / 2, 0,
-                        (width + scaledChildWidth) / 2, height);
-            } else {
-                final int scaledChildHeight = previewHeight * width / previewWidth;
-                child.layout(0, (height - scaledChildHeight) / 2,
-                        width, (height + scaledChildHeight) / 2);
-            }
-        }
-    }
-
-    public void hideSurfaceView() {
-        mSurfaceView.setVisibility(View.INVISIBLE);
-    }
-
-    public void showSurfaceView() {
-        mSurfaceView.setVisibility(View.VISIBLE);
-    }
-
     public void surfaceCreated(SurfaceHolder holder) {
-        // The Surface has been created, acquire the camera and tell it where
-        // to draw.
-        try {
-            if (mCamera != null) {
-                mCamera.setPreviewDisplay(holder);
+        if (_camera != null) {
+            try {
+                _camera.setPreviewDisplay(holder);
+            } catch (IOException e) {
+                Log.d(TAG, e.getMessage());
             }
-        } catch (IOException exception) {
-            Log.e(TAG, "IOException caused by setPreviewDisplay()", exception);
+        }
+    }
+
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        if (_camera != null) {
+            Camera.Parameters parameters = _camera.getParameters();
+            List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
+            for (Camera.Size size : previewSizes) {
+                Log.i(TAG, "Height: " + size.height + "     Width: " + size.width);
+            }
+
+            Camera.Size previewSize = previewSizes.get(0); // 1280 x 720 on Huawei Y530
+            parameters.setPreviewSize(previewSize.width, previewSize.height);
+            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+            requestLayout();
+
+            _camera.setDisplayOrientation(90);
+            _camera.setParameters(parameters);
+            _camera.setPreviewCallback(_previewCallback);
+            _camera.startPreview();
+            _camera.autoFocus(_autofocusCallback);
         }
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
-        // Surface will be destroyed when we return, so stop the preview.
-        if (mCamera != null) {
-            mCamera.cancelAutoFocus();
-            mCamera.stopPreview();
+        if (_camera != null) {
+            _camera.cancelAutoFocus();
+            _camera.stopPreview();
+            _camera = null;
         }
     }
-
-
-    private Size getOptimalPreviewSize(List<Size> sizes, int w, int h) {
-        final double ASPECT_TOLERANCE = 0.1;
-        double targetRatio = (double) w / h;
-        if (sizes == null) return null;
-
-        Size optimalSize = null;
-        double minDiff = Double.MAX_VALUE;
-
-        int targetHeight = h;
-
-        // Try to find an size match aspect ratio and size
-        for (Size size : sizes) {
-            double ratio = (double) size.width / size.height;
-            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
-            if (Math.abs(size.height - targetHeight) < minDiff) {
-                optimalSize = size;
-                minDiff = Math.abs(size.height - targetHeight);
-            }
-        }
-
-        // Cannot find the one match the aspect ratio, ignore the requirement
-        if (optimalSize == null) {
-            minDiff = Double.MAX_VALUE;
-            for (Size size : sizes) {
-                if (Math.abs(size.height - targetHeight) < minDiff) {
-                    optimalSize = size;
-                    minDiff = Math.abs(size.height - targetHeight);
-                }
-            }
-        }
-        return optimalSize;
-    }
-
-    public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-        if (holder.getSurface() == null){
-            // preview surface does not exist
-            return;
-        }
-
-        if (mCamera != null) {
-            // Now that the size is known, set up the camera parameters and begin
-            // the preview.
-            Camera.Parameters parameters = mCamera.getParameters();
-            parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
-            requestLayout();
-
-            mCamera.setParameters(parameters);
-            mCamera.setPreviewCallback(mPreviewCallback);
-            mCamera.startPreview();
-            mCamera.autoFocus(mAutoFocusCallback);
-        }
-    }
-
 }

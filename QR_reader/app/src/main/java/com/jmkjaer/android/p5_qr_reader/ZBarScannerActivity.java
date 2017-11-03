@@ -78,13 +78,13 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
         // Open the default i.e. the first rear facing camera.
         mCamera = Camera.open();
         if(mCamera == null) {
-            // Cancel request if mCamera is null.
+            // Cancel request if _camera is null.
             cancelRequest();
             return;
         }
 
         mPreview.setCamera(mCamera);
-        mPreview.showSurfaceView();
+//        mPreview.showSurfaceView();
 
         mPreviewing = true;
     }
@@ -105,7 +105,7 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
             // According to Jason Kuang on http://stackoverflow.com/questions/6519120/how-to-recover-camera-preview-from-sleep,
             // there might be surface recreation problems when the device goes to sleep. So lets just hide it and
             // recreate on resume
-            mPreview.hideSurfaceView();
+//            mPreview.hideSurfaceView();
 
             mPreviewing = false;
             mCamera = null;
