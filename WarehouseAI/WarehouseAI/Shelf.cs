@@ -41,11 +41,18 @@ namespace WarehouseAI
         /// <summary>
         /// Returns whether an item of the same ID is in the shelf
         /// </summary>
-        /// <param name="item">The item to be checked.</param>
+        /// <param name="items">The items to be checked.</param>
         /// <returns></returns>
-        public bool Contains(Item item)
+        public bool Contains(params Item[] items)
         {
-            return _items.Contains(item);
+            foreach (Item item in items)
+            {
+                if (!_items.Contains(item))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
     }

@@ -13,12 +13,12 @@ namespace WarehouseAI
         /// </summary>
         /// <param name="setOfItems">The set of items to calculate upon.</param>
         /// <returns></returns>
-        public static float ImportanceCoefficientAlgorithm(List<Item> setOfItems)
+        public static float ImportanceCoefficientAlgorithm(Item[] setOfItems)
         {
             float a = 0; // Number of Arcs
-            if (setOfItems == null || setOfItems.Count == 0)
+            if (setOfItems == null || setOfItems.Length == 0)
                 throw new ArgumentException("setOfItems Was empty");
-            int n = setOfItems.Count; // Number of nodes in the setOfItems
+            int n = setOfItems.Length; // Number of nodes in the setOfItems
             foreach (Item item in setOfItems)
             {
                 // Adds the number of relations from each item to any other items in setOfItems to the number of arcs
@@ -78,10 +78,92 @@ namespace WarehouseAI
             public float weight;
         }
 
+        public static void AddBook(Item item)
+        {
+            //Create a subnetwork, where each node except the dropoff point is a new FilterShelf node created from the original node
+            Node[] subNetwork = minimalNetwork[0].Append(minimalNetwork.Skip(1).Select(n => new FilterShelf((Shelf)n, item))).ToArray();
+            //The first node of the greedy descent algorithm
+            Node currentNode = subNetwork[0];
+            //All sets in the powerset of all items, where "item" is represented.
+            Item[][] itemSets = allItems.Power().Where(items => items.Contains(item)).ToArray();
+            //The lowest evaluation score between all neighbours are initialized to the max value of float
+            float lowestEvaluation = float.MaxValue;
+            bool cont = true;
+
+            //While cont is still being set to true, new neighbours are still being found
+            while (cont)
+            {
+                cont = false;
+
+                //The 5 first neighbours of the current node, casted to a FilterShelf, where there is still space for new books.
+                //The neighbours are sorted with lowest weight first, so te first 5 is the 5 closest.
+                FilterShelf[] neighbours = currentNode.Neighbours.Where(node => node is FilterShelf).Cast<FilterShelf>()
+                    .Where(shelf => shelf.Capacity != 0).Take(5).ToArray();
+
+                //Check through each neighbour to detect better candidates to place the book in.
+                foreach (FilterShelf shelf in neighbours)
+                {
+                    //First set the filterShelf to contain the new book...
+                    shelf.ContainsFilteredBook = true;
+                    //Then evaluate the placement of the new book.
+                    float eval = EvaluationFunction(subNetwork, itemSets);
+                    //Unequip the book from the shelf again.
+                    shelf.ContainsFilteredBook = false;
+
+                    //Set the new currentNode, if appropriate
+                    if (eval < lowestEvaluation)
+                    {
+                        currentNode = shelf;
+                        lowestEvaluation = eval;
+                        cont = true;
+                    }
+                }
+            }
+
+            //the new book is added to the appropriate node
+            ((FilterShelf)currentNode).Parent.AddBook(item);
+
+            //Set each value with the new item as "marked", and their values need to be updated when caching the weights again.
+            foreach (KeyValuePair<Item[], CacheElement> pair in weightCache)
+            {
+                if (pair.Key.Contains(item))
+                {
+                    pair.Value.marked = true;
+                }
+            }
+        }
+
         private static float EvaluationFunction(Node[] network, Item[][] itemSets)
         {
+            Dictionary<Item[], CacheElement> cache = new Dictionary<Item[], CacheElement>();
+            foreach (Item[] set in itemSets)
+            {
+                cache.Add(set, new CacheElement()
+                {
+                    marked = true,
+                    weight = 0,
+                });
+            }
 
-            return 0;
+            float result = 0;
+
+            foreach (Item[] set in itemSets.OrderByDescending(set => set.Length))
+            {
+                result += EvaluateSet(network, cache, set);
+            }
+
+            return result;
+        }
+
+        private static float EvaluateSet(Node[] network, Dictionary<Item[], CacheElement> cache, Item[] set)
+        {
+            float importance = ImportanceCoefficientAlgorithm(set);
+            if (importance <= 0)
+            {
+                return 0;
+            }
+
+            return importance * Weight(network, cache, set);
         }
 
         /// <summary>
@@ -109,58 +191,6 @@ namespace WarehouseAI
             }
         }
 
-        public static void AddBook(Item item)
-        {
-            //Create a subnetwork, where each node except the dropoff point is a new FilterShelf node created from the original node
-            Node[] subNetwork = minimalNetwork[0].Append(minimalNetwork.Skip(1).Select(n => new FilterShelf((Shelf)n, item))).ToArray();
-            //The first node of the greedy descent algorithm
-            Node currentNode = subNetwork[0];
-            //All sets in the powerset of all items, where "item" is represented.
-            Item[][] itemSets = allItems.Power().Where(items => items.Contains(item)).ToArray();
-            //The lowest evaluation score between all neighbours are initialized to the max value of float
-            float lowestEvaluation = float.MaxValue;
-
-            //While lowestEvaluation is still being reassigned, new neighboirs are still being found
-            while (lowestEvaluation == float.MaxValue)
-            {
-                //In the beginning of all loops, the lE is set to the max value of float
-                lowestEvaluation = float.MaxValue;
-                //The 5 first neighbours of the current node, casted to a FilterShelf, where there is still space for new books.
-                //The neighbours are sorted with lowest weight first, so te first 5 is the 5 closest.
-                FilterShelf[] neighbours = currentNode.Neighbours.Where(node => node is FilterShelf).Cast<FilterShelf>()
-                    .Where(shelf => shelf.Capacity != 0).Take(5).ToArray();
-
-                //Check through each neighbour to detect better candidates to place the book in.
-                foreach (FilterShelf shelf in neighbours)
-                {
-                    //First set the filterShelf to contain the new book...
-                    shelf.ContainsFilteredBook = true;
-                    //Then evaluate the placement of the new book.
-                    float eval = EvaluationFunction(subNetwork, itemSets);
-                    //Unequip the book from the shelf again.
-                    shelf.ContainsFilteredBook = false;
-
-                    //Set the new currentNode, if appropriate
-                    if (eval < lowestEvaluation)
-                    {
-                        currentNode = shelf;
-                        lowestEvaluation = eval;
-                    }
-                }
-            }
-
-            //the new book is added to the appropriate node
-            ((FilterShelf)currentNode).Parent.AddBook(item);
-
-            //Set each value with the new item as "marked", and their values need to be updated when caching the weights again.
-            foreach (KeyValuePair<Item[], CacheElement> pair in weightCache)
-            {
-                if (pair.Key.Contains(item))
-                {
-                    pair.Value.marked = true;
-                }
-            }
-        }
 
         public static void InitializeWeight(params Node[] nodes)
         {
@@ -211,53 +241,57 @@ namespace WarehouseAI
             {
                 emptyElement.marked = false;
             }
-
         }
 
-        public static float Weight(params Item[] i)
+        private static float Weight(Node[] network, Dictionary<Item[], CacheElement> cache, params Item[] itemSet)
         {
-            float TotalWeight = 0;
             List<Frontier> frontiers = new List<Frontier>();
-            frontiers.Add(new Frontier(new[] { minimalNetwork[0] }, i, 0));
+            frontiers.Add(new Frontier(new[] { network[0] }, itemSet, 0));
+            Node dropoff = network[0];
 
-            while (true)
+            while (cache[itemSet].marked)
             {
                 Frontier resultingFrontier = new Frontier(null, null, int.MaxValue);
-                foreach (Frontier f_i in frontiers)
+                foreach (Frontier frontier in frontiers)
                 {
-                    Node f_l = f_i.route.Last();
-                    if (f_i.books.Length >= 1)
+                    Node lastNode = frontier.route.Last();
+                    foreach (Shelf neighbour in lastNode.Neighbours.Where(n => n is Shelf).Cast<Shelf>()
+                        .Where(s => s.Contains(frontier.books)))
                     {
-                        foreach (Shelf g_i in f_l.Neighbours.Cast<Shelf>())
+                        if (!frontiers.Select(f => f.route).Contains(frontier.route.Append(neighbour))
+                            && frontier.weight/*+dist(lastNode, neighbour)*/< resultingFrontier.weight)
                         {
-                            if (g_i.Items.Any(item => f_i.books.Contains(item)))
-                            {
-                                if (!frontiers.Select(f => f.route).Contains(f_i.route.Concat(new[] { g_i }))
-                                    && f_i.weight/*+dist(f_l, g_i)*/< resultingFrontier.weight)
-                                {
-                                    resultingFrontier = new Frontier(f_i.route.Concat(new[] { g_i }).ToArray(),
-                                        f_i.books.Where(item => !g_i.Items.Contains(item)).ToArray(),
-                                        f_i.weight/*+dist(f_l, g_i)*/);
-                                }
-                            }
+                            resultingFrontier = new Frontier(frontier.route.Append(neighbour).ToArray(),
+                                frontier.books.Where(i => !neighbour.Contains(i)).ToArray(),
+                                frontier.weight/*+dist(lastNode, neighbour)*/);
                         }
                     }
-                    else
+                    CacheElement c;
+                    if (cache.TryGetValue(itemSet.Except(frontier.books).ToArray(), out c) && c.marked)
                     {
-                        Node g_0 = minimalNetwork[0];
-                        if (f_i.weight/*+dist(f_l, g_i)*/< resultingFrontier.weight)
+                        if (frontier.weight /*+dist(lastNode,dropoff)*/ < resultingFrontier.weight)
                         {
-                            resultingFrontier = new Frontier(f_i.route.Concat(new[] { g_0 }).ToArray(),
-                                f_i.books, f_i.weight/*+dist(f_l, g_i)*/);
+                            resultingFrontier = new Frontier(frontier.route.Append(dropoff).ToArray(),
+                                frontier.books,
+                                frontier.weight/*+dist(lastNode,dropoff)*/);
                         }
                     }
                 }
                 frontiers.Add(resultingFrontier);
-                if (resultingFrontier.route.Last() == minimalNetwork[0])
+                if (resultingFrontier.route.Last() == dropoff)
                 {
-                    return resultingFrontier.weight;
+                    CacheElement c = cache[itemSet.Except(resultingFrontier.books).ToArray()];
+                    c.marked = false;
+                    c.weight = resultingFrontier.weight;
                 }
             }
+
+            return cache[itemSet].weight;
+        }
+
+        public static float Weight(params Item[] i)
+        {
+            return Weight(minimalNetwork, weightCache, i);
         }
     }
 }

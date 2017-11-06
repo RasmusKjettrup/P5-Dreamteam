@@ -22,6 +22,15 @@ namespace WarehouseAI
             }
         }
 
+        public static IEnumerable<T> Append<T>(this IEnumerable<T> x, T y)
+        {
+            foreach (T t in x)
+            {
+                yield return t;
+            }
+            yield return y;
+        }
+
         /// <summary>
         /// Gets the powerset of the enumeration
         /// </summary>
