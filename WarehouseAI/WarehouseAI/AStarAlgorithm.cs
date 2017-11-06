@@ -24,17 +24,22 @@ namespace WarehouseAI
             return EdgeToCameFrom.weight + gCostToCameFrom;
         }
         */
+
         // Estimated cost from current to goal node.
-        private float Calculate_hCost(Node n)
+        private float Calculate_hCost(Node start, Node goal)
         {
-            throw new NotImplementedException();
+            if (start == null || goal == null)
+            {
+                throw new UnfittingNodeException("cannot calculate distance for A*, nodes are null");
+            }
+            double x1, x2, y1, y2;
+            x1 = start.X;
+            y1 = start.Y;
+            x2 = goal.X;
+            y2 = goal.Y;
+            return (float)Math.Sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
         }
 
-        private void ExploreNode(Node n)
-        {
-            //n.gCost = Calculate_gCost(n);
-            n.hCost = Calculate_hCost(n);
-        }
 
         private Node GetNextNodeToInvestigate()
         {
@@ -51,7 +56,7 @@ namespace WarehouseAI
                     lastNode = n;
                     NodeFound = true;
                 }
-                else if (n.fCost== lastFCost && lastHCost < n.hCost)
+                else if (n.fCost == lastFCost && lastHCost < n.hCost)
                 {
                     lastFCost = n.fCost;
                     lastHCost = n.hCost;
@@ -66,11 +71,17 @@ namespace WarehouseAI
             return lastNode;
         }
          
-        public List<Node> FindPath(Node startingNode, Node endingNode)
+        public List<Node> FindPath(Graph graph, Node startingNode, Node endingNode)
         {
             //Initialize the start node.
             startingNode.gCost = 0;
-            startingNode.hCost = Calculate_hCost(startingNode);
+            startingNode.hCost = Calculate_hCost(startingNode, endingNode);
+
+            //Initialize g-Cost for all nodes in the graph
+            foreach (Node n in graph.Nodes)
+            {
+                n.gCost = 1000000; //1.000.000 being some default high value.
+            }
 
             Node current;
             float temp_gCost;
@@ -103,7 +114,7 @@ namespace WarehouseAI
 
                     neighbour.CameFrom = current;
                     neighbour.gCost = temp_gCost;
-                    neighbour.hCost = Calculate_hCost(neighbour);
+                    neighbour.hCost = Calculate_hCost(neighbour, endingNode);
                 }
             }
 

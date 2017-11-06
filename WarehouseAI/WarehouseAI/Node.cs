@@ -20,6 +20,20 @@ namespace WarehouseAI
         private Node cameFrom;
         #endregion AStar_Fields
 
+        private int x;
+        private int y;
+
+        public int X
+        {
+            get { return x; }
+            set { x = value; }
+        }
+        public int Y
+        {
+            get { return y; }
+            set { y = value; }
+        }
+
         public Node[] Neighbours
         {
             get { return edges.Select(e => e.to).ToArray(); }
