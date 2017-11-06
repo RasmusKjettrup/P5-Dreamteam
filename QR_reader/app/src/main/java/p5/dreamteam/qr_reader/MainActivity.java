@@ -1,8 +1,11 @@
 package p5.dreamteam.qr_reader;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -25,8 +28,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void launchScanner(View v) {
         if (isCameraAvailable()) {
-            Intent intent = new Intent(this, ZBarScannerActivity.class);
-            startActivityForResult(intent, ZBAR_SCANNER_REQUEST);
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) !=
+                    PackageManager.PERMISSION_GRANTED) { // If no permission -> ask, else start
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 0);
+            } else {
+                Intent intent = new Intent(this, ZBarScannerActivity.class);
+                startActivityForResult(intent, ZBAR_SCANNER_REQUEST);
+            }
         } else {
             Toast.makeText(this, "Rear Facing Camera Unavailable", Toast.LENGTH_SHORT).show();
         }
@@ -34,20 +42,18 @@ public class MainActivity extends AppCompatActivity {
 
     public void launchQRScanner(View v) {
         if (isCameraAvailable()) {
-            Intent intent = new Intent(this, ZBarScannerActivity.class);
-            intent.putExtra(ZBarConstants.SCAN_MODES, new int[]{Symbol.QRCODE});
-            startActivityForResult(intent, ZBAR_SCANNER_REQUEST);
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager
+                    .PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 0);
+            } else {
+                Intent intent = new Intent(this, ZBarScannerActivity.class);
+                intent.putExtra(ZBarConstants.SCAN_MODES, new int[]{Symbol.QRCODE});
+                startActivityForResult(intent, ZBAR_SCANNER_REQUEST);
+            }
         } else {
             Toast.makeText(this, "Rear Facing Camera Unavailable", Toast.LENGTH_SHORT).show();
         }
     }
-
-//    public void launchBarcodeScanner(View v) {
-//        if (isCameraAvailable()) {
-//            Intent intent = new Intent(this, ZBarScannerActivity.class);
-//            startActivityForResult(intent, );
-//        }
-//    }
 
     public boolean isCameraAvailable() {
         return getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
