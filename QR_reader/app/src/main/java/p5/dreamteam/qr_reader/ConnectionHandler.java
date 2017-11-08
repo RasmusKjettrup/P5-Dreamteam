@@ -1,14 +1,14 @@
-package com.jmkjaer.android.p5_qr_reader;
+package p5.dreamteam.qr_reader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import com.jmkjaer.android.p5_qr_reader.events.DisconnectionEvent;
-import com.jmkjaer.android.p5_qr_reader.events.DisconnectEventListener;
-import com.jmkjaer.android.p5_qr_reader.events.InputEventListener;
-import com.jmkjaer.android.p5_qr_reader.events.RecievedInputEvent;
+import p5.dreamteam.qr_reader.events.DisconnectionEvent;
+import p5.dreamteam.qr_reader.events.DisconnectEventListener;
+import p5.dreamteam.qr_reader.events.InputEventListener;
+import p5.dreamteam.qr_reader.events.RecievedInputEvent;
 
 
 /**

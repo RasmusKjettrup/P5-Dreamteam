@@ -1,4 +1,4 @@
-package com.jmkjaer.android.p5_qr_reader.events;
+package p5.dreamteam.qr_reader.events;
 
 import java.util.ArrayList;
 import java.util.List;
