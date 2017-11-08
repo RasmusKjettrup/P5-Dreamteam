@@ -68,7 +68,7 @@ namespace WarehouseAI
             return items;
         }
 
-        private static Item[] allItems;
+        private static List<Item> allItems;
         private static Node[] minimalNetwork;
         private static Dictionary<Item[], CacheElement> weightCache;
 
@@ -80,6 +80,12 @@ namespace WarehouseAI
 
         public static void AddBook(Item item)
         {
+            if (allItems == null)
+            {
+                allItems = new List<Item>();
+            }
+            allItems.Add(item);
+
             //Create a subnetwork, where each node except the dropoff point is a new FilterShelf node created from the original node
             Node[] subNetwork = minimalNetwork[0].Append(minimalNetwork.Skip(1).Select(n => new FilterShelf((Shelf)n, item))).ToArray();
             //The first node of the greedy descent algorithm
