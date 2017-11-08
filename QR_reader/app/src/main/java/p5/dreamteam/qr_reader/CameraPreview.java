@@ -16,20 +16,15 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private static final String TAG = "CameraPreview";
 
     private Camera _camera;
-    private int _orientation;
     private Camera.PreviewCallback _previewCallback;
-    private Camera.AutoFocusCallback _autofocusCallback;
 
-    public CameraPreview(Context context, Camera.PreviewCallback previewCallback, Camera
-            .AutoFocusCallback autoFocusCallback) {
+    public CameraPreview(Context context, Camera.PreviewCallback previewCallback) {
         super(context);
 
         this._previewCallback = previewCallback;
-        this._autofocusCallback = autoFocusCallback;
 
         SurfaceHolder holder = getHolder();
         holder.addCallback(this);
-        holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
 
     public void setCamera(Camera camera) {
@@ -66,7 +61,6 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
             _camera.setParameters(parameters);
             _camera.setPreviewCallback(_previewCallback);
             _camera.startPreview();
-            _camera.autoFocus(_autofocusCallback);
         }
     }
 
