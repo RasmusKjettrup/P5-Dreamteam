@@ -11,19 +11,32 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+import p5.dreamteam.qr_reader.events.InputEventListener;
+import p5.dreamteam.qr_reader.events.DisconnectEventListener;
 
 import net.sourceforge.zbar.Symbol;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements InputEventListener, DisconnectEventListener{
     private static final int ZBAR_SCANNER_REQUEST = 0;
     private static final int ZBAR_QR_SCANNER_REQUEST = 1;
     private TextView _txtView;
+    private ConnectionHandler _connectionHandler;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         _txtView = findViewById(R.id.txt_message);
+        _connectionHandler = new ConnectionHandler(this, this);
+        _connectionHandler.clientSetup();
+    }
+
+    public void disconnectEventInvoke(){
+        // Event occurs whenever the client is disconnected from the server
+    }
+
+    public void inputEventInvoked(String string){
+        // Event occurs whenever the client recieves input from the server
     }
 
     public void launchScanner(View v) {
