@@ -12,7 +12,7 @@ namespace WarehouseAI
 
         public Node[] Nodes => _nodes;
 
-        public void ImportRepresentation(string path)
+        public void ImportWarehouse(string path)
         {
             CultureInfo c = (CultureInfo)CultureInfo.CurrentCulture.Clone();
             c.NumberFormat.CurrencyDecimalSeparator = ".";

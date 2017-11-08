@@ -8,7 +8,7 @@ namespace WarehouseAI
     {
         public WarehouseRepresentation warehouse { get; set; }
 
-        private Dictionary<string, Action<string[]>> commands;
+        private readonly Dictionary<string, Action<string[]>> commands;
 
         private bool quit = false;
 
@@ -18,6 +18,7 @@ namespace WarehouseAI
             {
                 {"importwarehouse", ImportWarehouse},
                 {"distance", Distance},
+                {"dist", Distance},
                 {"q", s => Quit()},
             };
         }
@@ -55,7 +56,7 @@ namespace WarehouseAI
         private void ImportWarehouse(string[] args)
         {
             Console.WriteLine("Now importing warehouse...");
-            warehouse.ImportRepresentation(args[0]);
+            warehouse.ImportWarehouse(args[0]);
 
             foreach (Node node in warehouse.Nodes)
             {

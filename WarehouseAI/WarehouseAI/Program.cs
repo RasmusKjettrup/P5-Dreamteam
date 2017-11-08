@@ -11,7 +11,7 @@ namespace WarehouseAI
     {
         private static void Main(string[] args)
         {
-            ConsoleController consoleController = new ConsoleController();
+            IController consoleController = new ConsoleController();
             WarehouseRepresentation warehouse = new WarehouseRepresentation();
 
             consoleController.warehouse = warehouse;
