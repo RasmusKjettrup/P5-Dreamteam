@@ -108,12 +108,12 @@ namespace WarehouseAI
                     // Removes connection to the client causing an exception
                     // Todo: Not sure why this is done here
                     // Todo: Maybe this can simply be done by ClientSockets.Remove(socket);
-                    foreach (Socket clientSocket in ClientSockets)
+                    for (int i = 0; i < ClientSockets.Count; i++)
                     {
-                        if (clientSocket.RemoteEndPoint.ToString().Equals(socket.RemoteEndPoint.ToString()))
+                        if (ClientSockets[i].RemoteEndPoint.ToString().Equals(socket.RemoteEndPoint.ToString()))
                         {
-                            ClientSockets.Remove(clientSocket);
-                            clientSocket.Close();
+                            ClientSockets.Remove(ClientSockets[i]);
+                            socket.Close();
                         }
                     }
                 }
