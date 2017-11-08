@@ -46,7 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AStarAlgorithm.cs" />
-    <Compile Include="Extensions.cs" />
+    <Compile Include="DijkstraAlgorithm.cs" />
     <Compile Include="Frontier.cs" />
     <Compile Include="Graph.cs" />
     <Compile Include="Item.cs" />
