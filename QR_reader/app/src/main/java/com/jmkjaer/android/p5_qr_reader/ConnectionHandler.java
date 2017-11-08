@@ -54,7 +54,7 @@ public class ConnectionHandler {
         try {
             _outputStream.print(data);
             _outputStream.flush();
-            if (data.equals(_endSignal)) // Todo write disconnect-event
+            if (data.equals(_endSignal))
                 _disconnectionEvent.invoke();
         } catch (Exception ioException) {
             ioException.printStackTrace();
@@ -77,7 +77,7 @@ public class ConnectionHandler {
                 // Todo: Implement exception handling
             }
 
-        } while (!message.equals("bye"));
+        } while (!message.equals(""));
     }
 }
 
