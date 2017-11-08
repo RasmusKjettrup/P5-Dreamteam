@@ -1,0 +1,44 @@
+apply plugin: 'com.android.application'
+
+android {
+<<<<<<< HEAD:QR_reader/app/build.gradle
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
+||||||| merged common ancestors
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
+=======
+    compileSdkVersion 25
+    buildToolsVersion '26.0.2'
+>>>>>>> Pc-To-Android-TCP:QR_reader/app/build.gradle
+    defaultConfig {
+        applicationId "P5.Dreamteam.awesome.p5_qr_reader"
+        minSdkVersion 16
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main/java', 'src/main/java/2', 'src/main/java/com/jmkjaer/android/p5_qr_reader/events']
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    testCompile 'junit:junit:4.12'
+    implementation files('libs/zbar.jar')
+}

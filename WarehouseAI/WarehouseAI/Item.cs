@@ -1,0 +1,74 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace WarehouseAI
+{
+    public class Item
+    {
+        /// <summary>
+        /// The ID of the item.
+        /// </summary>
+        public string ID { get; set; }
+        /// <summary>
+        /// The name of the item.
+        /// </summary>
+        public string Name { get; set; }
+
+        public int Priority { get; set; }
+
+        public List<Item> IngoingRelations { get; }
+
+        public List<Item> OutgoingRelations  { get; }
+
+        public Item(string id, string name)
+        {
+            ID = id;
+            Name = name;
+            OutgoingRelations = new List<Item>();
+            IngoingRelations = new List<Item>();
+        }
+        /// <summary>
+        /// Adds an out going relation between to items
+        /// </summary>
+        /// <param name="relatedItem">Item that is related</param>
+        public void AddOutgoingRelation(Item relatedItem)
+        {
+            OutgoingRelations.Add(relatedItem);
+            relatedItem.AddIngoingRelations(this);
+            Priority++;
+        }
+        /// <summary>
+        /// Adds an out going relation between to items
+        /// </summary>
+        /// <param name="relatedItem">Item that is related</param>
+        public void AddIngoingRelations(Item relatedItem)
+        {
+            IngoingRelations.Add(relatedItem);
+        }
+        /// <summary>
+        /// Finds an item´s neighbours
+        /// </summary>
+        /// <returns>A list of neighbours</returns>
+        public List<Item> Neighbours()
+        {
+            List<Item> neighbours = new List<Item>();
+
+            foreach (var ingoing in IngoingRelations )
+            {
+                foreach (var outgoing in OutgoingRelations)
+                {
+                    if (ingoing != outgoing && !neighbours.Contains(ingoing) && !neighbours.Contains(outgoing)) {
+                        neighbours.Add(ingoing);
+                        neighbours.Add(outgoing);
+                    }
+                }
+            }
+
+            return neighbours;
+        }
+
+    }
+}
