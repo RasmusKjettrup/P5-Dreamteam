@@ -13,22 +13,24 @@ namespace WarehouseAI
 
     public class Node
     {
+        public int Id;
+
+        private Edge[] _edges;
         #region AStar_Fields
-        private Edge[] edges;
         private float g_cost;
         private float h_cost;
         private Node cameFrom;
         #endregion AStar_Fields
 
-        private int x;
-        private int y;
+        private float x;
+        private float y;
 
-        public int X
+        public float X
         {
             get { return x; }
             set { x = value; }
         }
-        public int Y
+        public float Y
         {
             get { return y; }
             set { y = value; }
@@ -36,13 +38,13 @@ namespace WarehouseAI
 
         public Node[] Neighbours
         {
-            get { return edges.Select(e => e.to).ToArray(); }
+            get { return _edges.Select(e => e.to).ToArray(); }
         }
 
-        public virtual Edge[] Edges
+        public Edge[] Edges
         {
-            get { return edges; }
-            set { edges = value; }
+            get { return _edges; }
+            set { _edges = value; }
         }
 
         #region AStar_Props

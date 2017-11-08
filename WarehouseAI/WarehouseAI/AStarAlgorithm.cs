@@ -70,15 +70,21 @@ namespace WarehouseAI
             }
             return lastNode;
         }
-         
-        public List<Node> FindPath(Graph graph, Node startingNode, Node endingNode)
+
+        public float FindPath(Node[] graph, Node startingNode, Node endingNode)
+        {
+            Node[] temp;
+            return FindPath(graph, startingNode, endingNode, out temp);
+        }
+
+        public float FindPath(Node[] graph, Node startingNode, Node endingNode, out Node[] path)
         {
             //Initialize the start node.
             startingNode.gCost = 0;
             startingNode.hCost = Calculate_hCost(startingNode, endingNode);
 
             //Initialize g-Cost for all nodes in the graph
-            foreach (Node n in graph.Nodes)
+            foreach (Node n in graph)
             {
                 n.gCost = 1000000; //1.000.000 being some default high value.
             }
@@ -96,7 +102,10 @@ namespace WarehouseAI
                 current = GetNextNodeToInvestigate();
 
                 if (current == endingNode)
-                    return BackTrackPath(endingNode);
+                {
+                    path = BackTrackPath(endingNode).ToArray();
+                    return endingNode.gCost;
+                }
 
                 //  Remove the currently investigated node from the openSet, 
                 //  and add it to the closedSet
@@ -118,7 +127,8 @@ namespace WarehouseAI
                 }
             }
 
-            return null;
+            path = null;
+            return -1;
         }
 
         private List<Node> BackTrackPath(Node endNode)
