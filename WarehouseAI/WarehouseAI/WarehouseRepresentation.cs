@@ -9,8 +9,9 @@ namespace WarehouseAI
     public class WarehouseRepresentation
     {
         private Node[] _nodes;
-
         public Node[] Nodes => _nodes;
+
+        private Network<Shelf> _subNetwork;
 
         public void ImportWarehouse(string path)
         {
@@ -66,7 +67,7 @@ namespace WarehouseAI
                     }
 
                     Node node = nodes.Find(n => n.Id == id);
-                    node.Edges = neighbourNodes.Select(n => new Edge{ from = node, to = n, weight = -1 }).ToArray();
+                    node.Edges = neighbourNodes.Select(n => new Edge { from = node, to = n, weight = -1 }).ToArray();
                 }
                 catch { }
             }
@@ -77,9 +78,35 @@ namespace WarehouseAI
             {
                 foreach (Edge edge in node.Edges)
                 {
-                    edge.weight = (float) Math.Sqrt(Math.Pow(edge.from.X - edge.to.X, 2) + Math.Pow(edge.from.Y - edge.to.Y, 2));
+                    edge.weight = (float)Math.Sqrt(Math.Pow(edge.from.X - edge.to.X, 2) + Math.Pow(edge.from.Y - edge.to.Y, 2));
                 }
             }
+
+            CreateSubNetwork();
+        }
+
+        private void CreateSubNetwork()
+        {
+            _subNetwork = new Network<Shelf>(this, n => n is Shelf, s => new NetworkNode<Shelf>(s));
+
+            foreach (NetworkNode<Node> i in _subNetwork.AllNodes)
+            {
+                List<Edge> edges = new List<Edge>();
+                foreach (NetworkNode<Node> j in _subNetwork.AllNodes)
+                {
+                    Edge edge = new Edge();
+                    edge.from = i;
+                    edge.to = j;
+                    edge.weight = 0; //TODO: Fix the weight of edges in the subnetwork
+                    edges.Add(edge);
+                }
+                i.SetEdges(edges.ToArray());
+            }
+        }
+
+        public void AddBook(Item item)
+        {
+
         }
     }
 }

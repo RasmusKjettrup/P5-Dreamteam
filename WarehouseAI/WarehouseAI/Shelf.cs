@@ -12,7 +12,7 @@ namespace WarehouseAI
 
         public int MaxItemCapacity { get; set; } = 5;
 
-        private readonly List<Item> _items = new List<Item>();
+        protected List<Item> _items = new List<Item>();
 
         public virtual Item[] Items
         {

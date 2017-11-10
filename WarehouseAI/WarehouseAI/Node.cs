@@ -15,7 +15,7 @@ namespace WarehouseAI
     {
         public int Id;
 
-        private Edge[] _edges;
+        protected Edge[] _edges;
         #region AStar_Fields
         private float g_cost;
         private float h_cost;
@@ -36,7 +36,7 @@ namespace WarehouseAI
             set { y = value; }
         }
 
-        public Node[] Neighbours
+        public virtual Node[] Neighbours
         {
             get { return _edges.Select(e => e.to).ToArray(); }
         }

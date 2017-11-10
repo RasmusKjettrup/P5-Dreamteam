@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WarehouseAI
 {
-    public class PlacementAlgorithmClass
+    public static class PlacementAlgorithmClass
     {
         /// <summary>
         /// Calculates the importance coefficient.
