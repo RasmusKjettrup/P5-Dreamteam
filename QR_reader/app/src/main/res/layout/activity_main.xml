@@ -23,7 +23,7 @@
         android:id="@+id/btn_recieveData"
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
-        android:onClick="recieveData"
+        android:onClick="receiveData"
         android:text="Get new route" />
 
     <Button

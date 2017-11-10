@@ -8,20 +8,23 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-import p5.dreamteam.qr_reader.events.InputEventListener;
-import p5.dreamteam.qr_reader.events.DisconnectEventListener;
 
 import net.sourceforge.zbar.Symbol;
 
 import java.util.concurrent.ExecutionException;
 
+import p5.dreamteam.qr_reader.events.DisconnectEventListener;
+import p5.dreamteam.qr_reader.events.InputEventListener;
+
 public class MainActivity extends AppCompatActivity implements InputEventListener, DisconnectEventListener{
     private static final int ZBAR_SCANNER_REQUEST = 0;
     private static final int ZBAR_QR_SCANNER_REQUEST = 1;
     private TextView _txtView;
+    private final static String TAG = "MainActivity";
     private ConnectionHandler _connectionHandler;
 
     @Override
@@ -30,7 +33,6 @@ public class MainActivity extends AppCompatActivity implements InputEventListene
         setContentView(R.layout.activity_main);
         _txtView = findViewById(R.id.txt_message);
         _connectionHandler = new ConnectionHandler(this, this);
-        _connectionHandler.execute();
     }
 
     public void disconnectEventInvoke(){
@@ -74,7 +76,8 @@ public class MainActivity extends AppCompatActivity implements InputEventListene
         return getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
     }
 
-    public void recieveData(View v){
+    public void receiveData(View v){
+        _connectionHandler.execute();
         // Asks server for a new route
         _connectionHandler.sendDataToServer("Requesting route"); // Todo: Make sure server recognizes request
     }
@@ -89,7 +92,16 @@ public class MainActivity extends AppCompatActivity implements InputEventListene
             case ZBAR_SCANNER_REQUEST:
             case ZBAR_QR_SCANNER_REQUEST:
                 if (resultCode == RESULT_OK) {
-                    _txtView.setText(data.getStringExtra(ZBarConstants.SCAN_RESULT));
+                    String result = null;
+                    GoogleAPIRequest request = new GoogleAPIRequest();
+                    try {
+                        result = request.execute(data.getStringExtra(ZBarConstants.SCAN_RESULT)).get();
+                    } catch (InterruptedException e) {
+                        Log.e(TAG, "Connection to server was interrupted.");
+                    } catch (ExecutionException e) {
+                        Log.e(TAG, "Could ot execute due to connection interrupt.");
+                    }
+                    _txtView.setText(result);
                 } else if(resultCode == RESULT_CANCELED && data != null) {
                     String error = data.getStringExtra(ZBarConstants.ERROR_INFO);
                     if(!TextUtils.isEmpty(error)) {
