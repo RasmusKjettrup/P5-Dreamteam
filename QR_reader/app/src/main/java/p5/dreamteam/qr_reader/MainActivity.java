@@ -16,6 +16,8 @@ import p5.dreamteam.qr_reader.events.DisconnectEventListener;
 
 import net.sourceforge.zbar.Symbol;
 
+import java.util.concurrent.ExecutionException;
+
 public class MainActivity extends AppCompatActivity implements InputEventListener, DisconnectEventListener{
     private static final int ZBAR_SCANNER_REQUEST = 0;
     private static final int ZBAR_QR_SCANNER_REQUEST = 1;
@@ -28,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements InputEventListene
         setContentView(R.layout.activity_main);
         _txtView = findViewById(R.id.txt_message);
         _connectionHandler = new ConnectionHandler(this, this);
-        _connectionHandler.clientSetup();
+        _connectionHandler.execute();
     }
 
     public void disconnectEventInvoke(){
@@ -70,6 +72,15 @@ public class MainActivity extends AppCompatActivity implements InputEventListene
 
     public boolean isCameraAvailable() {
         return getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
+    }
+
+    public void recieveData(View v){
+        // Asks server for a new route
+        _connectionHandler.sendDataToServer("Requesting route"); // Todo: Make sure server recognizes request
+    }
+
+    public void updateUserInterface(View v){
+        _txtView.setText(_connectionHandler.getConnectionStatus());
     }
 
     @Override
