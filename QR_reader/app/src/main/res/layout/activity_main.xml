@@ -20,6 +20,13 @@
         android:text="Only QR" />
 
     <Button
+        android:id="@+id/btn_recieveData"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:onClick="recieveData"
+        android:text="Get new route" />
+
+    <Button
         android:id="@+id/btn_updateUI"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

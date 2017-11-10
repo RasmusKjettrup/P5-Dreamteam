@@ -50,7 +50,7 @@ namespace WarehouseAI
         private static void CommandSetup()
         {
             Commands.Add(CommandList, new Action(PrintAllCommands));
-            Commands.Add("\\list-clients", new Action(ListAllClients));
+            Commands.Add("\\clients", new Action(ListAllClients));
             Commands.Add("\\exit", new Action(() => { _running = false; }));
         }
         /// <summary>

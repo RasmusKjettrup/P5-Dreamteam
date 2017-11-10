@@ -56,7 +56,7 @@ public class ConnectionHandler extends AsyncTask<Void, Integer, String>{
         return "Connection Finished:";
     }
 
-    public String getConnectionStatus(){
+    public String getConnectionStatus(){ // Todo: Mostly used for debugge, consider removing
         if (_wasConnected){
             return "Client has been succesfully connected";
         }else if(_currentlyConnecting){
