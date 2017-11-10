@@ -100,7 +100,7 @@ namespace WarehouseAI
 
                     // Invoke event method to handle recieved message
                     MessageRecieved?.Invoke(text);
-                    response = "Client recieved: " + text;
+                    response = "Server recieved: " + text;
                     SendData(socket, response);
                 }
                 else
