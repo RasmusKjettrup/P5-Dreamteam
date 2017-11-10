@@ -62,7 +62,7 @@ namespace WarehouseAITest
             float expected;
             try
             {
-                expected = PlacementAlgorithmClass.ImportanceCoefficientAlgorithm(items);
+                expected = PlacementAlgorithmClass.ImportanceCoefficientAlgorithm(items.ToArray());
             }
             catch (Exception e)
             {
@@ -71,7 +71,7 @@ namespace WarehouseAITest
             // Assert
             if (numberOfItems == 0)
             {
-                Assert.Throws<ArgumentException>(() => PlacementAlgorithmClass.ImportanceCoefficientAlgorithm(items));
+                Assert.Throws<ArgumentException>(() => PlacementAlgorithmClass.ImportanceCoefficientAlgorithm(items.ToArray()));
             }
             else
             {

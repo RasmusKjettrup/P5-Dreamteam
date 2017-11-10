@@ -19,9 +19,9 @@ namespace WarehouseAI
 
         public int Priority { get; set; }
 
-        public List<Item> IngoingRelations { get; }
+        private List<Item> IngoingRelations { get; }
 
-        public List<Item> OutgoingRelations  { get; }
+        private List<Item> OutgoingRelations  { get; }
 
         public Item(string id, string name)
         {
@@ -43,22 +43,9 @@ namespace WarehouseAI
             IngoingRelations.Add(relatedItem);
         }
 
-        public List<Item> Neighbours()
+        public Item[] Neighbours()
         {
-            List<Item> neighbours = new List<Item>();
-
-            foreach (var ingoing in IngoingRelations )
-            {
-                foreach (var outgoing in OutgoingRelations)
-                {
-                    if (ingoing != outgoing && !neighbours.Contains(ingoing) && !neighbours.Contains(outgoing)) {
-                        neighbours.Add(ingoing);
-                        neighbours.Add(outgoing);
-                    }
-                }
-            }
-
-            return neighbours;
+            return OutgoingRelations.ToArray();
         }
 
     }

@@ -22,7 +22,7 @@ namespace WarehouseAI
             foreach (Item item in setOfItems)
             {
                 // Adds the number of relations from each item to any other items in setOfItems to the number of arcs
-                a += item.OutgoingRelations.Count(setOfItems.Contains);
+                a += item.Neighbours().Count(setOfItems.Contains);
             }
             return a / n;
         }
@@ -47,7 +47,7 @@ namespace WarehouseAI
         {
             const int k = 1;
             item.Priority -= k;
-            foreach (Item outgoingRelation in item.OutgoingRelations)
+            foreach (Item outgoingRelation in item.Neighbours())
             {
                 outgoingRelation.Priority++;
             }
@@ -249,6 +249,11 @@ namespace WarehouseAI
             }
         }
 
+        public static float Weight(params Item[] i)
+        {
+            return Weight(minimalNetwork, weightCache, i);
+        }
+
         private static float Weight(Node[] network, Dictionary<Item[], CacheElement> cache, params Item[] itemSet)
         {
             List<Frontier> frontiers = new List<Frontier>();
@@ -293,11 +298,6 @@ namespace WarehouseAI
             }
 
             return cache[itemSet].weight;
-        }
-
-        public static float Weight(params Item[] i)
-        {
-            return Weight(minimalNetwork, weightCache, i);
         }
     }
 }

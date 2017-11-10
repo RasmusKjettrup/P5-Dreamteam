@@ -40,14 +40,11 @@ namespace WarehouseAI
         public static IEnumerable<T[]> Power<T>(this IEnumerable<T> x)
         {
             //Return the power set of length 0 and higher
-            return Power(x, 0);
+            return Power(x.ToArray(), 0);
         }
 
-        private static IEnumerable<T[]> Power<T>(this IEnumerable<T> x, int length)
+        private static IEnumerable<T[]> Power<T>(T[] fullSet, int length)
         {
-            //Get the full set enumerated over
-            T[] fullSet = x.ToArray();
-
             //This is a recursive function, and if the requested length is over the length of the set, stop the recursion
             if (length > fullSet.Length)
             {

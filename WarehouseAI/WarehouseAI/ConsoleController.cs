@@ -19,11 +19,11 @@ namespace WarehouseAI
                 {"importwarehouse", ImportWarehouse},
                 {"distance", Distance},
                 {"dist", Distance},
+                {"quit", s => Quit()},
                 {"q", s => Quit()},
             };
         }
-
-
+        
         public void Start(params string[] args)
         {
             string arg = "";
@@ -33,6 +33,7 @@ namespace WarehouseAI
             }
             foreach (string s in arg.Split('-'))
             {
+                Console.WriteLine(s);
                 Command(s);
             }
 
@@ -65,6 +66,7 @@ namespace WarehouseAI
                 {
                     typ = "Shelf";
                 }
+
                 string neighbours = "";
                 for (int i = 0; i < node.Neighbours.Length; i++)
                 {
@@ -74,6 +76,7 @@ namespace WarehouseAI
                         neighbours += " ";
                     }
                 }
+
                 Console.WriteLine(@"{0} {1} ({2}) [{3}]", node.Id, typ, node.X + " " + node.Y, neighbours);
             }
             Console.WriteLine("Import complete.");

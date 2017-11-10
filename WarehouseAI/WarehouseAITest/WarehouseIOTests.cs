@@ -98,7 +98,7 @@ namespace WarehouseAITest
             {
                 string[] r = relation.Split(',').Select(s => s.Trim()).ToArray();
                 Assert.Contains(items.Find(item => item.ID == r[1]),
-                    items.Find(item => item.ID == r[0]).OutgoingRelations);
+                    items.Find(item => item.ID == r[0]).Neighbours());
             }
         }
     }
