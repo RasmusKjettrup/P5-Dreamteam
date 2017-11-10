@@ -1,0 +1,6 @@
+/home/jakob/P5-Dreamteam/WarehouseAI/WarehouseAI/obj/Debug/.NETFramework,Version=v4.5.2.AssemblyAttribute.cs
+/home/jakob/P5-Dreamteam/WarehouseAI/WarehouseAI/bin/Debug/WarehouseAI.exe.config
+/home/jakob/P5-Dreamteam/WarehouseAI/WarehouseAI/bin/Debug/WarehouseAI.pdb
+/home/jakob/P5-Dreamteam/WarehouseAI/WarehouseAI/bin/Debug/WarehouseAI.exe
+/home/jakob/P5-Dreamteam/WarehouseAI/WarehouseAI/obj/Debug/WarehouseAI.exe
+/home/jakob/P5-Dreamteam/WarehouseAI/WarehouseAI/obj/Debug/WarehouseAI.pdb
