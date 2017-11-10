@@ -16,11 +16,11 @@ namespace WarehouseAITest
             List<Item> items = new List<Item>();
             for (int i = 0; i < numberOfItems; i++)
             {
-                items.Add(new Item(i.ToString(), "item" + i.ToString()));
+                items.Add(new Item(i, "item" + i.ToString()));
             }
             for (int i = 0; i < numberOfRelations; i++)
             {
-                items[i % numberOfItems].AddOutgoingRelation(items.Find(item => item.ID == ((i + 1) % numberOfItems).ToString()));
+                items[i % numberOfItems].AddOutgoingRelation(items.Find(item => item.Id == (i + 1) % numberOfItems));
             }
             return items;
         }
@@ -64,7 +64,7 @@ namespace WarehouseAITest
             {
                 expected = PlacementAlgorithmClass.ImportanceCoefficientAlgorithm(items.ToArray());
             }
-            catch (Exception e)
+            catch
             {
                 expected = 0;
             }
@@ -75,7 +75,7 @@ namespace WarehouseAITest
             }
             else
             {
-                float actual = (float) numberOfRelations / numberOfItems;
+                float actual = (float)numberOfRelations / numberOfItems;
                 Assert.AreEqual(expected, actual);
             }
         }

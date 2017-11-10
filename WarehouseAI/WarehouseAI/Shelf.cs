@@ -34,7 +34,7 @@ namespace WarehouseAI
             }
             else
             {
-                throw new ArgumentException("Shelf " + ID + " already contains a book with ID " + item.ID);
+                throw new ArgumentException("Shelf " + ID + " already contains a book with ID " + item.Id);
             }
         }
 

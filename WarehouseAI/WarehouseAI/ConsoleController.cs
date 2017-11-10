@@ -7,6 +7,7 @@ namespace WarehouseAI
     public class ConsoleController : IController
     {
         public WarehouseRepresentation warehouse { get; set; }
+        public ItemDatabase itemDatabase { get; set; }
 
         private readonly Dictionary<string, Action<string[]>> commands;
 

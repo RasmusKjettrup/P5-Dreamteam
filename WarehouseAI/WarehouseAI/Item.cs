@@ -11,7 +11,7 @@ namespace WarehouseAI
         /// <summary>
         /// The ID of the item.
         /// </summary>
-        public string ID { get; set; }
+        public int Id { get; set; }
         /// <summary>
         /// The name of the item.
         /// </summary>
@@ -23,9 +23,9 @@ namespace WarehouseAI
 
         private List<Item> OutgoingRelations  { get; }
 
-        public Item(string id, string name)
+        public Item(int id, string name)
         {
-            ID = id;
+            Id = id;
             Name = name;
             OutgoingRelations = new List<Item>();
             IngoingRelations = new List<Item>();

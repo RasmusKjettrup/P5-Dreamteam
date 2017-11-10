@@ -53,6 +53,7 @@
     <Compile Include="Graph.cs" />
     <Compile Include="IController.cs" />
     <Compile Include="Item.cs" />
+    <Compile Include="ItemDatabase.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="PlacementAlgorithmClass.cs" />
     <Compile Include="Program.cs" />
