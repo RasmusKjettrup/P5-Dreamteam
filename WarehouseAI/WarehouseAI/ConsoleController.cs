@@ -18,13 +18,15 @@ namespace WarehouseAI
             commands = new Dictionary<string, Action<string[]>>
             {
                 {"importwarehouse", ImportWarehouse},
+                {"importitems", ImportItems},
+                {"importrelations", ImportRelations},
                 {"distance", Distance},
                 {"dist", Distance},
                 {"quit", s => Quit()},
                 {"q", s => Quit()},
             };
         }
-        
+
         public void Start(params string[] args)
         {
             string arg = "";
@@ -79,6 +81,37 @@ namespace WarehouseAI
                 }
 
                 Console.WriteLine(@"{0} {1} ({2}) [{3}]", node.Id, typ, node.X + " " + node.Y, neighbours);
+            }
+            Console.WriteLine("Import complete.");
+        }
+
+        private void ImportItems(string[] args)
+        {
+            Console.WriteLine("Importing items...");
+            itemDatabase.ImportItems(args[0]);
+            foreach (Item item in itemDatabase.Items)
+            {
+                Console.WriteLine(@"{0}: {1}", item.Id, item.Name);
+            }
+            Console.WriteLine("Import complete.");
+        }
+
+        private void ImportRelations(string[] args)
+        {
+            Console.WriteLine("Importing relations on items...");
+            itemDatabase.ImportRelations(args[0]);
+            foreach (Item item in itemDatabase.Items)
+            {
+                string neighbours = "";
+                for (int i = 0; i < item.Neighbours().Length; i++)
+                {
+                    neighbours += item.Neighbours()[i].Id;
+                    if (i != item.Neighbours().Length - 1)
+                    {
+                        neighbours += " ";
+                    }
+                }
+                Console.WriteLine(@"{0}: [{1}]", item.Id, neighbours);
             }
             Console.WriteLine("Import complete.");
         }
