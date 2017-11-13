@@ -48,7 +48,7 @@ namespace WarehouseAI
             //An System.AsyncCallback delegate that references the method to invoke when the operation is complete.
             try
             {
-                socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, ReceiveCallback, socket); // Todo: Add exceptionhandling 
+                socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, ReceiveCallback, socket);
             }
             catch (Exception e)
             {
@@ -67,7 +67,7 @@ namespace WarehouseAI
             
             try
             {
-                Socket socket = (Socket)asyncResult.AsyncState; // Todo: Implement casting exception handling
+                Socket socket = (Socket)asyncResult.AsyncState;
                 if (socket.Connected)
                 {
                     int received;
@@ -146,18 +146,32 @@ namespace WarehouseAI
         {
             int offset = 0;
             byte[] data = Encoding.ASCII.GetBytes(message);
-            socket.BeginSend(data, offset, data.Length, SocketFlags.None, SendCallback, socket); // Todo: Add exceptionhandling
-            _serverSocket.BeginAccept(AcceptCallback, null);
+            try
+            {
+                socket.BeginSend(data, offset, data.Length, SocketFlags.None, SendCallback, socket); 
+                _serverSocket.BeginAccept(AcceptCallback, null);
+            }
+            catch (Exception e)
+            {
+                ErrorOccured?.Invoke(e.Message);
+            }
         }
 
         /// <summary>
         /// Ends a pending async send.
         /// </summary>
         /// <param name="ascyncResult">Status of operation</param>
-        private static void SendCallback(IAsyncResult ascyncResult)
+        private void SendCallback(IAsyncResult ascyncResult)
         {
-            Socket socket = (Socket)ascyncResult.AsyncState; // Todo: Implement some casting exception handling
-            socket.EndSend(ascyncResult); // Todo: Add exceptionhandling
+            try
+            {
+                Socket socket = (Socket)ascyncResult.AsyncState; 
+                socket.EndSend(ascyncResult); 
+            }
+            catch (Exception e)
+            {
+                ErrorOccured?.Invoke(e.Message);
+            }
         }
     }
 }

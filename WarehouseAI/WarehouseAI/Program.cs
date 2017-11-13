@@ -54,6 +54,7 @@ namespace WarehouseAI
             Commands.Add("\\list-clients", new Action(ListAllClients));
             Commands.Add("\\exit", new Action(() => { _running = false; }));
         }
+
         /// <summary>
         /// Marks the error with red
         /// </summary>
