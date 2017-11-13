@@ -8,14 +8,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import net.sourceforge.zbar.Symbol;
-
-import java.util.concurrent.ExecutionException;
 
 import p5.dreamteam.qr_reader.events.DisconnectEventListener;
 import p5.dreamteam.qr_reader.events.InputEventListener;
@@ -82,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements InputEventListene
         _connectionHandler.sendDataToServer("Requesting route"); // Todo: Make sure server recognizes request
     }
 
-    public void updateUserInterface(View v){
+    public void updateUserInterface(View v) {
         _txtView.setText(_connectionHandler.getConnectionStatus());
     }
 
@@ -94,13 +91,14 @@ public class MainActivity extends AppCompatActivity implements InputEventListene
                 if (resultCode == RESULT_OK) {
                     String result = null;
                     GoogleAPIRequest request = new GoogleAPIRequest();
-                    try {
-                        result = request.execute(data.getStringExtra(ZBarConstants.SCAN_RESULT)).get();
-                    } catch (InterruptedException e) {
-                        Log.e(TAG, "Connection to server was interrupted.");
-                    } catch (ExecutionException e) {
-                        Log.e(TAG, "Could ot execute due to connection interrupt.");
-                    }
+                    result = data.getStringExtra(ZBarConstants.SCAN_RESULT);
+//                    try {
+//                        result = request.execute(data.getStringExtra(ZBarConstants.SCAN_RESULT)).get();
+//                    } catch (InterruptedException e) {
+//                        Log.e(TAG, "Connection to server was interrupted.");
+//                    } catch (ExecutionException e) {
+//                        Log.e(TAG, "Could ot execute due to connection interrupt.");
+//                    }
                     _txtView.setText(result);
                 } else if(resultCode == RESULT_CANCELED && data != null) {
                     String error = data.getStringExtra(ZBarConstants.ERROR_INFO);
