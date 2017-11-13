@@ -19,7 +19,7 @@ namespace WarehouseAI
             {
                 if (include(node))
                 {
-                    nodes.Add(conversion((T)node));
+                    nodes.Add(conversion(node));
                 }
             }
             Nodes = nodes.ToArray();

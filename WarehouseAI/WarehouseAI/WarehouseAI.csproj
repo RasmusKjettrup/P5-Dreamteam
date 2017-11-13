@@ -49,6 +49,7 @@
     <Compile Include="DijkstraAlgorithm.cs" />
     <Compile Include="ConsoleController.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="FilteredShelf.cs" />
     <Compile Include="Frontier.cs" />
     <Compile Include="Graph.cs" />
     <Compile Include="IController.cs" />

@@ -79,7 +79,7 @@ namespace WarehouseAI
         //    }
         //    allItems.Add(item);
 
-        //    //Create a subnetwork, where each node except the dropoff point is a new FilteredShelf node created from the original node
+        //    //Create a subnetwork, where each node except the dropoff point is a new FilteredShelfNetworkNode node created from the original node
         //    Node[] subNetwork = _minimalNetwork[0].Append(_minimalNetwork.Skip(1).Select(n => new FilterShelf((Shelf)n, item))).ToArray();
         //    //The first node of the greedy descent algorithm
         //    Node currentNode = subNetwork[0];
@@ -94,7 +94,7 @@ namespace WarehouseAI
         //    {
         //        cont = false;
 
-        //        //The 5 first neighbours of the current node, casted to a FilteredShelf, where there is still space for new books.
+        //        //The 5 first neighbours of the current node, casted to a FilteredShelfNetworkNode, where there is still space for new books.
         //        //The neighbours are sorted with lowest weight first, so te first 5 is the 5 closest.
         //        FilterShelf[] neighbours = currentNode.Neighbours.Where(node => node is FilterShelf).Cast<FilterShelf>()
         //            .Where(shelf => shelf.Capacity != 0).Take(5).ToArray();

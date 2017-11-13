@@ -23,27 +23,4 @@ namespace WarehouseAI
             _edges = _edges.OrderBy(e => e.weight).ToArray();
         }
     }
-
-    public class FilteredShelf : Shelf
-    {
-        public Shelf Parent;
-        public bool AddFilteredItem = false;
-        public int Capacity = 5;
-
-        private Item _filterItem;
-        
-        public new Item[] Items {
-            get {
-                return (AddFilteredItem
-                    ? Parent.Items.Where(i => i != _filterItem).Append(_filterItem)
-                    : Parent.Items.Where(i => i != _filterItem)).ToArray();
-            }
-        }
-
-        public FilteredShelf(Shelf parent, Item filterItem)
-        {
-            _filterItem = filterItem;
-            Parent = parent;
-        }
-    }
 }

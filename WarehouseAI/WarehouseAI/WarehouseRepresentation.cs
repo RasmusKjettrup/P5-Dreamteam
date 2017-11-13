@@ -99,6 +99,10 @@ namespace WarehouseAI
                 s => new NetworkNode<FilteredShelf>(new FilteredShelf((Shelf)s, item)));
             Node currentNode = filterNetwork.Dropoff;
 
+            if (_cache == null)
+            {
+                _cache = new WeightCache(ItemDatabase.Items.Power().ToArray());
+            }
             if (!ItemDatabase.Items.Contains(item))
             {
                 ItemDatabase.AddBook(item);
@@ -129,18 +133,24 @@ namespace WarehouseAI
                     }
                 }
             }
+            try
+            {
+                ((FilteredShelf)currentNode).Parent.AddBook(item);
+            }
+            catch
+            {
 
-            ((FilteredShelf)currentNode).Parent.AddBook(item);
+            }
 
             _cache.MarkItem(item);
         }
 
         private float EvaluationFunction<T>(Network<T> network, Item[][] itemSets) where T : Node
         {
+            itemSets = itemSets.OrderByDescending(i => i.Length).ToArray();
             WeightCache cache = new WeightCache(itemSets);
 
             float result = 0;
-
             foreach (Item[] set in itemSets.OrderByDescending(set => set.Length))
             {
                 result += EvaluateSet(network, cache, set);
