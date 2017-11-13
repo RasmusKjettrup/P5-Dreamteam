@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -75,9 +76,14 @@ namespace WarehouseAI
             }
         }
 
-        private static void ServerOnMessageRecieved(string s)
+        private static void ServerOnMessageRecieved(string data, string client)
         {
-            throw new NotImplementedException();
+            switch (data[0])
+            {
+                case 'Q': break; // Todo: Qr Message was recieved from client 
+                case 'R': break; // Todo: Route request recieved from client
+                default: Console.WriteLine($"The following message was recieved from the IP {client}: {data}"); break;
+            }
         }
         /// <summary>
         /// Prints the list of clients

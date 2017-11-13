@@ -15,7 +15,7 @@ namespace WarehouseAI
         private readonly Socket _serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         private const int Port = 100;
         private readonly IPAddress _ipAddress;
-        public event Action<string> MessageRecieved;
+        public event Action<string,string> MessageRecieved;
         public event Action<string> ErrorOccured;
 
         public WarehouseServerIO()
@@ -53,7 +53,7 @@ namespace WarehouseAI
         /// <summary>
         /// Stops a recieve call and reads the data from a client and gives it to the MessageRecieved event.
         /// </summary>
-        /// <param name="asyncResult">Status of operation</param> Todo: Write what this thing does when we are sure.
+        /// <param name="asyncResult">Status of operation</param>
         private void ReceiveCallback(IAsyncResult asyncResult)
         {
             int offset = 0;
@@ -99,7 +99,7 @@ namespace WarehouseAI
                     }
 
                     // Invoke event method to handle recieved message
-                    MessageRecieved?.Invoke(text);
+                    MessageRecieved?.Invoke(text,socket.RemoteEndPoint.ToString());
                     response = "Client recieved: " + text;
                     SendData(socket, response);
                 }
@@ -137,7 +137,7 @@ namespace WarehouseAI
         /// <summary>
         /// Ends a pending async send.
         /// </summary>
-        /// <param name="ascyncResult">Status of operation</param> Todo: Write what this thing does when we are sure.
+        /// <param name="ascyncResult">Status of operation</param>
         private static void SendCallback(IAsyncResult ascyncResult)
         {
             Socket socket = (Socket)ascyncResult.AsyncState; // Todo: Implement some casting exception handling
