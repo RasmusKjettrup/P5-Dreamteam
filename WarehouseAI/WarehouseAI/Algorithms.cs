@@ -102,7 +102,7 @@ namespace WarehouseAI
                         .Where(s => s.Contains(frontier.books)))
                     {
                         if (!frontiers.Select(f => f.route).Contains(frontier.route.Append(neighbour))
-                            && frontier.weight/*+dist(lastNode, neighbour)*/<= resultingFrontier.weight)
+                            && frontier.weight/*+dist(lastNode, neighbour)*/< resultingFrontier.weight)
                         {
                             resultingFrontier = new Frontier(frontier.route.Append(neighbour).ToArray(),
                                 frontier.books.Where(i => !neighbour.Contains(i)).ToArray(),
@@ -112,7 +112,7 @@ namespace WarehouseAI
                     CacheElement c;
                     if (cache.TryGet(itemSet.Except(frontier.books).ToArray(), out c) && c.Marked)
                     {
-                        if (frontier.weight /*+dist(lastNode,dropoff)*/ <= resultingFrontier.weight)
+                        if (frontier.weight /*+dist(lastNode,dropoff)*/ < resultingFrontier.weight)
                         {
                             resultingFrontier = new Frontier(frontier.route.Append(dropoff).ToArray(),
                                 frontier.books,

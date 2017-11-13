@@ -125,14 +125,7 @@ namespace WarehouseAI
                     }
                 }
             }
-            try
-            {
-                currentNode.Parent.AddBook(item);
-            }
-            catch
-            {
-
-            }
+            currentNode.Parent.AddBook(item);
 
             _cache.MarkItem(item);
         }
