@@ -117,7 +117,10 @@ public class ConnectionHandler extends AsyncTask<Void, Integer, String>{
         @Override
         public void run() {
             listenToServer();
-
+            if (_pendingOutput != ""){
+                sendData(_pendingOutput);
+                _pendingOutput = "";
+            }
             /*if (!_wasConnected || !_currentlyConnecting){
                 _currentlyConnecting = true;
                 clientSetup();

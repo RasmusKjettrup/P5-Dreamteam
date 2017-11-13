@@ -46,7 +46,14 @@ namespace WarehouseAI
             ClientSockets.Add(socket);
             // socket.RemoteEndPoint.ToString(); <- IP address of Client
             //An System.AsyncCallback delegate that references the method to invoke when the operation is complete.
-            socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, ReceiveCallback, socket); // Todo: Add exceptionhandling 
+            try
+            {
+                socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, ReceiveCallback, socket); // Todo: Add exceptionhandling 
+            }
+            catch (Exception e)
+            {
+                ErrorOccured?.Invoke(e.Message);
+            }
             _serverSocket.BeginAccept(AcceptCallback, null);
         }
 
@@ -57,68 +64,77 @@ namespace WarehouseAI
         private void ReceiveCallback(IAsyncResult asyncResult)
         {
             int offset = 0;
-            Socket socket = (Socket)asyncResult.AsyncState; // Todo: Implement casting exception handling
-            if (socket.Connected)
+            
+            try
             {
-                int received;
-                try
+                Socket socket = (Socket)asyncResult.AsyncState; // Todo: Implement casting exception handling
+                if (socket.Connected)
                 {
-                    // Ends a pending async read and stores the number of bytes recieved
-                    received = socket.EndReceive(asyncResult);
-                }
-                catch (Exception e)
-                {
-                    // Removes connection to the client causing an exception
-                    // Todo: Maybe this can simply be done by ClientSockets.Remove(socket);
-                    foreach (Socket clientSocket in ClientSockets)
+                    int received;
+                    try
                     {
-                        if (clientSocket.RemoteEndPoint.ToString().Equals(socket.RemoteEndPoint.ToString()))
-                        {
-                            ClientSockets.Remove(clientSocket);
-                            clientSocket.Close();
-                        }
+                        // Ends a pending async read and stores the number of bytes recieved
+                        received = socket.EndReceive(asyncResult);
                     }
-                    ErrorOccured?.Invoke(e.Message);
-                    return;
-                }
-                if (received != 0)
-                {
-                    byte[] dataBuffer = new byte[received];
-                    Array.Copy(_buffer, dataBuffer, received);
-                    string text = Encoding.ASCII.GetString(dataBuffer);
-
-                    string response = string.Empty;
-                    
-                    // Method stops when recieving an end signal from client
-                    // Todo: Consider changing stopsignal
-                    if (text == "bye")
+                    catch (Exception e)
                     {
-                        ClientSockets.Remove(socket);
-                        socket.Close();
+                        // Removes connection to the client causing an exception
+                        // Todo: Maybe this can simply be done by ClientSockets.Remove(socket);
+                        foreach (Socket clientSocket in ClientSockets)
+                        {
+                            if (clientSocket.RemoteEndPoint.ToString().Equals(socket.RemoteEndPoint.ToString()))
+                            {
+                                ClientSockets.Remove(clientSocket);
+                                clientSocket.Close();
+                            }
+                        }
+                        ErrorOccured?.Invoke(e.Message);
                         return;
                     }
-
-                    // Invoke event method to handle recieved message
-                    MessageRecieved?.Invoke(text,socket.RemoteEndPoint.ToString());
-                    response = "Client recieved: " + text;
-                    SendData(socket, response);
-                }
-                else
-                {
-                    // Removes connection to the client causing an exception
-                    // Todo: Not sure why this is done here
-                    // Todo: Maybe this can simply be done by ClientSockets.Remove(socket);
-                    for (int i = 0; i < ClientSockets.Count; i++)
+                    if (received != 0)
                     {
-                        if (ClientSockets[i].RemoteEndPoint.ToString().Equals(socket.RemoteEndPoint.ToString()))
+                        byte[] dataBuffer = new byte[received];
+                        Array.Copy(_buffer, dataBuffer, received);
+                        string text = Encoding.ASCII.GetString(dataBuffer);
+
+                        string response = string.Empty;
+
+                        // Method stops when recieving an end signal from client
+                        // Todo: Consider changing stopsignal
+                        if (text == "bye")
                         {
-                            ClientSockets.Remove(ClientSockets[i]);
+                            ClientSockets.Remove(socket);
                             socket.Close();
+                            return;
+                        }
+
+                        // Invoke event method to handle recieved message
+                        MessageRecieved?.Invoke(text, socket.RemoteEndPoint.ToString());
+                        response = "Client recieved: " + text;
+                        SendData(socket, response);
+                    }
+                    else
+                    {
+                        // Removes connection to the client causing an exception
+                        // Todo: Not sure why this is done here
+                        // Todo: Maybe this can simply be done by ClientSockets.Remove(socket);
+                        for (int i = 0; i < ClientSockets.Count; i++)
+                        {
+                            if (ClientSockets[i].RemoteEndPoint.ToString().Equals(socket.RemoteEndPoint.ToString()))
+                            {
+                                ClientSockets.Remove(ClientSockets[i]);
+                                socket.Close();
+                            }
                         }
                     }
                 }
+                socket.BeginReceive(_buffer, offset, _buffer.Length, SocketFlags.None, ReceiveCallback, socket);
             }
-            socket.BeginReceive(_buffer, offset, _buffer.Length, SocketFlags.None, ReceiveCallback, socket);
+            catch (Exception e)
+            {
+                ErrorOccured?.Invoke(e.Message);
+            }
+            
         }
 
         /// <summary>
