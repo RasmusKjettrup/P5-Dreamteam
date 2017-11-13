@@ -92,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements InputEventListene
                     String result = null;
                     GoogleAPIRequest request = new GoogleAPIRequest();
                     result = data.getStringExtra(ZBarConstants.SCAN_RESULT);
+                    // COMMENTED OUT BELOW: SEARCH ISBN
 //                    try {
 //                        result = request.execute(data.getStringExtra(ZBarConstants.SCAN_RESULT)).get();
 //                    } catch (InterruptedException e) {

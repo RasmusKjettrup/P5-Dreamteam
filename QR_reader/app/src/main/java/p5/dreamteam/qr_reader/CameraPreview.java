@@ -52,8 +52,10 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
                 Log.i(TAG, "Height: " + size.height + "     Width: " + size.width);
             }
 
-            Camera.Size previewSize = previewSizes.get(0); // 1280 x 720 on Huawei Y530
-            parameters.setPreviewSize(previewSize.width, previewSize.height);
+
+//            Camera.Size previewSize = previewSizes.get(0); // 1280 x 720 on Huawei Y530
+//            parameters.setPreviewSize(previewSize.width, previewSize.height);
+            parameters.setPreviewSize(320, 240);
             parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
             parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
             requestLayout();
