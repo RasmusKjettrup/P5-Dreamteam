@@ -33,6 +33,11 @@ namespace WarehouseAI
                 }
             }
         }
+
+        public bool TryGet(Item[] set, out CacheElement c)
+        {
+            return _cache.TryGetValue(set, out c);
+        }
     }
 
     public class CacheElement

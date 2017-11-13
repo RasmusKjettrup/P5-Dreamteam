@@ -2,15 +2,16 @@ using System.Linq;
 
 namespace WarehouseAI
 {
-    public class FilteredShelf : Shelf
+    public class FilteredShelfNetworkNode : NetworkNode
     {
-        public Shelf Parent;
+        public new Shelf Parent;
+
         public bool AddFilteredItem = false;
         public int Capacity = 5;
 
         private Item _filterItem;
         
-        public new Item[] Items {
+        public Item[] Items {
             get {
                 return (AddFilteredItem
                     ? Parent.Items.Where(i => i != _filterItem).Append(_filterItem)
@@ -18,12 +19,9 @@ namespace WarehouseAI
             }
         }
 
-        public override Node[] Neighbours => Parent.Neighbours;
-
-        public FilteredShelf(Shelf parent, Item filterItem)
+        public FilteredShelfNetworkNode(Shelf parent, Item filterItem) : base(parent)
         {
             _filterItem = filterItem;
-            Parent = parent;
         }
     }
 }

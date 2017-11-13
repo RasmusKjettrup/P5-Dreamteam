@@ -4,18 +4,18 @@ using System;
 
 namespace WarehouseAI
 {
-    public class Edge
+    public class Edge<T>
     {
         public float weight;
-        public Node to;
-        public Node from;
+        public T to;
+        public T from;
     }
 
     public class Node
     {
         public int Id;
 
-        protected Edge[] _edges;
+        protected Edge<Node>[] _edges;
         #region AStar_Fields
         private float g_cost;
         private float h_cost;
@@ -41,7 +41,7 @@ namespace WarehouseAI
             get { return _edges.Select(e => e.to).ToArray(); }
         }
 
-        public Edge[] Edges
+        public Edge<Node>[] Edges
         {
             get { return _edges; }
             set { _edges = value; }
@@ -69,13 +69,13 @@ namespace WarehouseAI
         }
         #endregion AStar_Props
 
-        public Edge GetEdgeToNeighbour(Node neighbour)
+        public Edge<Node> GetEdgeToNeighbour(Node neighbour)
         {
             if (Neighbours.Contains<Node>(neighbour) != true)
             {
                 throw new UnfittingNodeException("GetEdgeToNeighbour: The input node is not recognized as a neighbour");
             }
-            foreach (Edge e in Edges)
+            foreach (Edge<Node> e in Edges)
             {
                 if (e.to == neighbour || e.from == neighbour)
                 {

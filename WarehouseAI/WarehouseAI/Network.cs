@@ -4,17 +4,17 @@ using System.Linq;
 
 namespace WarehouseAI
 {
-    public class Network<T> where T : Node
+    public class Network<T> where T : NetworkNode
     {
-        public readonly NetworkNode<Node> Dropoff;
-        public readonly NetworkNode<T>[] Nodes;
-        public NetworkNode<Node>[] AllNodes => Dropoff.Append(Nodes.Select(n => n.Cast())).ToArray();
+        public readonly NetworkNode Dropoff;
+        public readonly T[] Nodes;
+        public NetworkNode[] AllNodes => Dropoff.Append(Nodes).ToArray();
 
-        public Network(Node[] graph, Func<Node, bool> include, Func<Node, NetworkNode<T>> conversion)
+        public Network(Node[] graph, Func<Node, bool> include, Func<Node, T> conversion)
         {
-            Dropoff = new NetworkNode<Node>(graph[0]);
+            Dropoff = new NetworkNode(graph[0]);
 
-            List<NetworkNode<T>> nodes = new List<NetworkNode<T>>();
+            List<T> nodes = new List<T>();
             foreach (Node node in graph.Skip(1))
             {
                 if (include(node))
@@ -24,15 +24,15 @@ namespace WarehouseAI
             }
             Nodes = nodes.ToArray();
 
-            foreach (NetworkNode<Node> i in AllNodes)
+            foreach (NetworkNode i in AllNodes)
             {
-                List<Edge> edges = new List<Edge>();
-                foreach (NetworkNode<Node> j in AllNodes)
+                List<Edge<NetworkNode>> edges = new List<Edge<NetworkNode>>();
+                foreach (NetworkNode j in AllNodes)
                 {
-                    Edge edge = new Edge();
+                    Edge<NetworkNode> edge = new Edge<NetworkNode>();
                     edge.from = i;
                     edge.to = j;
-                    edge.weight = 0; //TODO: Fix the weight of edges in the subnetwork
+                    edge.weight = 2; //TODO: Fix the weight of edges in the subnetwork
                     edges.Add(edge);
                 }
                 i.SetEdges(edges.ToArray());

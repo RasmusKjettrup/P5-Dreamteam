@@ -1,23 +1,32 @@
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 
 namespace WarehouseAI
 {
-    public class NetworkNode<T> : Node where T: Node
+    public class ShelfNetworkNode : NetworkNode
     {
-        public T Parent;
+        public new Shelf Parent;
 
-        public NetworkNode(T parent)
+        public ShelfNetworkNode(Node parent) : base(parent)
+        {}
+    }
+    public class NetworkNode : Node
+    {
+        public Node Parent;
+
+        protected new Edge<NetworkNode>[] _edges;
+        public new NetworkNode[] Neighbours => _edges.Select(e => e.to).ToArray();
+
+        public NetworkNode(Node parent)
         {
             Parent = parent;
         }
 
-        public NetworkNode<Node> Cast()
+        public NetworkNode Cast()
         {
-            return new NetworkNode<Node>(Parent);
+            return new NetworkNode(Parent);
         }
 
-        public void SetEdges(Edge[] edges)
+        public void SetEdges(Edge<NetworkNode>[] edges)
         {
             _edges = edges;
             _edges = _edges.OrderBy(e => e.weight).ToArray();

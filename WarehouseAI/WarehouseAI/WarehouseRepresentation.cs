@@ -14,7 +14,7 @@ namespace WarehouseAI
         public Node[] Nodes => _nodes;
         private WeightCache _cache;
 
-        private Network<Shelf> _subNetwork;
+        private Network<ShelfNetworkNode> _subNetwork;
 
         public void ImportWarehouse(string path)
         {
@@ -70,7 +70,7 @@ namespace WarehouseAI
                     }
 
                     Node node = nodes.Find(n => n.Id == id);
-                    node.Edges = neighbourNodes.Select(n => new Edge { from = node, to = n, weight = -1 }).ToArray();
+                    node.Edges = neighbourNodes.Select(n => new Edge<Node> { from = node, to = n, weight = -1 }).ToArray();
                 }
                 catch { }
             }
@@ -79,7 +79,7 @@ namespace WarehouseAI
 
             foreach (Node node in _nodes)
             {
-                foreach (Edge edge in node.Edges)
+                foreach (Edge<Node> edge in node.Edges)
                 {
                     edge.weight = (float)Math.Sqrt(Math.Pow(edge.from.X - edge.to.X, 2) + Math.Pow(edge.from.Y - edge.to.Y, 2));
                 }
@@ -90,24 +90,16 @@ namespace WarehouseAI
 
         private void CreateSubNetwork()
         {
-            _subNetwork = new Network<Shelf>(_nodes, n => n is Shelf, s => new NetworkNode<Shelf>((Shelf)s));
+            _subNetwork = new Network<ShelfNetworkNode>(_nodes, n => n is Shelf, s => new ShelfNetworkNode((Shelf)s));
         }
 
         public void AddBook(Item item)
         {
-            Network<FilteredShelf> filterNetwork = new Network<FilteredShelf>(_nodes, n => n is Shelf,
-                s => new NetworkNode<FilteredShelf>(new FilteredShelf((Shelf)s, item)));
-            Node currentNode = filterNetwork.Dropoff;
+            Network<FilteredShelfNetworkNode> filterNetwork = new Network<FilteredShelfNetworkNode>(
+                _nodes, n => n is Shelf,
+                s => new FilteredShelfNetworkNode((Shelf)s, item));
+            FilteredShelfNetworkNode currentNode = filterNetwork.Nodes[0];
 
-            if (_cache == null)
-            {
-                _cache = new WeightCache(ItemDatabase.Items.Power().ToArray());
-            }
-            if (!ItemDatabase.Items.Contains(item))
-            {
-                ItemDatabase.AddBook(item);
-                _cache = new WeightCache(ItemDatabase.Items.Power().ToArray());
-            }
             Item[][] itemSets = ItemDatabase.Items.Power().Where(i => i.Contains(item)).ToArray();
             float lowestEvaluation = float.MaxValue;
             bool cont = true;
@@ -116,10 +108,10 @@ namespace WarehouseAI
             {
                 cont = false;
 
-                FilteredShelf[] neighbours = currentNode.Neighbours.Where(n => n is FilteredShelf)
-                    .Cast<FilteredShelf>().Where(n => n.Capacity > 0).Take(5).ToArray();
+                FilteredShelfNetworkNode[] neighbours = currentNode.Neighbours.Where(n => n is FilteredShelfNetworkNode)
+                    .Cast<FilteredShelfNetworkNode>().Where(n => n.Capacity > 0).Take(5).ToArray();
 
-                foreach (FilteredShelf neighbour in neighbours)
+                foreach (FilteredShelfNetworkNode neighbour in neighbours)
                 {
                     neighbour.AddFilteredItem = true;
                     float eval = EvaluationFunction(filterNetwork, itemSets);
@@ -135,7 +127,7 @@ namespace WarehouseAI
             }
             try
             {
-                ((FilteredShelf)currentNode).Parent.AddBook(item);
+                currentNode.Parent.AddBook(item);
             }
             catch
             {
@@ -145,7 +137,7 @@ namespace WarehouseAI
             _cache.MarkItem(item);
         }
 
-        private float EvaluationFunction<T>(Network<T> network, Item[][] itemSets) where T : Node
+        private float EvaluationFunction<T>(Network<T> network, Item[][] itemSets) where T : NetworkNode
         {
             itemSets = itemSets.OrderByDescending(i => i.Length).ToArray();
             WeightCache cache = new WeightCache(itemSets);
@@ -159,7 +151,7 @@ namespace WarehouseAI
             return result;
         }
 
-        private float EvaluateSet<T>(Network<T> network, WeightCache cache, Item[] itemSet) where T : Node
+        private float EvaluateSet<T>(Network<T> network, WeightCache cache, Item[] itemSet) where T : NetworkNode
         {
             float importance = Algorithms.Importance(itemSet);
 
@@ -168,7 +160,7 @@ namespace WarehouseAI
                 return 0;
             }
 
-            return importance * Algorithms.Weight(network.AllNodes, cache, itemSet);
+            return importance * Algorithms.Weight(network.AllNodes.Select(n => n.Parent).ToArray(), cache, itemSet);
         }
     }
 }

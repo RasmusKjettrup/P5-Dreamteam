@@ -8,6 +8,9 @@ namespace WarehouseAI
 {
     public static class Algorithms
     {
+        private static Network<ShelfNetworkNode> _minimalNetwork;
+        private static WeightCache _cache;
+
         /// <summary>
         /// Calculates the importance coefficient.
         /// </summary>
@@ -67,115 +70,23 @@ namespace WarehouseAI
             List<Item> items = setOfItems.OrderBy(i => i.Priority).Reverse().ToList();
             return items;
         }
-        
-        private static Network<Shelf> _minimalNetwork;
-        private static WeightCache _cache;
 
-        //public static void AddBook(Item item)
-        //{
-        //    if (allItems == null)
-        //    {
-        //        allItems = new List<Item>();
-        //    }
-        //    allItems.Add(item);
-
-        //    //Create a subnetwork, where each node except the dropoff point is a new FilteredShelfNetworkNode node created from the original node
-        //    Node[] subNetwork = _minimalNetwork[0].Append(_minimalNetwork.Skip(1).Select(n => new FilterShelf((Shelf)n, item))).ToArray();
-        //    //The first node of the greedy descent algorithm
-        //    Node currentNode = subNetwork[0];
-        //    //All sets in the powerset of all items, where "item" is represented.
-        //    Item[][] itemSets = allItems.Power().Where(items => items.Contains(item)).ToArray();
-        //    //The lowest evaluation score between all neighbours are initialized to the max value of float
-        //    float lowestEvaluation = float.MaxValue;
-        //    bool cont = true;
-
-        //    //While cont is still being set to true, new neighbours are still being found
-        //    while (cont)
-        //    {
-        //        cont = false;
-
-        //        //The 5 first neighbours of the current node, casted to a FilteredShelfNetworkNode, where there is still space for new books.
-        //        //The neighbours are sorted with lowest weight first, so te first 5 is the 5 closest.
-        //        FilterShelf[] neighbours = currentNode.Neighbours.Where(node => node is FilterShelf).Cast<FilterShelf>()
-        //            .Where(shelf => shelf.Capacity != 0).Take(5).ToArray();
-
-        //        //Check through each neighbour to detect better candidates to place the book in.
-        //        foreach (FilterShelf shelf in neighbours)
-        //        {
-        //            //First set the filterShelf to contain the new book...
-        //            shelf.ContainsFilteredBook = true;
-        //            //Then evaluate the placement of the new book.
-        //            float eval = EvaluationFunction(subNetwork, itemSets);
-        //            //Unequip the book from the shelf again.
-        //            shelf.ContainsFilteredBook = false;
-
-        //            //Set the new currentNode, if appropriate
-        //            if (eval < lowestEvaluation)
-        //            {
-        //                currentNode = shelf;
-        //                lowestEvaluation = eval;
-        //                cont = true;
-        //            }
-        //        }
-        //    }
-
-        //    //the new book is added to the appropriate node
-        //    ((FilterShelf)currentNode).Parent.AddBook(item);
-
-        //    //Set each value with the new item as "marked", and their values need to be updated when caching the weights again.
-        //    foreach (KeyValuePair<Item[], CacheElement> pair in weightCache)
-        //    {
-        //        if (pair.Key.Contains(item))
-        //        {
-        //            pair.Value.marked = true;
-        //        }
-        //    }
-        //}
-
-        //private static float EvaluationFunction(Node[] graph, Item[][] itemSets)
-        //{
-        //    Dictionary<Item[], CacheElement> cache = new Dictionary<Item[], CacheElement>();
-        //    foreach (Item[] set in itemSets)
-        //    {
-        //        cache.Add(set, new CacheElement()
-        //        {
-        //            marked = true,
-        //            weight = 0,
-        //        });
-        //    }
-
-        //    float result = 0;
-
-        //    foreach (Item[] set in itemSets.OrderByDescending(set => set.Length))
-        //    {
-        //        result += EvaluateSet(graph, cache, set);
-        //    }
-
-        //    return result;
-        //}
-
-        //private static float EvaluateSet(Node[] graph, Dictionary<Item[], CacheElement> cache, Item[] set)
-        //{
-        //    float importance = Importance(set);
-        //    if (importance <= 0)
-        //    {
-        //        return 0;
-        //    }
-
-        //    return importance * Weight(graph, cache, set);
-        //}
-        
         public static void InitializeWeight(params Node[] nodes)
         {
-            _minimalNetwork = new Network<Shelf>(nodes, n => n is Shelf, n => new NetworkNode<Shelf>((Shelf)n));
+            _minimalNetwork = new Network<ShelfNetworkNode>(nodes, n => n is Shelf, n => new ShelfNetworkNode((Shelf)n));
         }
 
-        public static float Weight(params Item[] itemSet)
+        public static void InitializeCache(ItemDatabase itemDatabase)
         {
-            return Weight(_minimalNetwork.AllNodes, _cache, itemSet);
+            _cache = new WeightCache(itemDatabase.Items.Power().ToArray());
         }
 
-        public static float Weight(Node[] graph, WeightCache cache, params Item[] itemSet)
+        public static float Weight(Item[] itemSet)
+        {
+            return Weight(_minimalNetwork.AllNodes.Select(n => n.Parent).ToArray(), _cache, itemSet);
+        }
+
+        public static float Weight(Node[] graph, WeightCache cache, Item[] itemSet)
         {
             List<Frontier> frontiers = new List<Frontier>();
             frontiers.Add(new Frontier(new[] { graph[0] }, itemSet, 0));
@@ -191,16 +102,17 @@ namespace WarehouseAI
                         .Where(s => s.Contains(frontier.books)))
                     {
                         if (!frontiers.Select(f => f.route).Contains(frontier.route.Append(neighbour))
-                            && frontier.weight/*+dist(lastNode, neighbour)*/< resultingFrontier.weight)
+                            && frontier.weight/*+dist(lastNode, neighbour)*/<= resultingFrontier.weight)
                         {
                             resultingFrontier = new Frontier(frontier.route.Append(neighbour).ToArray(),
                                 frontier.books.Where(i => !neighbour.Contains(i)).ToArray(),
                                 frontier.weight/*+dist(lastNode, neighbour)*/);
                         }
                     }
-                    if (cache[itemSet.Except(frontier.books).ToArray()].Marked)
+                    CacheElement c;
+                    if (cache.TryGet(itemSet.Except(frontier.books).ToArray(), out c) && c.Marked)
                     {
-                        if (frontier.weight /*+dist(lastNode,dropoff)*/ < resultingFrontier.weight)
+                        if (frontier.weight /*+dist(lastNode,dropoff)*/ <= resultingFrontier.weight)
                         {
                             resultingFrontier = new Frontier(frontier.route.Append(dropoff).ToArray(),
                                 frontier.books,
