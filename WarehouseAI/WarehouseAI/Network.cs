@@ -10,11 +10,12 @@ namespace WarehouseAI
         public readonly NetworkNode<T>[] Nodes;
         public NetworkNode<Node>[] AllNodes => Dropoff.Append(Nodes.Select(n => n.Cast())).ToArray();
 
-        public Network(WarehouseRepresentation warehouse, Func<Node, bool> include, Func<T, NetworkNode<T>> conversion)
+        public Network(Node[] graph, Func<Node, bool> include, Func<Node, NetworkNode<T>> conversion)
         {
-            Dropoff = new NetworkNode<Node>(warehouse.Nodes[0]);
+            Dropoff = new NetworkNode<Node>(graph[0]);
+
             List<NetworkNode<T>> nodes = new List<NetworkNode<T>>();
-            foreach (Node node in warehouse.Nodes.Skip(1))
+            foreach (Node node in graph.Skip(1))
             {
                 if (include(node))
                 {
@@ -22,6 +23,20 @@ namespace WarehouseAI
                 }
             }
             Nodes = nodes.ToArray();
+
+            foreach (NetworkNode<Node> i in AllNodes)
+            {
+                List<Edge> edges = new List<Edge>();
+                foreach (NetworkNode<Node> j in AllNodes)
+                {
+                    Edge edge = new Edge();
+                    edge.from = i;
+                    edge.to = j;
+                    edge.weight = 0; //TODO: Fix the weight of edges in the subnetwork
+                    edges.Add(edge);
+                }
+                i.SetEdges(edges.ToArray());
+            }
         }
     }
 }

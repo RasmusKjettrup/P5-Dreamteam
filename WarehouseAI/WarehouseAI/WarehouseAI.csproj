@@ -57,11 +57,12 @@
     <Compile Include="Network.cs" />
     <Compile Include="NetworkNode.cs" />
     <Compile Include="Node.cs" />
-    <Compile Include="PlacementAlgorithmClass.cs" />
+    <Compile Include="Algorithms.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shelf.cs" />
     <Compile Include="WarehouseRepresentation.cs" />
+    <Compile Include="WeightCache.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -1,10 +1,16 @@
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace WarehouseAI
 {
     public class NetworkNode<T> : Node where T: Node
     {
         public T Parent;
+
+        public NetworkNode(T parent)
+        {
+            Parent = parent;
+        }
 
         public NetworkNode<Node> Cast()
         {
@@ -16,20 +22,17 @@ namespace WarehouseAI
             _edges = edges;
             _edges = _edges.OrderBy(e => e.weight).ToArray();
         }
-
-        public NetworkNode(T parent)
-        {
-            Parent = parent;
-        }
     }
 
-    public class FilterShelf : NetworkNode<Shelf>
+    public class FilteredShelf : Shelf
     {
+        public Shelf Parent;
         public bool AddFilteredItem = false;
+        public int Capacity = 5;
 
         private Item _filterItem;
-
-        public Item[] Items {
+        
+        public new Item[] Items {
             get {
                 return (AddFilteredItem
                     ? Parent.Items.Where(i => i != _filterItem).Append(_filterItem)
@@ -37,9 +40,10 @@ namespace WarehouseAI
             }
         }
 
-        public FilterShelf(Shelf parent, Item filterItem) : base(parent)
+        public FilteredShelf(Shelf parent, Item filterItem)
         {
             _filterItem = filterItem;
+            Parent = parent;
         }
     }
 }

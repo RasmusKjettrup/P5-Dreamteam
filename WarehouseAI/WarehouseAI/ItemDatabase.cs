@@ -60,6 +60,9 @@ namespace WarehouseAI
             }
         }
 
-
+        public void AddBook(Item item)
+        {
+            _items.Add(item);
+        }
     }
 }

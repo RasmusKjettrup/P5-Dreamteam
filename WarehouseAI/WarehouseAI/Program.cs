@@ -17,6 +17,7 @@ namespace WarehouseAI
 
             consoleController.warehouse = warehouse;
             consoleController.itemDatabase = itemDatabase;
+            warehouse.ItemDatabase = itemDatabase;
 
             consoleController.Start(args);
         }
