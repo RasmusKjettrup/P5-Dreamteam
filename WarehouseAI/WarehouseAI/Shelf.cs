@@ -14,12 +14,22 @@ namespace WarehouseAI
             public int instances;
         }
 
-        public int MaxCapacity { get; set; } = 5;
+        public int MaxCapacity { get; } = 5;
+
+        public int RemaningCapacity {
+            get {
+                int capacity = MaxCapacity;
+                foreach (ItemInstance instance in _itemInstances)
+                {
+                    capacity -= instance.instances;
+                }
+                return capacity;
+            }
+        }
 
         protected List<ItemInstance> _itemInstances = new List<ItemInstance>();
 
-        public virtual Item[] Items
-        {
+        public virtual Item[] Items {
             get { return _itemInstances.Select(i => i.item).ToArray(); }
         }
 
@@ -54,7 +64,7 @@ namespace WarehouseAI
         }
 
         /// <summary>
-        /// Returns wether all items in "items" are already on the shelf
+        /// Returns true if any of the items in "items" are already on the shelf
         /// </summary>
         /// <param name="items">The items to be checked.</param>
         /// <returns></returns>
@@ -62,13 +72,12 @@ namespace WarehouseAI
         {
             foreach (Item item in items)
             {
-                if (!_itemInstances.Select(i => i.item).Contains(item))
+                if (Items.Contains(item))
                 {
-                    return false;
+                    return true;
                 }
             }
-            return true;
+            return false;
         }
-
     }
 }

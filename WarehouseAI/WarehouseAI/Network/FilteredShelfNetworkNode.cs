@@ -9,7 +9,7 @@ namespace WarehouseAI
 
         private Item _filterItem;
         
-        public Item[] Items {
+        public override Item[] Items {
             get {
                 return (AddFilteredItem
                     ? ((Shelf)Parent).Items.Where(i => i != _filterItem).Append(_filterItem)
@@ -20,6 +20,7 @@ namespace WarehouseAI
         public FilteredShelfNetworkNode(Shelf parent, Item filterItem) : base(parent)
         {
             _filterItem = filterItem;
+            Capacity = parent.RemaningCapacity;
         }
     }
 }

@@ -6,7 +6,17 @@ namespace WarehouseAI
     public class WeightCache
     {
         private Dictionary<Item[], CacheElement> _cache;
-        public CacheElement this[Item[] index] => _cache[index];
+
+        public CacheElement this[Item[] index] {
+            get {
+                CacheElement c;
+                if (TryGet(index, out c))
+                {
+                    return c;
+                }
+                return null;
+            }
+        }
 
         public WeightCache(Item[][] itemSets)
         {
@@ -21,6 +31,7 @@ namespace WarehouseAI
             {
                 emptyElement.Marked = false;
             }
+
         }
 
         public void MarkItem(Item item)
@@ -36,7 +47,25 @@ namespace WarehouseAI
 
         public bool TryGet(Item[] set, out CacheElement c)
         {
-            return _cache.TryGetValue(set, out c);
+            c = null;
+            foreach (KeyValuePair<Item[], CacheElement> pair in _cache)
+            {
+                bool found = true;
+                foreach (Item item in set)
+                {
+                    if (!pair.Key.Contains(item))
+                    {
+                        found = false;
+                        break;
+                    }
+                }
+                if (found || pair.Key.Length == 0 && set.Length == 0)
+                {
+                    c = pair.Value;
+                    return true;
+                }
+            }
+            return false;
         }
     }
 
