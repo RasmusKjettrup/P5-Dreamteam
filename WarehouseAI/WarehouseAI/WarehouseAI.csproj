@@ -49,13 +49,14 @@
     <Compile Include="DijkstraAlgorithm.cs" />
     <Compile Include="ConsoleController.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="FilteredShelfNetworkNode.cs" />
+    <Compile Include="Network\FilteredShelfNetworkNode.cs" />
     <Compile Include="Frontier.cs" />
     <Compile Include="IController.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="ItemDatabase.cs" />
-    <Compile Include="Network.cs" />
-    <Compile Include="NetworkNode.cs" />
+    <Compile Include="Network\Network.cs" />
+    <Compile Include="Network\NetworkNode.cs" />
+    <Compile Include="Network\ShelfNetworkNode.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="Algorithms.cs" />
     <Compile Include="Program.cs" />

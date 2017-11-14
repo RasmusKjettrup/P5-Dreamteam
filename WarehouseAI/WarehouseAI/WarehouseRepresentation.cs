@@ -102,16 +102,16 @@ namespace WarehouseAI
 
         public void AddBook(Item item)
         {
-            if (!_addedItems.Contains(item))
-            {
-                _addedItems.Add(item);
-            }
 
             Network<FilteredShelfNetworkNode> filterNetwork = new Network<FilteredShelfNetworkNode>(
                 _nodes, n => n is Shelf,
                 s => new FilteredShelfNetworkNode((Shelf)s, item));
             FilteredShelfNetworkNode currentNode = filterNetwork.Nodes[0];
 
+            if (!_addedItems.Contains(item))
+            {
+                _addedItems.Add(item);
+            }
             Item[][] itemSets = _addedItems.Power().Where(i => i.Contains(item)).ToArray();
             float lowestEvaluation = float.MaxValue;
             bool cont = true;
@@ -165,7 +165,7 @@ namespace WarehouseAI
                 return 0;
             }
 
-            return importance * Algorithms.Weight(network.AllNodes.Select(n => n.Parent).ToArray(), cache, itemSet);
+            return importance * Algorithms.Weight(network.AllNodes.ToArray(), cache, itemSet);
         }
     }
 }

@@ -20,7 +20,6 @@ namespace WarehouseAI
         public FilteredShelfNetworkNode(Shelf parent, Item filterItem) : base(parent)
         {
             _filterItem = filterItem;
-            Parent = parent;
         }
     }
 }

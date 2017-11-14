@@ -28,10 +28,10 @@ namespace WarehouseAI
 
             foreach (NetworkNode i in AllNodes)
             {
-                List<Edge<NetworkNode>> edges = new List<Edge<NetworkNode>>();
+                List<Edge<Node>> edges = new List<Edge<Node>>();
                 foreach (NetworkNode j in AllNodes)
                 {
-                    Edge<NetworkNode> edge = new Edge<NetworkNode>();
+                    Edge<Node> edge = new Edge<Node>();
                     edge.from = i;
                     edge.to = j;
                     edge.weight = 2; //aStar.FindPath(graph, i.Parent, j.Parent); //TODO: Fix the weight of edges in the subnetwork

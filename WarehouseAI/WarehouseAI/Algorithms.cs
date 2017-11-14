@@ -112,7 +112,7 @@ namespace WarehouseAI
                     CacheElement c;
                     if (cache.TryGet(itemSet.Except(frontier.books).ToArray(), out c) && c.Marked)
                     {
-                        if (frontier.weight /*+dist(lastNode,dropoff)*/ < resultingFrontier.weight)
+                        if (frontier.weight/*+dist(lastNode,dropoff)*/ < resultingFrontier.weight)
                         {
                             resultingFrontier = new Frontier(frontier.route.Append(dropoff).ToArray(),
                                 frontier.books,
