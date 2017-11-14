@@ -14,30 +14,32 @@ import android.widget.Toast;
 
 import net.sourceforge.zbar.Symbol;
 
-import p5.dreamteam.qr_reader.events.DisconnectEventListener;
-import p5.dreamteam.qr_reader.events.InputEventListener;
+import java.util.concurrent.ExecutionException;
 
-public class MainActivity extends AppCompatActivity implements InputEventListener, DisconnectEventListener{
+public class MainActivity extends AppCompatActivity {
+
     private static final int ZBAR_SCANNER_REQUEST = 0;
     private static final int ZBAR_QR_SCANNER_REQUEST = 1;
     private TextView _txtView;
+    private TextView _txtResponse;
     private final static String TAG = "MainActivity";
-    private ConnectionHandler _connectionHandler;
+    ConnectionTask task;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         _txtView = findViewById(R.id.txt_message);
-        _connectionHandler = new ConnectionHandler(this, this);
-    }
+        _txtResponse = findViewById(R.id.txt_response);
 
-    public void disconnectEventInvoke(){
-        // Event occurs whenever the client is disconnected from the server
-    }
-
-    public void inputEventInvoked(String string){
-        // Event occurs whenever the client recieves input from the server
+        task = new ConnectionTask("192.168.43.7", 100, "Hello, server!");
+        try {
+            _txtResponse.setText(task.execute().get());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     public void launchScanner(View v) {
@@ -73,34 +75,13 @@ public class MainActivity extends AppCompatActivity implements InputEventListene
         return getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
     }
 
-    public void receiveData(View v){
-        _connectionHandler.execute();
-        // Asks server for a new route
-        _connectionHandler.sendDataToServer("Requesting route"); // Todo: Make sure server recognizes request
-    }
-
-    public void updateUserInterface(View v) {
-        _txtView.setText(_connectionHandler.getConnectionStatus());
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case ZBAR_SCANNER_REQUEST:
             case ZBAR_QR_SCANNER_REQUEST:
                 if (resultCode == RESULT_OK) {
-                    String result = null;
-                    GoogleAPIRequest request = new GoogleAPIRequest();
-                    result = data.getStringExtra(ZBarConstants.SCAN_RESULT);
-                    // COMMENTED OUT BELOW: SEARCH ISBN
-//                    try {
-//                        result = request.execute(data.getStringExtra(ZBarConstants.SCAN_RESULT)).get();
-//                    } catch (InterruptedException e) {
-//                        Log.e(TAG, "Connection to server was interrupted.");
-//                    } catch (ExecutionException e) {
-//                        Log.e(TAG, "Could ot execute due to connection interrupt.");
-//                    }
-                    _txtView.setText(result);
+                    _txtView.setText("Data sent");
                 } else if(resultCode == RESULT_CANCELED && data != null) {
                     String error = data.getStringExtra(ZBarConstants.ERROR_INFO);
                     if(!TextUtils.isEmpty(error)) {
