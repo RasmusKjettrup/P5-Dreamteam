@@ -6,15 +6,15 @@ namespace WarehouseAI
     {
         public Node Parent { get; set; }
 
+        public ShelfNetworkNode(Shelf parent)
+        {
+            Parent = parent;
+        }
+
         public void SetEdges(Edge<Node>[] edges)
         {
             _edges = edges;
             _edges = _edges.OrderBy(e => e.weight).ToArray();
-        }
-
-        public ShelfNetworkNode(Shelf parent)
-        {
-            Parent = parent;
         }
     }
 }

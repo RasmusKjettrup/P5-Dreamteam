@@ -5,7 +5,7 @@ namespace WarehouseAI
     public class FilteredShelfNetworkNode : ShelfNetworkNode
     {
         public bool AddFilteredItem = false;
-        public int Capacity = 5;
+        public int Capacity;
 
         private Item _filterItem;
         
