@@ -119,7 +119,7 @@ namespace WarehouseAI
 
         private void AddBook(string[] args)
         {
-            Console.WriteLine("Adding book...");
+            Console.WriteLine("Adding item...");
             Item item = itemDatabase.Items.First(i => i.Id == int.Parse(args[0]));
             warehouse.AddBook(item);
             foreach (Node node in warehouse.Nodes)

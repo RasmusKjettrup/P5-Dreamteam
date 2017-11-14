@@ -24,6 +24,8 @@ namespace WarehouseAI
             }
             Nodes = nodes.ToArray();
 
+            AStarAlgorithm aStar = new AStarAlgorithm();
+
             foreach (NetworkNode i in AllNodes)
             {
                 List<Edge<NetworkNode>> edges = new List<Edge<NetworkNode>>();
@@ -32,7 +34,7 @@ namespace WarehouseAI
                     Edge<NetworkNode> edge = new Edge<NetworkNode>();
                     edge.from = i;
                     edge.to = j;
-                    edge.weight = 2; //TODO: Fix the weight of edges in the subnetwork
+                    edge.weight = 2; //aStar.FindPath(graph, i.Parent, j.Parent); //TODO: Fix the weight of edges in the subnetwork
                     edges.Add(edge);
                 }
                 i.SetEdges(edges.ToArray());

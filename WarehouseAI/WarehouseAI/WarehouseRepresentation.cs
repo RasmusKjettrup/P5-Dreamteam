@@ -9,6 +9,7 @@ namespace WarehouseAI
     public class WarehouseRepresentation
     {
         public ItemDatabase ItemDatabase;
+        private List<Item> _addedItems;
 
         private Node[] _nodes;
         public Node[] Nodes => _nodes;
@@ -93,14 +94,25 @@ namespace WarehouseAI
             _subNetwork = new Network<ShelfNetworkNode>(_nodes, n => n is Shelf, s => new ShelfNetworkNode((Shelf)s));
         }
 
+        public void Inintialize()
+        {
+            _addedItems = new List<Item>();
+            _cache = new WeightCache(ItemDatabase.Items.Power().ToArray());
+        }
+
         public void AddBook(Item item)
         {
+            if (!_addedItems.Contains(item))
+            {
+                _addedItems.Add(item);
+            }
+
             Network<FilteredShelfNetworkNode> filterNetwork = new Network<FilteredShelfNetworkNode>(
                 _nodes, n => n is Shelf,
                 s => new FilteredShelfNetworkNode((Shelf)s, item));
             FilteredShelfNetworkNode currentNode = filterNetwork.Nodes[0];
 
-            Item[][] itemSets = ItemDatabase.Items.Power().Where(i => i.Contains(item)).ToArray();
+            Item[][] itemSets = _addedItems.Power().Where(i => i.Contains(item)).ToArray();
             float lowestEvaluation = float.MaxValue;
             bool cont = true;
 

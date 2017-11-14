@@ -8,15 +8,19 @@ namespace WarehouseAI
 {
     public class Shelf : Node
     {
-        public string ID;
+        protected class ItemInstance
+        {
+            public Item item;
+            public int instances;
+        }
 
-        public int MaxItemCapacity { get; set; } = 5;
+        public int MaxCapacity { get; set; } = 5;
 
-        protected List<Item> _items = new List<Item>();
+        protected List<ItemInstance> _itemInstances = new List<ItemInstance>();
 
         public virtual Item[] Items
         {
-            get { return _items.ToArray(); }
+            get { return _itemInstances.Select(i => i.item).ToArray(); }
         }
 
         /// <summary>
@@ -25,21 +29,32 @@ namespace WarehouseAI
         /// <param name="item">The item to be added.</param>
         public void AddBook(Item item)
         {
+            int books = 0;
+            foreach (ItemInstance instance in _itemInstances)
+            {
+                books += instance.instances;
+            }
+            if (books >= MaxCapacity)
+            {
+                throw new ArgumentException("Shelf " + Id + "is already full");
+            }
+
             if (Contains(item))
             {
-                if(_items.Count < MaxItemCapacity)
-                    _items.Add(item);
-                else
-                    throw new ArgumentException("Shelf " + ID + "is already full");
+                _itemInstances.Find(i => i.item == item).instances++;
             }
             else
             {
-                throw new ArgumentException("Shelf " + ID + " already contains a book with ID " + item.Id);
+                _itemInstances.Add(new ItemInstance()
+                {
+                    item = item,
+                    instances = 1,
+                });
             }
         }
 
         /// <summary>
-        /// Returns whether an item of the same ID is in the shelf
+        /// Returns wether all items in "items" are already on the shelf
         /// </summary>
         /// <param name="items">The items to be checked.</param>
         /// <returns></returns>
@@ -47,7 +62,7 @@ namespace WarehouseAI
         {
             foreach (Item item in items)
             {
-                if (!_items.Contains(item))
+                if (!_itemInstances.Select(i => i.item).Contains(item))
                 {
                     return false;
                 }

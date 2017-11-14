@@ -2,13 +2,6 @@ using System.Linq;
 
 namespace WarehouseAI
 {
-    public class ShelfNetworkNode : NetworkNode
-    {
-        public new Shelf Parent;
-
-        public ShelfNetworkNode(Node parent) : base(parent)
-        {}
-    }
     public class NetworkNode : Node
     {
         public Node Parent;

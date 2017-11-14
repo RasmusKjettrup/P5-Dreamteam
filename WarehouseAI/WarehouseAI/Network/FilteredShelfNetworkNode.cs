@@ -2,10 +2,8 @@ using System.Linq;
 
 namespace WarehouseAI
 {
-    public class FilteredShelfNetworkNode : NetworkNode
+    public class FilteredShelfNetworkNode : ShelfNetworkNode
     {
-        public new Shelf Parent;
-
         public bool AddFilteredItem = false;
         public int Capacity = 5;
 
@@ -22,6 +20,7 @@ namespace WarehouseAI
         public FilteredShelfNetworkNode(Shelf parent, Item filterItem) : base(parent)
         {
             _filterItem = filterItem;
+            Parent = parent;
         }
     }
 }

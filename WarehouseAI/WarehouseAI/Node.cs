@@ -21,22 +21,11 @@ namespace WarehouseAI
         private float h_cost;
         private Node cameFrom;
         #endregion AStar_Fields
+        
+        public float X { get; set; }
+        public float Y { get; set; }
 
-        private float x;
-        private float y;
-
-        public float X
-        {
-            get { return x; }
-            set { x = value; }
-        }
-        public float Y
-        {
-            get { return y; }
-            set { y = value; }
-        }
-
-        public virtual Node[] Neighbours
+        public Node[] Neighbours
         {
             get { return _edges.Select(e => e.to).ToArray(); }
         }
