@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
               android:orientation="vertical"
               android:padding="5dp"
               android:gravity="center"
@@ -33,13 +34,21 @@
         android:onClick="updateUserInterface"
         android:text="Update"/>
 
-    <TextView
-        android:id="@+id/txt_message"
+    <EditText
+        android:id="@+id/edt_text_to_send"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:minWidth="50dp"/>
 
     <TextView
         android:id="@+id/txt_response"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView"/>
+
+    <TextView
+        android:id="@+id/txt_scanned_result"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="TextView"/>

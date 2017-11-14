@@ -34,7 +34,12 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
     }
 
     private String receiveDataFromServer() {
-        return "hello";
+        try {
+            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "Server says " + data;
     }
 
     @Override
@@ -42,14 +47,14 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
         super.onPostExecute(s);
     }
 
-    private void sendDataToServer(String data) {
+    public void sendDataToServer(String data) {
         try {
             socket = new Socket(ip, port);
             writer = new PrintWriter(socket.getOutputStream(), true);
-            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             writer.print(data);
             writer.flush();
+            socket.close();
         } catch (IOException e) {
             Log.d(TAG, "IO not found");
         }

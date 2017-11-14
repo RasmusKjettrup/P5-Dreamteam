@@ -9,10 +9,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import net.sourceforge.zbar.Symbol;
 
 import java.util.concurrent.ExecutionException;
 
@@ -20,26 +19,23 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int ZBAR_SCANNER_REQUEST = 0;
     private static final int ZBAR_QR_SCANNER_REQUEST = 1;
-    private TextView _txtView;
     private TextView _txtResponse;
+    private EditText _editTextToSend;
+    private TextView _txtScannedResult;
+
     private final static String TAG = "MainActivity";
+    private String serverResponse;
+    private String customTextToSend;
+    private String dataToSend;
     ConnectionTask task;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        _txtView = findViewById(R.id.txt_message);
+        _txtScannedResult = findViewById(R.id.txt_scanned_result);
         _txtResponse = findViewById(R.id.txt_response);
-
-        task = new ConnectionTask("192.168.43.7", 100, "Hello, server!");
-        try {
-            _txtResponse.setText(task.execute().get());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
+        _editTextToSend = findViewById(R.id.edt_text_to_send);
     }
 
     public void launchScanner(View v) {
@@ -49,21 +45,6 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 0);
             } else {
                 Intent intent = new Intent(this, ZBarScannerActivity.class);
-                startActivityForResult(intent, ZBAR_SCANNER_REQUEST);
-            }
-        } else {
-            Toast.makeText(this, "Rear Facing Camera Unavailable", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void launchQRScanner(View v) {
-        if (isCameraAvailable()) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager
-                    .PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 0);
-            } else {
-                Intent intent = new Intent(this, ZBarScannerActivity.class);
-                intent.putExtra(ZBarConstants.SCAN_MODES, new int[]{Symbol.QRCODE});
                 startActivityForResult(intent, ZBAR_SCANNER_REQUEST);
             }
         } else {
@@ -81,7 +62,9 @@ public class MainActivity extends AppCompatActivity {
             case ZBAR_SCANNER_REQUEST:
             case ZBAR_QR_SCANNER_REQUEST:
                 if (resultCode == RESULT_OK) {
-                    _txtView.setText("Data sent");
+                    dataToSend = data.getStringExtra(ZBarConstants.SCAN_RESULT);
+                    sendDataToServer(dataToSend);
+                    _txtScannedResult.setText(dataToSend);
                 } else if(resultCode == RESULT_CANCELED && data != null) {
                     String error = data.getStringExtra(ZBarConstants.ERROR_INFO);
                     if(!TextUtils.isEmpty(error)) {
@@ -90,5 +73,23 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
         }
+    }
+
+    public void sendDataToServer(String data) {
+        task = new ConnectionTask("192.168.43.7", 100, data);
+        try {
+            serverResponse = task.execute().get();
+            _txtResponse.setText(serverResponse);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateUserInterface(View view) {
+        sendDataToServer(_editTextToSend.getText().toString());
+        _txtScannedResult.setText(dataToSend);
+        _txtResponse.setText(serverResponse);
     }
 }
