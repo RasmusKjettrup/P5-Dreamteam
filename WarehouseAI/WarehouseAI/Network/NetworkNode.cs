@@ -2,18 +2,13 @@ using System.Linq;
 
 namespace WarehouseAI
 {
-    public class NetworkNode : Node
+    public class NetworkNode : Node, INetworkNode
     {
-        public Node Parent;
+        public Node Parent { get; set; }
 
         public NetworkNode(Node parent)
         {
             Parent = parent;
-        }
-
-        public NetworkNode Cast()
-        {
-            return new NetworkNode(Parent);
         }
 
         public void SetEdges(Edge<Node>[] edges)

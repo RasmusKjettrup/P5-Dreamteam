@@ -119,6 +119,10 @@ namespace WarehouseAI
                                 frontier.weight/*+dist(lastNode,dropoff)*/);
                         }
                     }
+                    if (resultingFrontier.route == null)
+                    {
+                        
+                    }
                 }
                 frontiers.Add(resultingFrontier);
                 if (resultingFrontier.route.Last() == dropoff)

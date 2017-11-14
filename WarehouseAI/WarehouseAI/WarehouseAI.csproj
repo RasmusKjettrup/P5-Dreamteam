@@ -54,6 +54,7 @@
     <Compile Include="IController.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="ItemDatabase.cs" />
+    <Compile Include="Network\INetworkNode.cs" />
     <Compile Include="Network\Network.cs" />
     <Compile Include="Network\NetworkNode.cs" />
     <Compile Include="Network\ShelfNetworkNode.cs" />

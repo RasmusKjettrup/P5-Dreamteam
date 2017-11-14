@@ -137,12 +137,12 @@ namespace WarehouseAI
                     }
                 }
             }
-            currentNode.Parent.AddBook(item);
+            ((Shelf)currentNode.Parent).AddBook(item);
 
             _cache.MarkItem(item);
         }
 
-        private float EvaluationFunction<T>(Network<T> network, Item[][] itemSets) where T : NetworkNode
+        private float EvaluationFunction<T>(Network<T> network, Item[][] itemSets) where T : INetworkNode
         {
             itemSets = itemSets.OrderByDescending(i => i.Length).ToArray();
             WeightCache cache = new WeightCache(itemSets);
@@ -156,7 +156,7 @@ namespace WarehouseAI
             return result;
         }
 
-        private float EvaluateSet<T>(Network<T> network, WeightCache cache, Item[] itemSet) where T : NetworkNode
+        private float EvaluateSet<T>(Network<T> network, WeightCache cache, Item[] itemSet) where T : INetworkNode
         {
             float importance = Algorithms.Importance(itemSet);
 
@@ -165,7 +165,7 @@ namespace WarehouseAI
                 return 0;
             }
 
-            return importance * Algorithms.Weight(network.AllNodes.ToArray(), cache, itemSet);
+            return importance * Algorithms.Weight(network.AllNodes.Cast<Node>().ToArray(), cache, itemSet);
         }
     }
 }

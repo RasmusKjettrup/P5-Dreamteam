@@ -12,8 +12,8 @@ namespace WarehouseAI
         public Item[] Items {
             get {
                 return (AddFilteredItem
-                    ? Parent.Items.Where(i => i != _filterItem).Append(_filterItem)
-                    : Parent.Items.Where(i => i != _filterItem)).ToArray();
+                    ? ((Shelf)Parent).Items.Where(i => i != _filterItem).Append(_filterItem)
+                    : ((Shelf)Parent).Items.Where(i => i != _filterItem)).ToArray();
             }
         }
 

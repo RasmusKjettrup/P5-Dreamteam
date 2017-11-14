@@ -4,11 +4,11 @@ using System.Linq;
 
 namespace WarehouseAI
 {
-    public class Network<T> where T : NetworkNode
+    public class Network<T> where T : INetworkNode
     {
-        public readonly NetworkNode Dropoff;
+        public readonly INetworkNode Dropoff;
         public readonly T[] Nodes;
-        public NetworkNode[] AllNodes => Dropoff.Append(Nodes).ToArray();
+        public INetworkNode[] AllNodes => Dropoff.Append(Nodes.Cast<INetworkNode>()).ToArray();
 
         public Network(Node[] graph, Func<Node, bool> include, Func<Node, T> conversion)
         {
@@ -26,14 +26,14 @@ namespace WarehouseAI
 
             AStarAlgorithm aStar = new AStarAlgorithm();
 
-            foreach (NetworkNode i in AllNodes)
+            foreach (INetworkNode i in AllNodes)
             {
                 List<Edge<Node>> edges = new List<Edge<Node>>();
-                foreach (NetworkNode j in AllNodes)
+                foreach (INetworkNode j in AllNodes)
                 {
                     Edge<Node> edge = new Edge<Node>();
-                    edge.from = i;
-                    edge.to = j;
+                    edge.from = (Node)i;
+                    edge.to = (Node)j;
                     edge.weight = 2; //aStar.FindPath(graph, i.Parent, j.Parent); //TODO: Fix the weight of edges in the subnetwork
                     edges.Add(edge);
                 }
