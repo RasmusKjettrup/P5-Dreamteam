@@ -46,7 +46,7 @@ namespace WarehouseAI
         //}
         private Dictionary<Tuple<Node,Node>, float> _distances = new Dictionary<Tuple<Node,Node>, float>();
 
-        public void LoadAllDistances(List<Node> nodes)
+        private void LoadAllDistances(List<Node> nodes)
         {
             foreach (Node node in nodes)
             {
@@ -59,6 +59,7 @@ namespace WarehouseAI
 
         public void GenerateMatrix(List<Node> nodes)
         {
+            LoadAllDistances(nodes);
             for (int i = 0; i < nodes.Count; i++)
             {
                 for (int j = 0; j < nodes.Count; j++)
@@ -76,7 +77,7 @@ namespace WarehouseAI
             }
         }
 
-        public float CalculateDistance(Node currentNode, Node endNode, float relativeWeight)
+        private float CalculateDistance(Node currentNode, Node endNode, float relativeWeight)
         {
             List<Node> markedNodes = new List<Node>();
             Dictionary<Node, float> queue = new Dictionary<Node, float>();
