@@ -6,9 +6,9 @@ namespace WarehouseAI
     public static class Extensions
     {
         /// <summary>
-        /// Appends the set to the end of an object
+        /// Appends the set to the end of an object.
         /// </summary>
-        /// <typeparam name="T">Object type</typeparam>
+        /// <typeparam name="T"></typeparam>
         /// <param name="x">Base object</param>
         /// <param name="y">Set to add</param>
         /// <returns></returns>
@@ -22,6 +22,13 @@ namespace WarehouseAI
             }
         }
 
+        /// <summary>
+        /// Appends the object to the end of a set.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="x">Base set</param>
+        /// <param name="y">Object to add</param>
+        /// <returns></returns>
         public static IEnumerable<T> Append<T>(this IEnumerable<T> x, T y)
         {
             foreach (T t in x)

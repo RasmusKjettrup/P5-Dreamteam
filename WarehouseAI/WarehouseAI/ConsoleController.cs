@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace WarehouseAI
@@ -20,7 +21,8 @@ namespace WarehouseAI
                 {"importwarehouse", ImportWarehouse},
                 {"importitems", ImportItems},
                 {"importrelations", ImportRelations},
-                {"addbook", AddBook },
+                {"addnode", AddNode },
+                {"addbook", AddBook},
                 {"distance", Distance},
                 {"dist", Distance},
                 {"quit", s => Quit()},
@@ -63,26 +65,7 @@ namespace WarehouseAI
             Console.WriteLine("Now importing warehouse...");
             warehouse.ImportWarehouse(args[0]);
 
-            foreach (Node node in warehouse.Nodes)
-            {
-                string typ = "Node";
-                if (node is Shelf)
-                {
-                    typ = "Shelf";
-                }
-
-                string neighbours = "";
-                for (int i = 0; i < node.Neighbours.Length; i++)
-                {
-                    neighbours += node.Neighbours[i].Id;
-                    if (i != node.Neighbours.Length - 1)
-                    {
-                        neighbours += " ";
-                    }
-                }
-
-                Console.WriteLine(@"{0} {1} ({2}) [{3}]", node.Id, typ, node.X + " " + node.Y, neighbours);
-            }
+            PrintWarehouse();
             Console.WriteLine("Import complete.");
         }
 
@@ -142,6 +125,40 @@ namespace WarehouseAI
             Console.WriteLine("Book added.");
         }
 
+        private void AddNode(string[] args)
+        {
+            Console.WriteLine("Adding node...");
+
+            CultureInfo c = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+            Node newNode = null;
+
+            int relationalIndex = 0;
+            try
+            {
+                switch (args[relationalIndex])
+                {
+                    case "Node":
+                        newNode = new Node();
+                        break;
+                    case "Shelf":
+                        newNode = new Shelf();
+                        break;
+                    default:
+                        newNode = new Node();
+                        relationalIndex--;
+                        break;
+                }
+                newNode.X = float.Parse(args[relationalIndex+1], NumberStyles.Any, c);
+                newNode.Y = float.Parse(args[relationalIndex+2], NumberStyles.Any, c);
+            }
+            catch { }
+
+            warehouse.AddNode(newNode,args.Skip(relationalIndex+3).Select(s => int.Parse(s)).ToArray());
+
+            PrintWarehouse();
+            Console.WriteLine("Node added.");
+        }
+
         private void Distance(string[] args)
         {
             try
@@ -175,6 +192,30 @@ namespace WarehouseAI
         {
             Console.WriteLine("Now quitting...");
             quit = true;
+        }
+
+        private void PrintWarehouse()
+        {
+            foreach (Node node in warehouse.Nodes)
+            {
+                string typ = "Node";
+                if (node is Shelf)
+                {
+                    typ = "Shelf";
+                }
+
+                string neighbours = "";
+                for (int i = 0; i < node.Neighbours.Length; i++)
+                {
+                    neighbours += node.Neighbours[i].Id;
+                    if (i != node.Neighbours.Length - 1)
+                    {
+                        neighbours += " ";
+                    }
+                }
+
+                Console.WriteLine(@"{0} {1} ({2}) [{3}]", node.Id, typ, node.X + " " + node.Y, neighbours);
+            }
         }
     }
 }

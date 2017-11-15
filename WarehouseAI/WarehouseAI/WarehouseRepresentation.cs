@@ -11,8 +11,8 @@ namespace WarehouseAI
         public ItemDatabase ItemDatabase;
         private List<Item> _addedItems;
 
-        private Node[] _nodes;
-        public Node[] Nodes => _nodes;
+        private List<Node> _nodes;
+        public Node[] Nodes => _nodes.ToArray();
         private WeightCache _cache;
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace WarehouseAI
 
             string[][] lines = File.ReadAllLines(path).Select(s => s.Split(',').Select(t => t.Trim()).ToArray()).ToArray();
 
-            List<Node> nodes = new List<Node>();
+            _nodes = new List<Node>();
 
             foreach (string[] line in lines)
             {
@@ -51,7 +51,7 @@ namespace WarehouseAI
                     newNode.X = float.Parse(pos[0], NumberStyles.Any, c);
                     newNode.Y = float.Parse(pos[1], NumberStyles.Any, c);
 
-                    nodes.Add(newNode);
+                    _nodes.Add(newNode);
                 }
                 catch { }
             }
@@ -67,18 +67,16 @@ namespace WarehouseAI
                     {
                         try
                         {
-                            neighbourNodes.Add(nodes.Find(n => n.Id == int.Parse(neighbour)));
+                            neighbourNodes.Add(_nodes.Find(n => n.Id == int.Parse(neighbour)));
                         }
                         catch { }
                     }
 
-                    Node node = nodes.Find(n => n.Id == id);
+                    Node node = _nodes.Find(n => n.Id == id);
                     node.Edges = neighbourNodes.Select(n => new Edge<Node> { from = node, to = n, weight = -1 }).ToArray();
                 }
                 catch { }
             }
-
-            _nodes = nodes.ToArray();
 
             foreach (Node node in _nodes)
             {
@@ -99,6 +97,36 @@ namespace WarehouseAI
         }
 
         /// <summary>
+        /// Adds a new node to the warehouse graph.
+        /// </summary>
+        /// <param name="newNode"></param>
+        /// <param name="neighbourIds"></param>
+        public void AddNode(Node newNode, int[] neighbourIds)
+        {
+            if (_nodes == null)
+            {
+                _nodes = new List<Node>();
+            }
+
+            List<Node> neighbourNodes = new List<Node>();
+            foreach (int id in neighbourIds)
+            {
+                neighbourNodes.Add(_nodes.Find(n => n.Id == id));
+            }
+
+            newNode.Edges = neighbourNodes.Select(n => new Edge<Node>() { from = newNode, to = n, weight = -1 })
+                .ToArray();
+            foreach (Node node in neighbourNodes)
+            {
+                node.Edges = node.Edges.Append(new Edge<Node>() { from = node, to = newNode, weight = -1 }).ToArray();
+            }
+
+            newNode.Id = _nodes.Max(n => n.Id) + 1;
+
+            _nodes.Add(newNode);
+        }
+
+        /// <summary>
         /// Adds a book to the warehouse. Calculates the optimal position and adds the book to the position.
         /// </summary>
         /// <param name="item"></param>
@@ -108,7 +136,7 @@ namespace WarehouseAI
             //Only shelves and the dropoff point is added to the network.
             //Each node is a new "FilteredShelfNetworkNode", with an all pairs connection to eachother.
             Network<FilteredShelfNetworkNode> filterNetwork = new Network<FilteredShelfNetworkNode>(
-                _nodes, n => n is Shelf,
+                _nodes.ToArray(), n => n is Shelf,
                 s => new FilteredShelfNetworkNode((Shelf)s, item));
             //The currentNode is any node in the graph, where greedy descent evaluations are completed on.
             FilteredShelfNetworkNode currentNode = filterNetwork.Nodes[0];
@@ -174,7 +202,7 @@ namespace WarehouseAI
             itemSets = itemSets.OrderByDescending(i => i.Length).ToArray();
             //Create a new cache used in the specific evaulationfunction
             WeightCache cache = new WeightCache(itemSets);
-            
+
             float result = 0;
             //Find the sum of the evaluation of each item set in itemSets
             foreach (Item[] set in itemSets)
