@@ -81,13 +81,45 @@ namespace WarehouseAI
             _cache = new WeightCache(itemDatabase.Items.Power().ToArray());
         }
 
+        /// <summary>
+        /// Calculates and returns the weight of collecting a set of items. The calculation is done on the graph of nodes
+        /// "graph", which is assumed to contain shelves that contain the items in the item set.
+        /// </summary>
+        /// <param name="itemSet">The items to collect.</param>
+        /// <returns></returns>
         public static float Weight(Item[] itemSet)
         {
             return Weight(_minimalNetwork.AllNodes.Select(n => n.Parent).ToArray(), _cache, itemSet);
         }
-
+        
+        /// <summary>
+        /// Calculates and returns the weight of collecting a set of items. The calculation is done on the graph of nodes
+        /// "graph", which is assumed to contain shelves that contain the items in the item set.
+        /// </summary>
+        /// <param name="graph">The warehouse representation.</param>
+        /// <param name="cache">A cache of item weights that helps with optimization when many weights are calculated in
+        /// bulk.</param>
+        /// <param name="itemSet">The items to collect.</param>
+        /// <returns></returns>
         public static float Weight(Node[] graph, WeightCache cache, Item[] itemSet)
         {
+            Node[] dummy;
+            return Weight(graph, cache, itemSet, out dummy);
+        }
+
+        /// <summary>
+        /// Calculates and returns the weight of collecting a set of items. The calculation is done on the graph of nodes
+        /// "graph", which is assumed to contain shelves that contain the items in the item set.
+        /// </summary>
+        /// <param name="graph">The warehouse representation.</param>
+        /// <param name="cache">A cache of item weights that helps with optimization when many weights are calculated in
+        /// bulk.</param>
+        /// <param name="itemSet">The items to collect.</param>
+        /// <param name="path">The path that an agent should take when collecting the items in the set.</param>
+        /// <returns></returns>
+        public static float Weight(Node[] graph, WeightCache cache, Item[] itemSet, out Node[] path)
+        {
+            path = null;
             List<Frontier> frontiers = new List<Frontier>();
             frontiers.Add(new Frontier(new[] { graph[0] }, itemSet, 0));
             Node dropoff = graph[0];
@@ -126,6 +158,7 @@ namespace WarehouseAI
                     CacheElement c = cache[itemSet.Except(resultingFrontier.books).ToArray()];
                     c.Marked = false;
                     c.Weight = resultingFrontier.weight;
+                    path = resultingFrontier.route;
                 }
             }
 
