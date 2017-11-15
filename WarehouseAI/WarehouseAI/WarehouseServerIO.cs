@@ -32,7 +32,7 @@ namespace WarehouseAI
         public void SetupServer()
         {
             _serverSocket.Bind(new IPEndPoint(_ipAddress, Port));
-            _serverSocket.Listen(1);
+            _serverSocket.Listen(10);
             _serverSocket.BeginAccept(AcceptCallback, null);
         }
 
@@ -101,32 +101,32 @@ namespace WarehouseAI
 
                         // Method stops when recieving an end signal from client
                         // Todo: Consider changing stopsignal
-                        if (text == "bye")
-                        {
-                            ClientSockets.Remove(socket);
-                            socket.Close();
-                            return;
-                        }
+//                        if (text == "bye")
+//                        {
+//                            ClientSockets.Remove(socket);
+//                            socket.Close();
+//                            return;
+//                        }
 
                         // Invoke event method to handle recieved message
                         MessageRecieved?.Invoke(text, socket.RemoteEndPoint.ToString());
                         response = "Client recieved: " + text;
                         SendData(socket, response);
                     }
-                    else
-                    {
-                        // Removes connection to the client causing an exception
-                        // Todo: Not sure why this is done here
-                        // Todo: Maybe this can simply be done by ClientSockets.Remove(socket);
-                        for (int i = 0; i < ClientSockets.Count; i++)
-                        {
-                            if (ClientSockets[i].RemoteEndPoint.ToString().Equals(socket.RemoteEndPoint.ToString()))
-                            {
-                                ClientSockets.Remove(ClientSockets[i]);
-                                socket.Close();
-                            }
-                        }
-                    }
+//                    else
+//                    {
+//                         Removes connection to the client causing an exception
+//                         Todo: Not sure why this is done here
+//                         Todo: Maybe this can simply be done by ClientSockets.Remove(socket);
+//                        for (int i = 0; i < ClientSockets.Count; i++)
+//                        {
+//                            if (ClientSockets[i].RemoteEndPoint.ToString().Equals(socket.RemoteEndPoint.ToString()))
+//                            {
+//                                ClientSockets.Remove(ClientSockets[i]);
+//                                socket.Close();
+//                            }
+//                        }
+//                    }
                 }
                 socket.BeginReceive(_buffer, offset, _buffer.Length, SocketFlags.None, ReceiveCallback, socket);
             }

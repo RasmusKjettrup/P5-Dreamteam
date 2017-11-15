@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace WarehouseAI
 {
-    public class Program
+    public static class Program
     {
         private const string CommandList = "\\help";
         private static readonly Dictionary<string, Delegate> Commands = new Dictionary<string, Delegate>();
@@ -18,6 +19,7 @@ namespace WarehouseAI
 
         private static void Main(string[] args)
         {
+            Debug.WriteLine("Test");
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Setting up _server...");
             _server = new WarehouseServerIO();
@@ -81,7 +83,7 @@ namespace WarehouseAI
         {
             switch (data[0])
             {
-                case 'Q': break; // Todo: Qr Message was recieved from client 
+                case 'Q': break; // Todo: Qr Message was recieved from client
                 case 'R': break; // Todo: Route request recieved from client
                 default: Console.WriteLine($"The following message was recieved from the IP {client}: {data}"); break;
             }
