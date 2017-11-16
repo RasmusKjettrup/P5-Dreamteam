@@ -6,6 +6,7 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -18,10 +19,8 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
     private int port;
     private String data;
     private Socket socket;
-    private PrintWriter writer;
-    private BufferedReader reader;
 
-    public ConnectionTask(String ip, int port, String data) {
+    ConnectionTask(String ip, int port, String data) {
         this.ip = ip;
         this.port = port;
         this.data = data;
@@ -29,17 +28,19 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
 
     @Override
     protected String doInBackground(Void... voids) {
+        Log.d(TAG, "Sending data to server...");
         sendDataToServer(data);
-        return receiveDataFromServer();
-    }
-
-    private String receiveDataFromServer() {
+        Log.d(TAG, "Data sent.");
+        Log.d(TAG, "Receiving data...");
+        String response = receiveDataFromServer();
+        Log.d(TAG, "Response received. Closing socket...");
         try {
-            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return "Server says " + data;
+        Log.d(TAG, "Socket closed, and response sent to onPostExecute");
+        return response;
     }
 
     @Override
@@ -47,16 +48,30 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
         super.onPostExecute(s);
     }
 
-    public void sendDataToServer(String data) {
+    private String receiveDataFromServer() {
+        StringBuilder response = new StringBuilder();
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            Log.d(TAG, "Reader initialised.");
+            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+                response.append(line);
+            }
+            Log.d(TAG, "Response read.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.d(TAG, "Returning response...");
+        return response.toString();
+    }
+
+    private void sendDataToServer(String data) {
         try {
             socket = new Socket(ip, port);
-            writer = new PrintWriter(socket.getOutputStream(), true);
-
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
             writer.print(data);
             writer.flush();
-            socket.close();
         } catch (IOException e) {
-            Log.d(TAG, "IO not found");
+            Log.e(TAG, e.getMessage());
         }
     }
 }
