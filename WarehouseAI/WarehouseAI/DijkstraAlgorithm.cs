@@ -47,6 +47,15 @@ namespace WarehouseAI
         //}
         private Dictionary<Tuple<Node, Node>, float> _distances = new Dictionary<Tuple<Node, Node>, float>();
 
+        /// <summary>
+        /// A dictionary which consists of a tuple and a float.
+        /// Where the tuple contain two nodes and the float represent the distance between them. 
+        /// </summary>
+        private Dictionary<Tuple<Node, Node>, float> _distances = new Dictionary<Tuple<Node, Node>, float>();
+        /// <summary>
+        /// Sets nodes distance to maxvalue
+        /// </summary>
+        /// <param name="nodes"></param>
         private void LoadAllDistances(List<Node> nodes)
         {
             foreach (Node node in nodes)
@@ -57,7 +66,11 @@ namespace WarehouseAI
                 }
             }
         }
-
+        /// <summary>
+        /// Generates a matrix of the distances between the nodes.
+        /// All pairs shortest path matrix
+        /// </summary>
+        /// <param name="nodes"></param>
         public void GenerateMatrix(List<Node> nodes)
         {
             LoadAllDistances(nodes);
@@ -67,6 +80,8 @@ namespace WarehouseAI
                 {
                     if (i < j)
                     {
+                        // We know that all pairs of nodes are in _distances.
+                        // Therefore, we calculate distance from node1 to node2 and set the same distance from node2 to node1
                         _distances[new Tuple<Node, Node>(nodes[i], nodes[j])] = CalculateDistance(nodes[i], nodes[j], 0);
                         _distances[new Tuple<Node, Node>(nodes[j], nodes[i])] = _distances[new Tuple<Node, Node>(nodes[i], nodes[j])];
                     }
@@ -77,10 +92,16 @@ namespace WarehouseAI
                 }
             }
         }
-
+        /// <summary>
+        /// Calculates the distance between the nodes.
+        /// </summary>
+        /// <param name="currentNode"></param>
+        /// <param name="endNode"></param>
+        /// <param name="relativeWeight"></param>
+        /// <returns>The distance</returns>
         private float CalculateDistance(Node currentNode, Node endNode, float relativeWeight)
         {
-            List<Node> markedNodes = new List<Node>();
+            List<Node> markedNodes = new List<Node>();// already visited nodes.
             Dictionary<Node, float> queue = new Dictionary<Node, float>();
             Node next = null;
             float val = 0;
