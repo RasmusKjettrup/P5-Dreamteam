@@ -56,7 +56,7 @@ namespace WarehouseAI
                     edges.Add(edge);
                 }
                 //Set the new edges.
-                i.SetEdges(edges.ToArray());
+                i.SetEdges(edges.OrderBy(e => e.weight).ToArray());
             }
         }
     }

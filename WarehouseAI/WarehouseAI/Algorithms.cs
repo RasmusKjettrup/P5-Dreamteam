@@ -88,7 +88,7 @@ namespace WarehouseAI
         /// <returns></returns>
         public static float Weight(Item[] itemSet)
         {
-            return Weight(_minimalNetwork.AllNodes.Cast<Node>().ToArray(), _cache, itemSet);
+            return Weight(_minimalNetwork.AllNodes.Cast<Node>().ToArray(), itemSet);
         }
 
         /// <summary>
@@ -99,14 +99,14 @@ namespace WarehouseAI
         /// <param name="cache">A cache of item weights that helps with optimization when many weights are calculated in
         /// bulk.</param>
         /// <param name="itemSet">The items to collect.</param>
+        /// <param name="distanceMap">The distance map. Give as parameter to prevent calculating it every time
+        /// weight is run. </param>
         /// <returns></returns>
-        public static float Weight(Node[] graph, WeightCache cache, Item[] itemSet)
+        public static float Weight(Node[] graph, Item[] itemSet, WeightCache cache = null, DistanceMap distanceMap = null)
         {
             Node[] dummy;
-            return Weight(graph, cache, itemSet, out dummy);
+            return Weight(graph, itemSet, out dummy, cache, distanceMap);
         }
-
-        private static DistanceMap _distanceMap;
 
         /// <summary>
         /// Calculates and returns the weight of collecting a set of items. The calculation is done on the graph of nodes
@@ -117,14 +117,24 @@ namespace WarehouseAI
         /// bulk.</param>
         /// <param name="itemSet">The items to collect.</param>
         /// <param name="path">The path that an agent should take when collecting the items in the set.</param>
+        /// <param name="distanceMap">The distance map. Give as parameter to prevent calculating it every time
+        /// weight is run. </param>
         /// <returns></returns>
-        public static float Weight(Node[] graph, WeightCache cache, Item[] itemSet, out Node[] path)
+        public static float Weight(Node[] graph, Item[] itemSet, out Node[] path, WeightCache cache = null, DistanceMap distanceMap = null)
         {
             path = null;
+            if (distanceMap == null)
+            {
+                distanceMap = new DistanceMap(graph);
+            }
+            if (cache == null)
+            {
+                cache = _cache;
+            }
+
             List<Frontier> frontiers = new List<Frontier>();
             frontiers.Add(new Frontier(new[] { graph[0] }, itemSet, 0));
             Node dropoff = graph[0];
-            _distanceMap = new DistanceMap(graph);
 
             while (cache[itemSet].Marked)
             {
@@ -135,7 +145,7 @@ namespace WarehouseAI
                     foreach (Shelf neighbour in lastNode.Neighbours.Where(n => n is Shelf).Cast<Shelf>()
                         .Where(s => s.Contains(frontier.books)))
                     {
-                        float distance = Distance(lastNode, neighbour);
+                        float distance = Distance(distanceMap, lastNode, neighbour);
                         if (!frontiers.Select(f => f.route).Contains(frontier.route.Append(neighbour))
                             && frontier.weight + distance < resultingFrontier.weight)
                         {
@@ -147,7 +157,7 @@ namespace WarehouseAI
                     CacheElement c;
                     if (cache.TryGet(itemSet.Except(frontier.books).ToArray(), out c) && c.Marked)
                     {
-                        float distance = Distance(lastNode, dropoff);
+                        float distance = Distance(distanceMap, lastNode, dropoff);
                         if (frontier.weight + distance < resultingFrontier.weight)
                         {
                             resultingFrontier = new Frontier(frontier.route.Append(dropoff).ToArray(),
@@ -169,10 +179,10 @@ namespace WarehouseAI
             return cache[itemSet].Weight;
         }
 
-        private static float Distance(Node from, Node to)
+        private static float Distance(DistanceMap distanceMap, Node from, Node to)
         {
             float f;
-            _distanceMap.TryGet(from.Id, to.Id, out f);
+            distanceMap.TryGet(from.Id, to.Id, out f);
             return f;
         }
     }

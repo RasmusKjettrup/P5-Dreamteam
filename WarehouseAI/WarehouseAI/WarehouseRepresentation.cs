@@ -132,7 +132,7 @@ namespace WarehouseAI
                 _nodes.ToArray(), n => n is Shelf,
                 s => new FilteredShelfNetworkNode((Shelf)s, item));
             //The currentNode is any node in the graph, where greedy descent evaluations are completed on.
-            FilteredShelfNetworkNode currentNode = filterNetwork.Nodes[0];
+            INetworkNode currentNode = filterNetwork.Dropoff;
 
             //Add the new item to the added items list, if it is not already there.
             if (!_addedItems.Contains(item))
@@ -145,6 +145,8 @@ namespace WarehouseAI
             float lowestEvaluation = float.MaxValue;
             //Whenever "cont" is not set back to "true" after running the while loop, new lowest local evaluations are still being found.
             bool cont = true;
+            //A list of marked nodea are maintained, to prevent evaluating the same node twice
+            List<FilteredShelfNetworkNode> markedNodes = new List<FilteredShelfNetworkNode>();
 
             while (cont)
             {
@@ -153,11 +155,16 @@ namespace WarehouseAI
                 //neighbours are the neighbouring nodes of the currentnode, where only "FilteredShelfNodes" are included,
                 //the capacity for new items on the shelf are more than 0, and only including the 5 first.
                 //Since the neighbours are ordered with lowest weight first, the 5 closest are chosen.
-                FilteredShelfNetworkNode[] neighbours = currentNode.Neighbours.Where(n => n is FilteredShelfNetworkNode)
+                FilteredShelfNetworkNode[] neighbours = ((Node)currentNode).Neighbours.Where(n => n is FilteredShelfNetworkNode)
                     .Cast<FilteredShelfNetworkNode>().Where(n => n.Capacity > 0).Take(5).ToArray();
 
                 foreach (FilteredShelfNetworkNode neighbour in neighbours)
                 {
+                    if (markedNodes.Contains(neighbour))
+                    {
+                        continue;
+                    }
+
                     //Add the item to the neighbour...
                     neighbour.AddFilteredItem = true;
                     //Evaluate the state...
@@ -172,6 +179,7 @@ namespace WarehouseAI
                         lowestEvaluation = eval;
                         cont = true;
                     }
+                    markedNodes.Add(neighbour);
                 }
             }
             //After the while loop, currentNode has been set to be the local minimum, and the book is added to this shelf.
@@ -195,12 +203,14 @@ namespace WarehouseAI
             itemSets = itemSets.OrderByDescending(i => i.Length).ToArray();
             //Create a new cache used in the specific evaulationfunction
             WeightCache cache = new WeightCache(itemSets);
+            //Calculate distances between nodes only once, and pass them along to the weight algorithm.
+            DistanceMap map = new DistanceMap(network.AllNodes.Cast<Node>().ToArray());
 
             float result = 0;
             //Find the sum of the evaluation of each item set in itemSets
             foreach (Item[] set in itemSets)
             {
-                result += EvaluateSet(network, cache, set);
+                result += EvaluateSet(network, set, cache, map);
             }
 
             return result;
@@ -213,8 +223,9 @@ namespace WarehouseAI
         /// <param name="network"></param>
         /// <param name="cache"></param>
         /// <param name="itemSet"></param>
+        /// <param name="map"></param>
         /// <returns></returns>
-        private float EvaluateSet<T>(Network<T> network, WeightCache cache, Item[] itemSet) where T : INetworkNode
+        private float EvaluateSet<T>(Network<T> network, Item[] itemSet, WeightCache cache, DistanceMap map) where T : INetworkNode
         {
             //The importance of the items in relation to eachother.
             float importance = Algorithms.Importance(itemSet);
@@ -226,7 +237,7 @@ namespace WarehouseAI
             }
 
             //Calculate the weight given a set of nodes (the network), a cache, and a set of items.
-            return importance * Algorithms.Weight(network.AllNodes.Cast<Node>().ToArray(), cache, itemSet);
+            return importance * Algorithms.Weight(network.AllNodes.Cast<Node>().ToArray(), itemSet, cache, map);
         }
     }
 }

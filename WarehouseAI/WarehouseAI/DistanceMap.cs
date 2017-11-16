@@ -69,11 +69,11 @@ namespace WarehouseAI
                     if (nodeSubDictionary.TryGetValue(currentFront.Item1.Id, out dummy))
                     {
                         nodeSubDictionary[currentFront.Item1.Id] = currentFront.Item2;
-                        remainingIndexes--;
                         if (remainingIndexes == 0)
                         {
                             return;
                         }
+                        remainingIndexes--;
                     }
 
                     foreach (Edge<Node> edge in currentFront.Item1.Edges)
