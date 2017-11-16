@@ -37,7 +37,7 @@ namespace WarehouseAI
             {
                 arg += s + " ";
             }
-            foreach (string s in arg.Split('-'))
+            foreach (string s in arg.Split('-').Where(s => s != ""))
             {
                 Console.WriteLine(s);
                 Command(s);
@@ -51,7 +51,7 @@ namespace WarehouseAI
 
         private void Command(string input)
         {
-            string[] inputStrings = input.Split(' ');
+            string[] inputStrings = input.Split(' ').Where(s => s != "").ToArray();
 
             Action<string[]> c;
             if (commands.TryGetValue(inputStrings[0].ToLower(), out c))
@@ -104,7 +104,16 @@ namespace WarehouseAI
         {
             Console.WriteLine("Adding item...");
             Item item = itemDatabase.Items.First(i => i.Id == int.Parse(args[0]));
-            warehouse.AddBook(item);
+            if (args.Length == 1)
+            {
+                warehouse.AddBook(item);
+            }
+            else
+            {
+                Shelf shelf = (Shelf) warehouse.Nodes.First(n => n.Id == int.Parse(args[1]));
+                shelf.AddBook(item);
+            }
+
             foreach (Node node in warehouse.Nodes)
             {
                 if (node is Shelf)

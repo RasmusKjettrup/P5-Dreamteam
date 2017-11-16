@@ -27,11 +27,10 @@ namespace WarehouseAI
             }
 
             CacheElement emptyElement;
-            if (_cache.TryGetValue(new Item[0], out emptyElement))
+            if (TryGet(new Item[0], out emptyElement))
             {
                 emptyElement.Marked = false;
             }
-
         }
 
         public void MarkItem(Item item)
@@ -50,6 +49,10 @@ namespace WarehouseAI
             c = null;
             foreach (KeyValuePair<Item[], CacheElement> pair in _cache)
             {
+                if (pair.Key.Length != set.Length)
+                {
+                    continue;
+                }
                 bool found = true;
                 foreach (Item item in set)
                 {
@@ -59,7 +62,7 @@ namespace WarehouseAI
                         break;
                     }
                 }
-                if (found || pair.Key.Length == 0 && set.Length == 0)
+                if (found)
                 {
                     c = pair.Value;
                     return true;

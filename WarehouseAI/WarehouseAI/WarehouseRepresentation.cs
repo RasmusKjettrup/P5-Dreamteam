@@ -9,7 +9,22 @@ namespace WarehouseAI
     public class WarehouseRepresentation
     {
         public ItemDatabase ItemDatabase;
-        private List<Item> _addedItems;
+        private Item[] AddedItems {
+            get {
+                List<Item> accu = new List<Item>();
+                foreach (Item[] items in _nodes.Where(n => n is Shelf).Cast<Shelf>().Select(s => s.Items))
+                {
+                    foreach (Item item in items)
+                    {
+                        if (!accu.Contains(item))
+                        {
+                            accu.Add(item);
+                        }
+                    }
+                }
+                return accu.ToArray();
+            }
+        }
 
         private List<Node> _nodes;
         public Node[] Nodes => _nodes.ToArray();
@@ -85,7 +100,6 @@ namespace WarehouseAI
         /// </summary>
         public void Inintialize()
         {
-            _addedItems = new List<Item>();
             _cache = new WeightCache(ItemDatabase.Items.Power().ToArray());
         }
 
@@ -134,13 +148,8 @@ namespace WarehouseAI
             //The currentNode is any node in the graph, where greedy descent evaluations are completed on.
             INetworkNode currentNode = filterNetwork.Dropoff;
 
-            //Add the new item to the added items list, if it is not already there.
-            if (!_addedItems.Contains(item))
-            {
-                _addedItems.Add(item);
-            }
             //The itemSets are the sets of items that need to be evaluated on.
-            Item[][] itemSets = _addedItems.Power().Where(i => i.Contains(item)).ToArray();
+            Item[][] itemSets = AddedItems.Union(new[] { item }).Power().Where(i => i.Contains(item)).ToArray();
             //lowestEvaluation denotes the lowest local evaulation of the evaluation funtion.
             float lowestEvaluation = float.MaxValue;
             //Whenever "cont" is not set back to "true" after running the while loop, new lowest local evaluations are still being found.

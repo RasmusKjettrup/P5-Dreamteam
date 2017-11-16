@@ -43,7 +43,7 @@ namespace WarehouseAI
                 Dictionary<int, float> subdict = new Dictionary<int, float>();
                 for (int j = i; j < size; j++)
                 {
-                    subdict.Add(graph[j].Id, -1f);
+                    subdict.Add(graph[j].Id, float.MaxValue);
                 }
                 _dictionary.Add(graph[i].Id, subdict);
             }
@@ -54,7 +54,6 @@ namespace WarehouseAI
             Dictionary<int, float> nodeSubDictionary;
             if (_dictionary.TryGetValue(node.Id, out nodeSubDictionary))
             {
-                int remainingIndexes = nodeSubDictionary.Count;
                 List<Node> markedNodes = new List<Node>();
                 Queue<Tuple<Node, float>> frontiers = new Queue<Tuple<Node, float>>();
 
@@ -68,12 +67,8 @@ namespace WarehouseAI
                     float dummy;
                     if (nodeSubDictionary.TryGetValue(currentFront.Item1.Id, out dummy))
                     {
-                        nodeSubDictionary[currentFront.Item1.Id] = currentFront.Item2;
-                        if (remainingIndexes == 0)
-                        {
-                            return;
-                        }
-                        remainingIndexes--;
+                        nodeSubDictionary[currentFront.Item1.Id] = 
+                            Math.Min(currentFront.Item2, nodeSubDictionary[currentFront.Item1.Id]);
                     }
 
                     foreach (Edge<Node> edge in currentFront.Item1.Edges)

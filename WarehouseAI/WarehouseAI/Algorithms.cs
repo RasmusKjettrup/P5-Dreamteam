@@ -146,7 +146,7 @@ namespace WarehouseAI
                         .Where(s => s.Contains(frontier.books)))
                     {
                         float distance = Distance(distanceMap, lastNode, neighbour);
-                        if (!frontiers.Select(f => f.route).Contains(frontier.route.Append(neighbour))
+                        if (NotExplored(frontiers.ToArray(), frontier.route.Append(neighbour).ToArray())
                             && frontier.weight + distance < resultingFrontier.weight)
                         {
                             resultingFrontier = new Frontier(frontier.route.Append(neighbour).ToArray(),
@@ -158,7 +158,7 @@ namespace WarehouseAI
                     if (cache.TryGet(itemSet.Except(frontier.books).ToArray(), out c) && c.Marked)
                     {
                         float distance = Distance(distanceMap, lastNode, dropoff);
-                        if (frontier.weight + distance < resultingFrontier.weight)
+                        if (frontier.weight + distance <= resultingFrontier.weight)
                         {
                             resultingFrontier = new Frontier(frontier.route.Append(dropoff).ToArray(),
                                 frontier.books,
@@ -177,6 +177,29 @@ namespace WarehouseAI
             }
 
             return cache[itemSet].Weight;
+        }
+
+        private static bool NotExplored(Frontier[] frontiers, Node[] potentialNodes)
+        {
+            foreach (Frontier frontier in frontiers)
+            {
+                if (frontier.route.Length != potentialNodes.Length)
+                {
+                    continue;
+                }
+                for (int i = 0; i < frontier.route.Length; i++)
+                {
+                    if (potentialNodes[i] != frontier.route[i])
+                    {
+                        break;
+                    }
+                    if (i == frontier.route.Length-1)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
 
         private static float Distance(DistanceMap distanceMap, Node from, Node to)
