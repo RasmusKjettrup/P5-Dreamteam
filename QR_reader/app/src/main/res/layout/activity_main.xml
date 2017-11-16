@@ -64,11 +64,17 @@
         android:inputType="text"
         android:minWidth="100dp"/>
 
-    <TextView
-        android:id="@+id/txt_response"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Server response"
-        />
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/txt_response"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Server response"
+            />
+    </ScrollView>
+
 
 </LinearLayout>

@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace WarehouseAI {
     public static class WarehouseServerIO {
-        private const int MaxConnections = 10;
+        private const int ConnectionQueueAmount = 1;
         public static ManualResetEvent allDone = new ManualResetEvent(false);
 
         public static void StartListening() {
@@ -18,7 +18,7 @@ namespace WarehouseAI {
 
             try {
                 socket.Bind(localEndPoint);
-                socket.Listen(MaxConnections);
+                socket.Listen(ConnectionQueueAmount);
                 while (true) {
                     allDone.Reset();
 
@@ -53,7 +53,7 @@ namespace WarehouseAI {
             int bytesRead = handler.EndReceive(ar);
 
             if (bytesRead > 0) {
-                state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
+                state.sb.Append(Encoding.UTF8.GetString(state.buffer, 0, bytesRead));
 
                 var content = state.sb.ToString();
                 if (content.EndsWith("<EOF>")) {
@@ -68,7 +68,7 @@ namespace WarehouseAI {
         }
 
         private static void Send(Socket handler, string data) {
-            byte[] byteData = Encoding.ASCII.GetBytes(data);
+            byte[] byteData = Encoding.UTF8.GetBytes(data);
 
             handler.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), handler);
         }
