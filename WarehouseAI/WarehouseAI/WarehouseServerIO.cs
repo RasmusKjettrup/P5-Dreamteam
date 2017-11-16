@@ -58,7 +58,7 @@ namespace WarehouseAI {
                 var content = state.sb.ToString();
                 if (content.EndsWith("<EOF>")) {
                     Console.WriteLine("Read {0} bytes from socket. \n Data : {1}", content.Length, content);
-                    Send(handler, $"SErVER SAYS HELLO as well as {content}");
+                    Send(handler, "sErVeR sAyS hElLo!!! as well as " + content);
                     Console.WriteLine("Message sent.");
                 }
                 else {

@@ -28,18 +28,13 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
 
     @Override
     protected String doInBackground(Void... voids) {
-        Log.d(TAG, "Sending data to server...");
         sendDataToServer(data);
-        Log.d(TAG, "Data sent.");
-        Log.d(TAG, "Receiving data...");
         String response = receiveDataFromServer();
-        Log.d(TAG, "Response received. Closing socket...");
         try {
             socket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
-        Log.d(TAG, "Socket closed, and response sent to onPostExecute");
         return response;
     }
 
@@ -52,18 +47,15 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
         StringBuilder response = new StringBuilder();
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            Log.d(TAG, "Reader initialised.");
 
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 response.append(line);
             }
-            Log.d(TAG, response.toString());
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
-        Log.d(TAG, "Returning response...");
 
-        return response.toString();
+        return response.substring(0, response.length() - 5); // Remove <EOF> from displayed response
     }
 
     private void sendDataToServer(String data) {

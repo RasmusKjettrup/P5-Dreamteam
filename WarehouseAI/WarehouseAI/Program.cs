@@ -22,10 +22,6 @@ namespace WarehouseAI
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Setting up _server...");
             
-//            _server.SetupServer();
-//            _server.MessageRecieved += ServerOnMessageRecieved;
-//            _server.ErrorOccured += ServerOnErrorOccured;
-
             Console.WriteLine("Server setup complete");
             Console.WriteLine($"Type {CommandList} for all commands");
 
