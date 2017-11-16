@@ -53,14 +53,16 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             Log.d(TAG, "Reader initialised.");
+
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 response.append(line);
             }
-            Log.d(TAG, "Response read.");
+            Log.d(TAG, response.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
         Log.d(TAG, "Returning response...");
+
         return response.toString();
     }
 
@@ -68,7 +70,7 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
         try {
             socket = new Socket(ip, port);
             PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
-            writer.print(data);
+            writer.print(data + "<EOF>"); // Server expects <EOF>, since we can send more lines in one message
             writer.flush();
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());

@@ -1,177 +1,97 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
-namespace WarehouseAI
-{
-    internal class WarehouseServerIO
-    {
-        private readonly byte[] _buffer = new byte[1024]; // An array of type Byte that is the storage location for the received data.
-        public List<Socket> ClientSockets { get; set; }
-        private readonly Socket _serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        private const int Port = 100;
-        private readonly IPAddress _ipAddress;
-        public event Action<string,string> MessageRecieved;
-        public event Action<string> ErrorOccured;
+namespace WarehouseAI {
+    public static class WarehouseServerIO {
+        private const int MaxConnections = 10;
+        public static ManualResetEvent allDone = new ManualResetEvent(false);
 
-        public WarehouseServerIO()
-        {
-            ClientSockets = new List<Socket>();
-            
-            _ipAddress = IPAddress.Any; // Provides an IP address that indicates that the server must listen for client activity on all network interfaces. This field is read-only. 
-        }
+        public static void StartListening() {
+            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+            IPAddress ipAddress = ipHostInfo.AddressList[0];
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 100);
 
-        /// <summary>
-        /// Binds IP-address and Port to the server's socket.
-        /// Starts waiting for incoming connections.
-        /// </summary>
-        public void SetupServer()
-        {
-            _serverSocket.Bind(new IPEndPoint(_ipAddress, Port));
-            _serverSocket.Listen(10);
-            _serverSocket.BeginAccept(AcceptCallback, null);
-        }
+            Socket socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
-        /// <summary>
-        /// Accepts a connection from a client, prepares to recieve data from the client and prepares for another client.
-        /// </summary>
-        /// <param name="asyncResult"> An IAsyncResult that stores state information for this asynchronous operation as well as any user defined data.</param>
-        private void AcceptCallback(IAsyncResult asyncResult)
-        {
-            Socket socket = _serverSocket.EndAccept(asyncResult);
-            ClientSockets.Add(socket);
-            // socket.RemoteEndPoint.ToString(); <- IP address of Client
-            //An System.AsyncCallback delegate that references the method to invoke when the operation is complete.
-            try
-            {
-                socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, ReceiveCallback, socket);
-            }
-            catch (Exception e)
-            {
-                ErrorOccured?.Invoke(e.Message);
-            }
-            _serverSocket.BeginAccept(AcceptCallback, null);
-        }
+            try {
+                socket.Bind(localEndPoint);
+                socket.Listen(MaxConnections);
+                while (true) {
+                    allDone.Reset();
 
-        /// <summary>
-        /// Stops a recieve call and reads the data from a client and gives it to the MessageRecieved event.
-        /// </summary>
-        /// <param name="asyncResult">Status of operation</param>
-        private void ReceiveCallback(IAsyncResult asyncResult)
-        {
-            int offset = 0;
-            
-            try
-            {
-                Socket socket = (Socket)asyncResult.AsyncState;
-                if (socket.Connected)
-                {
-                    int received;
-                    try
-                    {
-                        // Ends a pending async read and stores the number of bytes recieved
-                        received = socket.EndReceive(asyncResult);
-                    }
-                    catch (Exception e)
-                    {
-                        // Removes connection to the client causing an exception
-                        // Todo: Maybe this can simply be done by ClientSockets.Remove(socket);
-                        foreach (Socket clientSocket in ClientSockets)
-                        {
-                            if (clientSocket.RemoteEndPoint.ToString().Equals(socket.RemoteEndPoint.ToString()))
-                            {
-                                ClientSockets.Remove(clientSocket);
-                                clientSocket.Close();
-                            }
-                        }
-                        ErrorOccured?.Invoke(e.Message);
-                        return;
-                    }
-                    if (received != 0)
-                    {
-                        byte[] dataBuffer = new byte[received];
-                        Array.Copy(_buffer, dataBuffer, received);
-                        string text = Encoding.ASCII.GetString(dataBuffer);
+                    Console.WriteLine("Waiting for a connection...");
+                    socket.BeginAccept(new AsyncCallback(AcceptCallback), socket);
 
-                        string response = string.Empty;
-
-                        // Method stops when recieving an end signal from client
-                        // Todo: Consider changing stopsignal
-//                        if (text == "bye")
-//                        {
-//                            ClientSockets.Remove(socket);
-//                            socket.Close();
-//                            return;
-//                        }
-
-                        // Invoke event method to handle recieved message
-                        MessageRecieved?.Invoke(text, socket.RemoteEndPoint.ToString());
-                        response = "Client recieved: " + text;
-                        SendData(socket, response);
-                    }
-//                    else
-//                    {
-//                         Removes connection to the client causing an exception
-//                         Todo: Not sure why this is done here
-//                         Todo: Maybe this can simply be done by ClientSockets.Remove(socket);
-//                        for (int i = 0; i < ClientSockets.Count; i++)
-//                        {
-//                            if (ClientSockets[i].RemoteEndPoint.ToString().Equals(socket.RemoteEndPoint.ToString()))
-//                            {
-//                                ClientSockets.Remove(ClientSockets[i]);
-//                                socket.Close();
-//                            }
-//                        }
-//                    }
+                    allDone.WaitOne(); // Block current thread and wait for signal from other thread
                 }
-                socket.BeginReceive(_buffer, offset, _buffer.Length, SocketFlags.None, ReceiveCallback, socket);
+            } catch (Exception e) {
+                Console.WriteLine(e.ToString());
             }
-            catch (Exception e)
-            {
-                ErrorOccured?.Invoke(e.Message);
-            }
-            
+
+            Console.WriteLine("\nPress enter to continue...");
+            Console.Read();
         }
 
-        /// <summary>
-        /// Sends specified data to a connected socket.
-        /// </summary>
-        /// <param name="socket">The socket recieving the message.</param>
-        /// <param name="message">The message that will be sent to the specified socket.</param>
-        private void SendData(Socket socket, string message)
-        {
-            int offset = 0;
-            byte[] data = Encoding.ASCII.GetBytes(message);
-            try
-            {
-                socket.BeginSend(data, offset, data.Length, SocketFlags.None, SendCallback, socket); 
-                _serverSocket.BeginAccept(AcceptCallback, null);
-            }
-            catch (Exception e)
-            {
-                ErrorOccured?.Invoke(e.Message);
+        private static void AcceptCallback(IAsyncResult ar) { 
+            allDone.Set();
+
+            Socket listener = (Socket) ar.AsyncState;
+            Socket handler = listener.EndAccept(ar);
+
+            StateObject state = new StateObject();
+            state.workSocket = handler;
+            handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallback), state);
+        }
+
+        private static void ReadCallback(IAsyncResult ar) {
+            StateObject state = (StateObject) ar.AsyncState;
+            Socket handler = state.workSocket;
+
+            int bytesRead = handler.EndReceive(ar);
+
+            if (bytesRead > 0) {
+                state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
+
+                var content = state.sb.ToString();
+                if (content.EndsWith("<EOF>")) {
+                    Console.WriteLine("Read {0} bytes from socket. \n Data : {1}", content.Length, content);
+                    Send(handler, $"SErVER SAYS HELLO as well as {content}");
+                    Console.WriteLine("Message sent.");
+                }
+                else {
+                    handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallback), state);
+                }
             }
         }
 
-        /// <summary>
-        /// Ends a pending async send.
-        /// </summary>
-        /// <param name="ascyncResult">Status of operation</param>
-        private void SendCallback(IAsyncResult ascyncResult)
-        {
-            try
-            {
-                Socket socket = (Socket)ascyncResult.AsyncState; 
-                socket.EndSend(ascyncResult); 
+        private static void Send(Socket handler, string data) {
+            byte[] byteData = Encoding.ASCII.GetBytes(data);
+
+            handler.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), handler);
+        }
+
+        private static void SendCallback(IAsyncResult ar) {
+            try {
+                Socket handler = (Socket) ar.AsyncState;
+
+                int bytesSent = handler.EndSend(ar);
+                Console.WriteLine("Sent {0} bytes to client.\n", bytesSent);
+
+                handler.Shutdown(SocketShutdown.Both);
+                handler.Close();
+            } catch (Exception e) {
+                Console.WriteLine(e.ToString());
             }
-            catch (Exception e)
-            {
-                ErrorOccured?.Invoke(e.Message);
-            }
+        }
+
+        private class StateObject {
+            public Socket workSocket = null;
+            public const int BufferSize = 1024;
+            public byte[] buffer = new byte[BufferSize];
+            public StringBuilder sb = new StringBuilder();
         }
     }
 }
