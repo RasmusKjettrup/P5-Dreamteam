@@ -8,7 +8,7 @@ namespace WarehouseAI
 {
     public class Frontier
     {
-        public Frontier(Node[] route, Item[] books, int weight)
+        public Frontier(Node[] route, Item[] books, float weight)
         {
             this.route = route;
             this.books = books;
@@ -26,6 +26,6 @@ namespace WarehouseAI
         /// <summary>
         /// the weight of the path the forntier has taken.
         /// </summary>
-        public int weight { get; }
+        public float weight { get; }
     }
 }

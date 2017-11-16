@@ -73,6 +73,11 @@ namespace WarehouseAI
             }
             throw new UnfittingNodeException("GetEdgeToNeighbour: The input node is recognized as a neighbour, but not found as part of any edge in Node.Edges");
         }
+
+        public float EuclidDistance(Node node)
+        {
+            return (float)Math.Sqrt(Math.Pow(node.X - X, 2) + Math.Pow(node.Y - Y, 2));
+        }
     }
 
     public class UnfittingNodeException: Exception

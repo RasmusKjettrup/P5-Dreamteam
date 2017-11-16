@@ -73,17 +73,10 @@ namespace WarehouseAI
                     }
 
                     Node node = _nodes.Find(n => n.Id == id);
-                    node.Edges = neighbourNodes.Select(n => new Edge<Node> { from = node, to = n, weight = -1 }).ToArray();
+                    node.Edges = neighbourNodes.Select(n => new Edge<Node> { from = node, to = n, weight = node.EuclidDistance(n) })
+                        .ToArray();
                 }
                 catch { }
-            }
-
-            foreach (Node node in _nodes)
-            {
-                foreach (Edge<Node> edge in node.Edges)
-                {
-                    edge.weight = (float)Math.Sqrt(Math.Pow(edge.from.X - edge.to.X, 2) + Math.Pow(edge.from.Y - edge.to.Y, 2));
-                }
             }
         }
 
@@ -114,11 +107,11 @@ namespace WarehouseAI
                 neighbourNodes.Add(_nodes.Find(n => n.Id == id));
             }
 
-            newNode.Edges = neighbourNodes.Select(n => new Edge<Node>() { from = newNode, to = n, weight = -1 })
+            newNode.Edges = neighbourNodes.Select(n => new Edge<Node>() { from = newNode, to = n, weight = newNode.EuclidDistance(n) })
                 .ToArray();
             foreach (Node node in neighbourNodes)
             {
-                node.Edges = node.Edges.Append(new Edge<Node>() { from = node, to = newNode, weight = -1 }).ToArray();
+                node.Edges = node.Edges.Append(new Edge<Node>() { from = node, to = newNode, weight = node.EuclidDistance(newNode) }).ToArray();
             }
 
             newNode.Id = _nodes.Max(n => n.Id) + 1;

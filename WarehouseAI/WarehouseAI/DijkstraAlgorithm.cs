@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ namespace WarehouseAI
 {
     /*     Dijkstra no longer needed?     */
 
-    
+
     public class DijkstraAlgorithm
     {
         //private List<Node> vertexSet;
@@ -30,12 +31,12 @@ namespace WarehouseAI
         //                distanceMatrix[i, j] = -1;
         //        }
         //    }
-            
+
         //    while (vertexSet.Count > 0)
         //    {
         //        current = 
         //    }
-            
+
 
         //    return distanceMatrix;
         //}
@@ -44,7 +45,7 @@ namespace WarehouseAI
         //{
         //    return null;
         //}
-        private Dictionary<Tuple<Node,Node>, float> _distances = new Dictionary<Tuple<Node,Node>, float>();
+        private Dictionary<Tuple<Node, Node>, float> _distances = new Dictionary<Tuple<Node, Node>, float>();
 
         private void LoadAllDistances(List<Node> nodes)
         {
@@ -52,7 +53,7 @@ namespace WarehouseAI
             {
                 foreach (Node node1 in nodes)
                 {
-                    _distances.Add(new Tuple<Node, Node>(node,node1), float.MaxValue);
+                    _distances.Add(new Tuple<Node, Node>(node, node1), float.MaxValue);
                 }
             }
         }
@@ -100,7 +101,7 @@ namespace WarehouseAI
                 next = nextPair.Key;
                 val = nextPair.Value;
                 queue.Remove(next);
-                
+
                 currentNode = next;
                 relativeWeight = val;
             }

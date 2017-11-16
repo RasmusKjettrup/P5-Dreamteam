@@ -30,7 +30,6 @@ namespace WarehouseAI
             return a / n;
         }
 
-
         public static void PlacementAlgorithm(List<Item> setOfItems)
         {
             foreach (Item item in setOfItems)
@@ -89,9 +88,9 @@ namespace WarehouseAI
         /// <returns></returns>
         public static float Weight(Item[] itemSet)
         {
-            return Weight(_minimalNetwork.AllNodes.Select(n => n.Parent).ToArray(), _cache, itemSet);
+            return Weight(_minimalNetwork.AllNodes.Cast<Node>().ToArray(), _cache, itemSet);
         }
-        
+
         /// <summary>
         /// Calculates and returns the weight of collecting a set of items. The calculation is done on the graph of nodes
         /// "graph", which is assumed to contain shelves that contain the items in the item set.
@@ -106,6 +105,8 @@ namespace WarehouseAI
             Node[] dummy;
             return Weight(graph, cache, itemSet, out dummy);
         }
+
+        private static DistanceMap _distanceMap;
 
         /// <summary>
         /// Calculates and returns the weight of collecting a set of items. The calculation is done on the graph of nodes
@@ -123,6 +124,7 @@ namespace WarehouseAI
             List<Frontier> frontiers = new List<Frontier>();
             frontiers.Add(new Frontier(new[] { graph[0] }, itemSet, 0));
             Node dropoff = graph[0];
+            _distanceMap = new DistanceMap(graph);
 
             while (cache[itemSet].Marked)
             {
@@ -133,22 +135,24 @@ namespace WarehouseAI
                     foreach (Shelf neighbour in lastNode.Neighbours.Where(n => n is Shelf).Cast<Shelf>()
                         .Where(s => s.Contains(frontier.books)))
                     {
+                        float distance = Distance(lastNode, neighbour);
                         if (!frontiers.Select(f => f.route).Contains(frontier.route.Append(neighbour))
-                            && frontier.weight/*+dist(lastNode, neighbour)*/<= resultingFrontier.weight)
+                            && frontier.weight + distance < resultingFrontier.weight)
                         {
                             resultingFrontier = new Frontier(frontier.route.Append(neighbour).ToArray(),
                                 frontier.books.Where(i => !neighbour.Contains(i)).ToArray(),
-                                frontier.weight/*+dist(lastNode, neighbour)*/);
+                                frontier.weight + distance);
                         }
                     }
                     CacheElement c;
                     if (cache.TryGet(itemSet.Except(frontier.books).ToArray(), out c) && c.Marked)
                     {
-                        if (frontier.weight/*+dist(lastNode,dropoff)*/ <= resultingFrontier.weight)
+                        float distance = Distance(lastNode, dropoff);
+                        if (frontier.weight + distance < resultingFrontier.weight)
                         {
                             resultingFrontier = new Frontier(frontier.route.Append(dropoff).ToArray(),
                                 frontier.books,
-                                frontier.weight/*+dist(lastNode,dropoff)*/);
+                                frontier.weight + distance);
                         }
                     }
                 }
@@ -163,6 +167,13 @@ namespace WarehouseAI
             }
 
             return cache[itemSet].Weight;
+        }
+
+        private static float Distance(Node from, Node to)
+        {
+            float f;
+            _distanceMap.TryGet(from.Id, to.Id, out f);
+            return f;
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace WarehouseAI
@@ -35,11 +36,14 @@ namespace WarehouseAI
             }
             Nodes = nodes.ToArray();
 
-            AStarAlgorithm aStar = new AStarAlgorithm();
+            DistanceMap map = new DistanceMap(AllNodes.Select(n => n.Parent).ToArray());
+
+            int id = 0;
 
             //Set the distance between the new nodes, and the new edges between them.
             foreach (INetworkNode i in AllNodes)
             {
+                ((Node) i).Id = i.Parent.Id;
                 List<Edge<Node>> edges = new List<Edge<Node>>();
                 foreach (INetworkNode j in AllNodes)
                 {
@@ -48,7 +52,7 @@ namespace WarehouseAI
                     edge.from = (Node)i;
                     edge.to = (Node)j;
                     //The weight between them is the distance between the old nodes.
-                    edge.weight = 2; //aStar.FindPath(graph, i.Parent, j.Parent); //TODO: Fix the weight of edges in the subnetwork
+                    map.TryGet(i.Parent.Id, j.Parent.Id, out edge.weight); //TODO: Fix the weight of edges in the subnetwork
                     edges.Add(edge);
                 }
                 //Set the new edges.

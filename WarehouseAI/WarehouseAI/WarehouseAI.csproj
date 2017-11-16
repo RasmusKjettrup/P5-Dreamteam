@@ -48,6 +48,7 @@
     <Compile Include="AStarAlgorithm.cs" />
     <Compile Include="DijkstraAlgorithm.cs" />
     <Compile Include="ConsoleController.cs" />
+    <Compile Include="DistanceMap.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Network\FilteredShelfNetworkNode.cs" />
     <Compile Include="Frontier.cs" />
