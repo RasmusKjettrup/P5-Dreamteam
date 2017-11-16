@@ -45,7 +45,6 @@ namespace WarehouseAI
         //{
         //    return null;
         //}
-        private Dictionary<Tuple<Node, Node>, float> _distances = new Dictionary<Tuple<Node, Node>, float>();
 
         /// <summary>
         /// A dictionary which consists of a tuple and a float.
