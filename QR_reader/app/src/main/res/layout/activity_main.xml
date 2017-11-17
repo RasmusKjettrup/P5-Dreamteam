@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
+              android:padding="5dp"
+              android:gravity="top"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/edit_ip"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:hint="IP Address"
+            android:text="192.168.43.7"/>
+
+        <EditText
+            android:id="@+id/edit_port"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Port"
+            android:text="100"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_allScan"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:onClick="launchScanner"
+        android:text="Scan for all supported codes" />
+
+    <Button
+        android:id="@+id/btn_qrScan"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:onClick="launchQRScanner"
+        android:text="Only QR" />
+
+    <Button
+        android:id="@+id/btn_recieveData"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:onClick="receiveData"
+        android:text="Get new route" />
+
+    <Button
+        android:id="@+id/btn_updateUI"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="updateUserInterface"
+        android:text="Update"/>
+
+    <EditText
+        android:id="@+id/edt_text_to_send"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:minWidth="100dp"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/txt_response"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Server response"
+            />
+    </ScrollView>
+
+
+</LinearLayout>

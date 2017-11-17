@@ -66,15 +66,12 @@
     <Compile Include="Shelf.cs" />
     <Compile Include="WarehouseRepresentation.cs" />
     <Compile Include="WeightCache.cs" />
+    <Compile Include="WarehouseIO.cs" />
+    <Compile Include="WarehouseServerIO.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Importance\" />
-    <Folder Include="Placement\" />
-    <Folder Include="Weight\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
