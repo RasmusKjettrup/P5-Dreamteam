@@ -18,17 +18,20 @@ namespace WarehouseAI
 
         private static void Main(string[] args)
         {
-            Debug.WriteLine("Test");
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Setting up _server...");
-            
-            Console.WriteLine("Server setup complete");
-            Console.WriteLine($"Type {CommandList} for all commands");
+            IController consoleController = new ConsoleController();
+            WarehouseRepresentation warehouse = new WarehouseRepresentation();
+            ItemDatabase itemDatabase = new ItemDatabase();
+
+            consoleController.warehouse = warehouse;
+            consoleController.itemDatabase = itemDatabase;
+            warehouse.ItemDatabase = itemDatabase;
 
             CommandSetup();
 
+            warehouse.Inintialize();
             WarehouseServerIO.StartListening();
 
+            consoleController.Start(args);
             while (_running)
             {
                 Console.Write("Please enter a command: ");

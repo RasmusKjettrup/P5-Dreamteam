@@ -11,7 +11,7 @@ namespace WarehouseAI
         /// <summary>
         /// The ID of the item.
         /// </summary>
-        public string ID { get; set; }
+        public int Id { get; set; }
         /// <summary>
         /// The name of the item.
         /// </summary>
@@ -19,55 +19,33 @@ namespace WarehouseAI
 
         public int Priority { get; set; }
 
-        public List<Item> IngoingRelations { get; }
+        private List<Item> IngoingRelations { get; }
 
-        public List<Item> OutgoingRelations  { get; }
+        private List<Item> OutgoingRelations  { get; }
 
-        public Item(string id, string name)
+        public Item(int id, string name)
         {
-            ID = id;
+            Id = id;
             Name = name;
             OutgoingRelations = new List<Item>();
             IngoingRelations = new List<Item>();
         }
-        /// <summary>
-        /// Adds an out going relation between to items
-        /// </summary>
-        /// <param name="relatedItem">Item that is related</param>
+
         public void AddOutgoingRelation(Item relatedItem)
         {
             OutgoingRelations.Add(relatedItem);
             relatedItem.AddIngoingRelations(this);
             Priority++;
         }
-        /// <summary>
-        /// Adds an out going relation between to items
-        /// </summary>
-        /// <param name="relatedItem">Item that is related</param>
+
         public void AddIngoingRelations(Item relatedItem)
         {
             IngoingRelations.Add(relatedItem);
         }
-        /// <summary>
-        /// Finds an item´s neighbours
-        /// </summary>
-        /// <returns>A list of neighbours</returns>
-        public List<Item> Neighbours()
+
+        public Item[] Neighbours()
         {
-            List<Item> neighbours = new List<Item>();
-
-            foreach (var ingoing in IngoingRelations )
-            {
-                foreach (var outgoing in OutgoingRelations)
-                {
-                    if (ingoing != outgoing && !neighbours.Contains(ingoing) && !neighbours.Contains(outgoing)) {
-                        neighbours.Add(ingoing);
-                        neighbours.Add(outgoing);
-                    }
-                }
-            }
-
-            return neighbours;
+            return OutgoingRelations.ToArray();
         }
 
     }
