@@ -27,6 +27,7 @@ namespace WarehouseAI
                 {"dist", Distance},
                 {"quit", s => Quit()},
                 {"q", s => Quit()},
+                {"help", PrintAllCommands},
             };
         }
 
@@ -224,6 +225,38 @@ namespace WarehouseAI
                 }
 
                 Console.WriteLine(@"{0} {1} ({2}) [{3}]", node.Id, typ, node.X + " " + node.Y, neighbours);
+            }
+        }
+
+        /// <summary>
+        /// Marks the error with red
+        /// </summary>
+        /// <param name="s">Error occured</param>
+        private static void ServerOnErrorOccured(string s)
+        {
+            ConsoleColor currentConsoleColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(s);
+            Console.ForegroundColor = currentConsoleColor;
+        }
+        /// <summary>
+        /// Prints all commands available
+        /// </summary>
+        private void PrintAllCommands(string[] args)
+        {
+            foreach (string commandsKey in commands.Keys)
+            {
+                Console.WriteLine(commandsKey);
+            }
+        }
+
+        private static void ServerOnMessageRecieved(string data, string client)
+        {
+            switch (data[0])
+            {
+                case 'Q': break; // Todo: Qr Message was recieved from client
+                case 'R': break; // Todo: Route request recieved from client
+                default: Console.WriteLine($"The following message was recieved from the IP {client}: {data}"); break;
             }
         }
     }
