@@ -1,6 +1,6 @@
 using System.Linq;
 
-namespace WarehouseAI
+namespace WarehouseAI.Network
 {
     public class FilteredShelfNetworkNode : ShelfNetworkNode
     {

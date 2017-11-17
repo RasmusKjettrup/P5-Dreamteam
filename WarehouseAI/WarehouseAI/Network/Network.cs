@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 
-namespace WarehouseAI
+namespace WarehouseAI.Network
 {
     public class Network<T> where T : INetworkNode
     {

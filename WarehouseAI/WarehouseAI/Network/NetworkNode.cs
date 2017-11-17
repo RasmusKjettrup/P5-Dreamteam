@@ -1,6 +1,6 @@
 using System.Linq;
 
-namespace WarehouseAI
+namespace WarehouseAI.Network
 {
     public class NetworkNode : Node, INetworkNode
     {
