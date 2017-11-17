@@ -209,6 +209,12 @@ namespace WarehouseAI
             return cache[itemSet].Weight;
         }
 
+        /// <summary>
+        /// Checks wether a potential set of nodes have already been added to a route in the set of frontiers or not.
+        /// </summary>
+        /// <param name="frontiers"></param>
+        /// <param name="potentialNodes"></param>
+        /// <returns></returns>
         private static bool NotExplored(Frontier[] frontiers, Node[] potentialNodes)
         {
             foreach (Frontier frontier in frontiers)
@@ -232,6 +238,13 @@ namespace WarehouseAI
             return true;
         }
 
+        /// <summary>
+        /// Uses a DistanceMap to find the distance between two nodes, and returns the result.
+        /// </summary>
+        /// <param name="distanceMap"></param>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <returns></returns>
         private static float Distance(DistanceMap distanceMap, Node from, Node to)
         {
             float f;
