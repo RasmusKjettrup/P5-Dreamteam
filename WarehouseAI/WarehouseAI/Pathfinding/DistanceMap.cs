@@ -55,32 +55,42 @@ namespace WarehouseAI.Pathfinding
             Dictionary<int, float> nodeSubDictionary;
             if (_dictionary.TryGetValue(node.Id, out nodeSubDictionary))
             {
-                Queue<Tuple<Node, float>> frontiers = new Queue<Tuple<Node, float>>();
+                int i = 0;
+                List<Tuple<Node, float>> frontiers = new List<Tuple<Node, float>>();
 
-                frontiers.Enqueue(new Tuple<Node, float>(node, 0));
+                frontiers.Add(new Tuple<Node, float>(node, 0));
 
-                while (frontiers.Count != 0)
+                while (frontiers.Count != i)
                 {
-                    Tuple<Node, float> currentFront = frontiers.Dequeue();
+                    Tuple<Node, float> currentFront = frontiers[i];
 
-                    bool updatedValue = false;
                     float weight;
                     if (nodeSubDictionary.TryGetValue(currentFront.Item1.Id, out weight))
                     {
                         if (currentFront.Item2 < weight)
                         {
-                            updatedValue = true;
                             nodeSubDictionary[currentFront.Item1.Id] = currentFront.Item2;
                         }
                     }
 
-                    if (updatedValue)
+                    foreach (Edge<Node> edge in currentFront.Item1.Edges)
                     {
-                        foreach (Edge<Node> edge in currentFront.Item1.Edges)
+                        float newWeight = currentFront.Item2 + edge.weight;
+                        bool add = true;
+                        foreach (Tuple<Node, float> frontier in frontiers)
                         {
-                            frontiers.Enqueue(new Tuple<Node, float>(edge.to, currentFront.Item2 + edge.weight));
+                            if (frontier.Item1 == edge.to && frontier.Item2 < newWeight)
+                            {
+                                add = false;
+                                break;
+                            }
+                        }
+                        if (add)
+                        {
+                            frontiers.Add(new Tuple<Node, float>(edge.to, newWeight));
                         }
                     }
+                    i++;
                 }
             }
         }
