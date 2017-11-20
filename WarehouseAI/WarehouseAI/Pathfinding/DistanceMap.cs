@@ -55,7 +55,6 @@ namespace WarehouseAI.Pathfinding
             Dictionary<int, float> nodeSubDictionary;
             if (_dictionary.TryGetValue(node.Id, out nodeSubDictionary))
             {
-                List<Node> markedNodes = new List<Node>();
                 Queue<Tuple<Node, float>> frontiers = new Queue<Tuple<Node, float>>();
 
                 frontiers.Enqueue(new Tuple<Node, float>(node, 0));
@@ -63,18 +62,19 @@ namespace WarehouseAI.Pathfinding
                 while (frontiers.Count != 0)
                 {
                     Tuple<Node, float> currentFront = frontiers.Dequeue();
-                    markedNodes.Add(currentFront.Item1);
 
-                    float dummy;
-                    if (nodeSubDictionary.TryGetValue(currentFront.Item1.Id, out dummy))
+                    bool updatedValue = false;
+                    float weight;
+                    if (nodeSubDictionary.TryGetValue(currentFront.Item1.Id, out weight))
                     {
-                        nodeSubDictionary[currentFront.Item1.Id] = 
-                            Math.Min(currentFront.Item2, nodeSubDictionary[currentFront.Item1.Id]);
+                        updatedValue = currentFront.Item2 < weight;
+                        nodeSubDictionary[currentFront.Item1.Id] =
+                            Math.Min(currentFront.Item2, weight);
                     }
 
-                    foreach (Edge<Node> edge in currentFront.Item1.Edges)
+                    if (updatedValue)
                     {
-                        if (!markedNodes.Contains(edge.to))
+                        foreach (Edge<Node> edge in currentFront.Item1.Edges)
                         {
                             frontiers.Enqueue(new Tuple<Node, float>(edge.to, currentFront.Item2 + edge.weight));
                         }
