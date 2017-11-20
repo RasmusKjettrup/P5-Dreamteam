@@ -45,32 +45,33 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AStarAlgorithm.cs" />
-    <Compile Include="DijkstraAlgorithm.cs" />
-    <Compile Include="ConsoleController.cs" />
-    <Compile Include="DistanceMap.cs" />
+    <Compile Include="Pathfinding\AStarAlgorithm.cs" />
+    <Compile Include="Pathfinding\DijkstraAlgorithm.cs" />
+    <Compile Include="UI\ConsoleController.cs" />
+    <Compile Include="Pathfinding\DistanceMap.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="Network\FilteredShelfNetworkNode.cs" />
+    <Compile Include="ShortestPathGraph\FilteredShelfShortestPathGraphNode.cs" />
     <Compile Include="Frontier.cs" />
-    <Compile Include="IController.cs" />
-    <Compile Include="Item.cs" />
-    <Compile Include="ItemDatabase.cs" />
-    <Compile Include="Network\INetworkNode.cs" />
-    <Compile Include="Network\Network.cs" />
-    <Compile Include="Network\NetworkNode.cs" />
-    <Compile Include="Network\ShelfNetworkNode.cs" />
-    <Compile Include="Node.cs" />
+    <Compile Include="UI\IController.cs" />
+    <Compile Include="Representation\Item.cs" />
+    <Compile Include="Representation\ItemDatabase.cs" />
+    <Compile Include="ShortestPathGraph\IShortestPathGraphNode.cs" />
+    <Compile Include="ShortestPathGraph\ShortestPathGraph.cs" />
+    <Compile Include="ShortestPathGraph\ShortestPathGraphNode.cs" />
+    <Compile Include="ShortestPathGraph\ShelfShortestPathGraphNode.cs" />
+    <Compile Include="Representation\Node.cs" />
     <Compile Include="Algorithms.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Shelf.cs" />
-    <Compile Include="WarehouseRepresentation.cs" />
-    <Compile Include="WeightCache.cs" />
+    <Compile Include="Representation\Shelf.cs" />
+    <Compile Include="Representation\WarehouseRepresentation.cs" />
+    <Compile Include="Representation\WeightCache.cs" />
     <Compile Include="WarehouseServerIO.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
