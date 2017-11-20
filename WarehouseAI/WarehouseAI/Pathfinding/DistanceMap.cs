@@ -67,9 +67,11 @@ namespace WarehouseAI.Pathfinding
                     float weight;
                     if (nodeSubDictionary.TryGetValue(currentFront.Item1.Id, out weight))
                     {
-                        updatedValue = currentFront.Item2 < weight;
-                        nodeSubDictionary[currentFront.Item1.Id] =
-                            Math.Min(currentFront.Item2, weight);
+                        if (currentFront.Item2 < weight)
+                        {
+                            updatedValue = true;
+                            nodeSubDictionary[currentFront.Item1.Id] = currentFront.Item2;
+                        }
                     }
 
                     if (updatedValue)
