@@ -42,7 +42,7 @@ namespace WarehouseAI.Pathfinding
         private Node GetNextNodeToInvestigate()
         {
             //find node with the lowest f-cost, else, search by h-cost
-            float lastFCost = 1000000, lastHCost = 1000000;
+            float lastFCost = float.MaxValue, lastHCost = float.MaxValue;
             Node lastNode = null;
             bool NodeFound = false;
             foreach (Node n in openSet)
@@ -84,7 +84,7 @@ namespace WarehouseAI.Pathfinding
             //Initialize g-Cost for all nodes in the graph
             foreach (Node n in graph)
             {
-                n.gCost = 1000000; //1.000.000 being some default high value.
+                n.gCost = float.MaxValue; //1.000.000 being some default high value.
             }
 
             Node current;
