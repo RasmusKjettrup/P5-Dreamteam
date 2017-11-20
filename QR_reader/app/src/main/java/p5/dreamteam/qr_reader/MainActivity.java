@@ -1,6 +1,7 @@
 package p5.dreamteam.qr_reader;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,11 +26,13 @@ public class MainActivity extends AppCompatActivity {
     private EditText _editTextToSend;
     private EditText _editIP;
     private EditText _editPort;
+    private CheckBox _chkFlash;
 
     private final static String TAG = "MainActivity";
     private String serverResponse;
     private String dataToSend;
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,9 +41,12 @@ public class MainActivity extends AppCompatActivity {
         _editTextToSend = findViewById(R.id.edt_text_to_send);
         _editIP = findViewById(R.id.edit_ip);
         _editPort = findViewById(R.id.edit_port);
+        _chkFlash = findViewById(R.id.check_flash);
 
         _editIP.setInputType(InputType.TYPE_CLASS_PHONE);
         _editPort.setInputType(InputType.TYPE_CLASS_PHONE);
+        _editIP.setText("192.168.43.7");
+        _editPort.setText("100");
     }
 
     public void launchScanner(View v) {
@@ -49,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 0);
             } else {
                 Intent intent = new Intent(this, ZBarScannerActivity.class);
+                intent.putExtra("FLASH", _chkFlash.isChecked());
                 startActivityForResult(intent, ZBAR_SCANNER_REQUEST);
             }
         } else {
