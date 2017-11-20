@@ -1,11 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using WarehouseAI.Network;
+using WarehouseAI.Pathfinding;
+using WarehouseAI.ShortestPathGraph;
 
-namespace WarehouseAI
+namespace WarehouseAI.Representation
 {
     public class WarehouseRepresentation
     {
@@ -89,7 +89,7 @@ namespace WarehouseAI
                     }
 
                     Node node = _nodes.Find(n => n.Id == id);
-                    node.Edges = neighbourNodes.Select(n => new Edge<Node> { from = node, to = n, weight = node.EuclidDistance(n) })
+                    node.Edges = neighbourNodes.Select(n => new Edge<Node> { @from = node, to = n, weight = node.EuclidDistance(n) })
                         .ToArray();
                 }
                 catch { }
@@ -122,11 +122,11 @@ namespace WarehouseAI
                 neighbourNodes.Add(_nodes.Find(n => n.Id == id));
             }
 
-            newNode.Edges = neighbourNodes.Select(n => new Edge<Node>() { from = newNode, to = n, weight = newNode.EuclidDistance(n) })
+            newNode.Edges = neighbourNodes.Select(n => new Edge<Node>() { @from = newNode, to = n, weight = newNode.EuclidDistance(n) })
                 .ToArray();
             foreach (Node node in neighbourNodes)
             {
-                node.Edges = node.Edges.Append(new Edge<Node>() { from = node, to = newNode, weight = node.EuclidDistance(newNode) }).ToArray();
+                node.Edges = node.Edges.Append(new Edge<Node>() { @from = node, to = newNode, weight = node.EuclidDistance(newNode) }).ToArray();
             }
 
             newNode.Id = _nodes.Max(n => n.Id) + 1;
@@ -140,14 +140,14 @@ namespace WarehouseAI
         /// <param name="item"></param>
         public void AddBook(Item item)
         {
-            //The filterNetwork is used as a tempoary graph where evaluations of the state are run on.
-            //Only shelves and the dropoff point is added to the network.
-            //Each node is a new "FilteredShelfNetworkNode", with an all pairs connection to eachother.
-            Network<FilteredShelfNetworkNode> filterNetwork = new Network<FilteredShelfNetworkNode>(
+            //The filterShortestPathGraph is used as a tempoary graph where evaluations of the state are run on.
+            //Only shelves and the dropoff point is added to the shortestPathGraph.
+            //Each node is a new "FilteredShelfShortestPathGraphNode", with an all pairs connection to eachother.
+            ShortestPathGraph<FilteredShelfShortestPathGraphNode> filterShortestPathGraph = new ShortestPathGraph<FilteredShelfShortestPathGraphNode>(
                 _nodes.ToArray(), n => n is Shelf,
-                s => new FilteredShelfNetworkNode((Shelf)s, item));
+                s => new FilteredShelfShortestPathGraphNode((Shelf)s, item));
             //The currentNode is any node in the graph, where greedy descent evaluations are completed on.
-            INetworkNode currentNode = filterNetwork.Dropoff;
+            IShortestPathGraphNode currentNode = filterShortestPathGraph.Dropoff;
 
             //The itemSets are the sets of items that need to be evaluated on.
             Item[][] itemSets = AddedItems.Union(new[] { item }).Power().Where(i => i.Contains(item)).ToArray();
@@ -156,7 +156,7 @@ namespace WarehouseAI
             //Whenever "cont" is not set back to "true" after running the while loop, new lowest local evaluations are still being found.
             bool cont = true;
             //A list of marked nodea are maintained, to prevent evaluating the same node twice
-            List<FilteredShelfNetworkNode> markedNodes = new List<FilteredShelfNetworkNode>();
+            List<FilteredShelfShortestPathGraphNode> markedNodes = new List<FilteredShelfShortestPathGraphNode>();
 
             while (cont)
             {
@@ -165,10 +165,10 @@ namespace WarehouseAI
                 //neighbours are the neighbouring nodes of the currentnode, where only "FilteredShelfNodes" are included,
                 //the capacity for new items on the shelf are more than 0, and only including the 5 first.
                 //Since the neighbours are ordered with lowest weight first, the 5 closest are chosen.
-                FilteredShelfNetworkNode[] neighbours = ((Node)currentNode).Neighbours.Where(n => n is FilteredShelfNetworkNode)
-                    .Cast<FilteredShelfNetworkNode>().Where(n => n.Capacity > 0).Take(5).ToArray();
+                FilteredShelfShortestPathGraphNode[] neighbours = ((Node)currentNode).Neighbours.Where(n => n is FilteredShelfShortestPathGraphNode)
+                    .Cast<FilteredShelfShortestPathGraphNode>().Where(n => n.Capacity > 0).Take(5).ToArray();
 
-                foreach (FilteredShelfNetworkNode neighbour in neighbours)
+                foreach (FilteredShelfShortestPathGraphNode neighbour in neighbours)
                 {
                     if (markedNodes.Contains(neighbour))
                     {
@@ -178,7 +178,7 @@ namespace WarehouseAI
                     //Add the item to the neighbour...
                     neighbour.AddFilteredItem = true;
                     //Evaluate the state...
-                    float eval = EvaluationFunction(filterNetwork, itemSets);
+                    float eval = EvaluationFunction(filterShortestPathGraph, itemSets);
                     //And remove the item from the neighbour.
                     neighbour.AddFilteredItem = false;
 
@@ -201,41 +201,41 @@ namespace WarehouseAI
         }
 
         /// <summary>
-        /// Evaluates the current state of the network, and returns the efficency.
+        /// Evaluates the current state of the shortestPathGraph, and returns the efficency.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="network"></param>
+        /// <param name="shortestPathGraph"></param>
         /// <param name="itemSets">The sets to evaluate</param>
         /// <returns></returns>
-        private float EvaluationFunction<T>(Network<T> network, Item[][] itemSets) where T : INetworkNode
+        private float EvaluationFunction<T>(ShortestPathGraph<T> shortestPathGraph, Item[][] itemSets) where T : IShortestPathGraphNode
         {
             //Order the sets of items in the list to optimize the cache implementation
             itemSets = itemSets.OrderByDescending(i => i.Length).ToArray();
             //Create a new cache used in the specific evaulationfunction
             WeightCache cache = new WeightCache(itemSets);
             //Calculate distances between nodes only once, and pass them along to the weight algorithm.
-            DistanceMap map = new DistanceMap(network.AllNodes.Cast<Node>().ToArray());
+            DistanceMap map = new DistanceMap(shortestPathGraph.AllNodes.Cast<Node>().ToArray());
 
             float result = 0;
             //Find the sum of the evaluation of each item set in itemSets
             foreach (Item[] set in itemSets)
             {
-                result += EvaluateSet(network, set, cache, map);
+                result += EvaluateSet(shortestPathGraph, set, cache, map);
             }
 
             return result;
         }
 
         /// <summary>
-        /// Evaluate the state of the network with one specific set of items.
+        /// Evaluate the state of the shortestPathGraph with one specific set of items.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="network"></param>
+        /// <param name="shortestPathGraph"></param>
         /// <param name="cache"></param>
         /// <param name="itemSet"></param>
         /// <param name="map"></param>
         /// <returns></returns>
-        private float EvaluateSet<T>(Network<T> network, Item[] itemSet, WeightCache cache, DistanceMap map) where T : INetworkNode
+        private float EvaluateSet<T>(ShortestPathGraph<T> shortestPathGraph, Item[] itemSet, WeightCache cache, DistanceMap map) where T : IShortestPathGraphNode
         {
             //The importance of the items in relation to eachother.
             float importance = Algorithms.Importance(itemSet);
@@ -246,8 +246,8 @@ namespace WarehouseAI
                 return 0;
             }
 
-            //Calculate the weight given a set of nodes (the network), a cache, and a set of items.
-            return importance * Algorithms.Weight(network.AllNodes.Cast<Node>().ToArray(), itemSet, cache, map);
+            //Calculate the weight given a set of nodes (the shortestPathGraph), a cache, and a set of items.
+            return importance * Algorithms.Weight(shortestPathGraph.AllNodes.Cast<Node>().ToArray(), itemSet, cache, map);
         }
     }
 }

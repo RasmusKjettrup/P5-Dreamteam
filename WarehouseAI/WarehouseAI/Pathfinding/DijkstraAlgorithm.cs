@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using WarehouseAI.Representation;
 
-namespace WarehouseAI
+namespace WarehouseAI.Pathfinding
 {
     /*     Dijkstra no longer needed?     */
 

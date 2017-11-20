@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using WarehouseAI.Representation;
 
-namespace WarehouseAI
+namespace WarehouseAI.Pathfinding
 {
     /// <summary>
     /// A map of distances from all nodes in a graph to all other nodes in the graph.

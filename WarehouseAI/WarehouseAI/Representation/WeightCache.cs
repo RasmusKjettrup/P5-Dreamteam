@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace WarehouseAI
+namespace WarehouseAI.Representation
 {
     public class WeightCache
     {

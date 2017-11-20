@@ -1,4 +1,6 @@
-namespace WarehouseAI
+using WarehouseAI.Representation;
+
+namespace WarehouseAI.UI
 {
     public interface IController
     {

@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WarehouseAI.Network;
+using WarehouseAI.Pathfinding;
+using WarehouseAI.Representation;
+using WarehouseAI.ShortestPathGraph;
 
 namespace WarehouseAI
 {
     public static class Algorithms
     {
-        private static Network<ShelfNetworkNode> _minimalNetwork;
+        private static ShortestPathGraph<ShelfShortestPathGraphNode> _minimalShortestPathGraph;
         private static WeightCache _cache;
 
         /// <summary>
@@ -73,7 +75,7 @@ namespace WarehouseAI
 
         public static void InitializeWeight(params Node[] nodes)
         {
-            _minimalNetwork = new Network<ShelfNetworkNode>(nodes, n => n is Shelf, n => new ShelfNetworkNode((Shelf)n));
+            _minimalShortestPathGraph = new ShortestPathGraph<ShelfShortestPathGraphNode>(nodes, n => n is Shelf, n => new ShelfShortestPathGraphNode((Shelf)n));
         }
 
         public static void InitializeCache(ItemDatabase itemDatabase)
@@ -89,7 +91,7 @@ namespace WarehouseAI
         /// <returns></returns>
         public static float Weight(Item[] itemSet)
         {
-            return Weight(_minimalNetwork.AllNodes.Cast<Node>().ToArray(), itemSet);
+            return Weight(_minimalShortestPathGraph.AllNodes.Cast<Node>().ToArray(), itemSet);
         }
 
         /// <summary>

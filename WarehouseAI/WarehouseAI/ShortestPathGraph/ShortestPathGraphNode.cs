@@ -1,12 +1,13 @@
 using System.Linq;
+using WarehouseAI.Representation;
 
-namespace WarehouseAI.Network
+namespace WarehouseAI.ShortestPathGraph
 {
-    public class ShelfNetworkNode : Shelf, INetworkNode
+    public class ShortestPathGraphNode : Node, IShortestPathGraphNode
     {
         public Node Parent { get; set; }
 
-        public ShelfNetworkNode(Shelf parent)
+        public ShortestPathGraphNode(Node parent)
         {
             Parent = parent;
         }

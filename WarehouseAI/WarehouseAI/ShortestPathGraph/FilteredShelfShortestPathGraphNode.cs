@@ -1,8 +1,9 @@
 using System.Linq;
+using WarehouseAI.Representation;
 
-namespace WarehouseAI.Network
+namespace WarehouseAI.ShortestPathGraph
 {
-    public class FilteredShelfNetworkNode : ShelfNetworkNode
+    public class FilteredShelfShortestPathGraphNode : ShelfShortestPathGraphNode
     {
         public bool AddFilteredItem = false;
         public int Capacity;
@@ -17,7 +18,7 @@ namespace WarehouseAI.Network
             }
         }
 
-        public FilteredShelfNetworkNode(Shelf parent, Item filterItem) : base(parent)
+        public FilteredShelfShortestPathGraphNode(Shelf parent, Item filterItem) : base(parent)
         {
             _filterItem = filterItem;
             Capacity = parent.RemaningCapacity;

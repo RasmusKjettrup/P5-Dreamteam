@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using WarehouseAI;
+using WarehouseAI.Representation;
 
 namespace WarehouseAITest
 {

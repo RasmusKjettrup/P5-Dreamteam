@@ -1,8 +1,7 @@
-using System.Collections.Generic;
-using System.Linq;
 using System;
+using System.Linq;
 
-namespace WarehouseAI
+namespace WarehouseAI.Representation
 {
     public class Edge<T>
     {
