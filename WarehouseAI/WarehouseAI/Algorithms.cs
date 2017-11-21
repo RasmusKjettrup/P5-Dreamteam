@@ -217,28 +217,28 @@ namespace WarehouseAI
         /// <param name="frontiers"></param>
         /// <param name="potentialNodes"></param>
         /// <returns></returns>
-        private static bool NotExplored(Frontier[] frontiers, Node[] potentialNodes)
+private static bool NotExplored(Frontier[] frontiers, Node[] potentialNodes)
+{
+    foreach (Frontier frontier in frontiers)
+    {
+        if (frontier.route.Length != potentialNodes.Length)
         {
-            foreach (Frontier frontier in frontiers)
-            {
-                if (frontier.route.Length != potentialNodes.Length)
-                {
-                    continue;
-                }
-                for (int i = 0; i < frontier.route.Length; i++)
-                {
-                    if (potentialNodes[i] != frontier.route[i])
-                    {
-                        break;
-                    }
-                    if (i == frontier.route.Length - 1)
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
+            continue;
         }
+        for (int i = 0; i < frontier.route.Length; i++)
+        {
+            if (potentialNodes[i] != frontier.route[i])
+            {
+                break;
+            }
+            if (i == frontier.route.Length - 1)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
 
         /// <summary>
         /// Uses a DistanceMap to find the distance between two nodes, and returns the result.

@@ -360,3 +360,5 @@ paket-files/
 amazon-related-crawler/amazon/items\.txt
 
 amazon-related-crawler/amazon/relations\.txt
+
+WarehouseAI/WarehouseAI/obj/Debug/
