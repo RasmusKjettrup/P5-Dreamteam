@@ -231,7 +231,7 @@ namespace WarehouseAI
                     {
                         break;
                     }
-                    if (i == frontier.route.Length-1)
+                    if (i == frontier.route.Length - 1)
                     {
                         return false;
                     }
@@ -250,7 +250,10 @@ namespace WarehouseAI
         private static float Distance(DistanceMap distanceMap, Node from, Node to)
         {
             float f;
-            distanceMap.TryGet(from.Id, to.Id, out f);
+            if (!distanceMap.TryGet(from.Id, to.Id, out f))
+            {
+                throw new ArgumentException("A distance from " + from.Id + " to " + to.Id + " was not found.");
+            }
             return f;
         }
     }
