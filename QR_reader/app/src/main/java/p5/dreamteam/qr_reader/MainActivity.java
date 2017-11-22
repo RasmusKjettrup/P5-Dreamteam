@@ -19,10 +19,12 @@ import android.widget.Toast;
 
 import java.util.concurrent.ExecutionException;
 
+/**
+ * Main class that the user meets on app launch.
+ */
 public class MainActivity extends AppCompatActivity {
 
     private static final int ZBAR_SCANNER_REQUEST = 0;
-    private static final int ZBAR_QR_SCANNER_REQUEST = 1;
     private TextView _txtResponse;
     private EditText _editTextToSend;
     private EditText _editIP;
@@ -30,8 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox _chkFlash;
 
     private final static String TAG = "MainActivity";
-    private String serverResponse;
-    private String dataToSend;
+    private String _serverResponse;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -75,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case ZBAR_SCANNER_REQUEST:
                 if (resultCode == RESULT_OK) {
-                    dataToSend = data.getStringExtra(ZBarConstants.SCAN_RESULT);
+                    String dataToSend = data.getStringExtra(ZBarConstants.SCAN_RESULT);
                     sendDataToServer(dataToSend);
                 } else if(resultCode == RESULT_CANCELED && data != null) {
                     String error = data.getStringExtra(ZBarConstants.ERROR_INFO);
@@ -91,8 +92,8 @@ public class MainActivity extends AppCompatActivity {
         try {
             ConnectionTask task = new ConnectionTask(_editIP.getText().toString(),
                     Integer.parseInt(_editPort.getText().toString()), data);
-            serverResponse = task.execute().get();
-            _txtResponse.setText(serverResponse);
+            _serverResponse = task.execute().get();
+            _txtResponse.setText(_serverResponse);
         } catch (InterruptedException e) {
             Log.e(TAG, e.getMessage());
         } catch (ExecutionException e) {
@@ -102,9 +103,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void updateUserInterface(View view) {
+    public void sendDataButtonClick(View view) {
         sendDataToServer(_editTextToSend.getText().toString());
-        Toast.makeText(this, serverResponse, Toast.LENGTH_LONG).show();
-        _txtResponse.setText(serverResponse);
+//        Toast.makeText(this, _serverResponse, Toast.LENGTH_LONG).show();
+        _txtResponse.setText(_serverResponse);
     }
 }

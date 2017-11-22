@@ -64,21 +64,33 @@
     </LinearLayout>
 
 
-    <Button
-        android:id="@+id/btn_updateUI"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="updateUserInterface"
-        android:text="Send"
-        />
-
-    <EditText
-        android:id="@+id/edt_text_to_send"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="text"
-        android:hint="Text to send"
-        />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_updateUI"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="sendDataButtonClick"
+            android:text="Send"
+            />
+
+        <Space
+            android:layout_width="5dp"
+            android:layout_height="wrap_content"
+            />
+
+        <EditText
+            android:id="@+id/edt_text_to_send"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:hint="Text to send"
+            />
+    </LinearLayout>
+
 
     <ScrollView
         android:layout_width="match_parent"

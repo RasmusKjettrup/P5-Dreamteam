@@ -11,19 +11,19 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 /**
- * TODO: Add a class header comment!
+ * Task that asynchronously creates a connection to a server, and terminates on server response.
  */
 public class ConnectionTask extends AsyncTask<Void, Void, String> {
     private static final String TAG = "ConnectionTask";
-    private String ip;
-    private int port;
-    private String data;
-    private Socket socket;
+    private String _ip;
+    private int _port;
+    private String _data;
+    private Socket _socket;
 
     ConnectionTask(String ip, int port, String data) {
-        this.ip = ip;
-        this.port = port;
-        this.data = data;
+        this._ip = ip;
+        this._port = port;
+        this._data = data;
     }
 
     @Override
@@ -31,9 +31,9 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
         String response;
 
         try {
-            sendDataToServer(data);
+            sendDataToServer(_data);
             response = receiveDataFromServer();
-            socket.close();
+            _socket.close();
         } catch (IOException e) {
             response = "Server not found";
             Log.e(TAG, "Server not found - doInBackground()");
@@ -50,7 +50,7 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
     private String receiveDataFromServer() throws IOException {
         StringBuilder response = new StringBuilder();
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
 
         for (String line = reader.readLine(); line != null; line = reader.readLine()) {
             response.append(line);
@@ -60,8 +60,8 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
     }
 
     private void sendDataToServer(String data) throws IOException {
-        socket = new Socket(ip, port);
-        PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
+        _socket = new Socket(_ip, _port);
+        PrintWriter writer = new PrintWriter(new OutputStreamWriter(_socket.getOutputStream()));
         writer.print(data + "<EOF>"); // Server expects <EOF>, since we can send more lines in one message
         writer.flush();
     }
