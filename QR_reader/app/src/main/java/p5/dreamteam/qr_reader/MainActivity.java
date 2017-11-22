@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText _editIP;
     private EditText _editPort;
     private CheckBox _chkFlash;
+    private CheckBox _chkSendImmediately;
 
     private final static String TAG = "MainActivity";
     private String _serverResponse;
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         _editIP = findViewById(R.id.edit_ip);
         _editPort = findViewById(R.id.edit_port);
         _chkFlash = findViewById(R.id.check_flash);
+        _chkSendImmediately = findViewById(R.id.check_sendImmediately);
 
         _editIP.setInputType(InputType.TYPE_CLASS_PHONE);
         _editPort.setInputType(InputType.TYPE_CLASS_PHONE);
@@ -74,7 +77,11 @@ public class MainActivity extends AppCompatActivity {
             case ZBAR_SCANNER_REQUEST:
                 if (resultCode == RESULT_OK) {
                     String dataToSend = data.getStringExtra(ZBarConstants.SCAN_RESULT);
-                    sendDataToServer(dataToSend);
+                    if (_chkSendImmediately.isChecked()) {
+                        sendDataToServer(dataToSend);
+                    } else {
+                        _editTextToSend.setText(dataToSend);
+                    }
                 } else if(resultCode == RESULT_CANCELED && data != null) {
                     String error = data.getStringExtra(ZBarConstants.ERROR_INFO);
                     if(!TextUtils.isEmpty(error)) {
@@ -86,7 +93,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             launchScanner();
         } else {
@@ -111,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendDataButtonClick(View view) {
         sendDataToServer(_editTextToSend.getText().toString());
-//        Toast.makeText(this, _serverResponse, Toast.LENGTH_LONG).show();
         _txtResponse.setText(_serverResponse);
+        _editTextToSend.setText("");
     }
 }

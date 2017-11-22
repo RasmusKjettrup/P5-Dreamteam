@@ -72,10 +72,9 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
     @Override
     protected void onResume() {
         super.onResume();
-        // Open the default i.e. the first rear facing camera.
-        _camera = Camera.open();
+
+        _camera = Camera.open(); // rear
         if(_camera == null) {
-            // Cancel request if _camera is null.
             cancelRequest();
             return;
         }
@@ -113,8 +112,6 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
     protected void onPause() {
         super.onPause();
 
-        // Because the Camera object is a shared resource, it's very
-        // important to release it when the activity is paused.
         if (_camera != null) {
             _preview.setCamera(null);
             _camera.cancelAutoFocus();
