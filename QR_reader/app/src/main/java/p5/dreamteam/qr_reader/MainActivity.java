@@ -10,6 +10,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -53,14 +54,15 @@ public class MainActivity extends AppCompatActivity {
         if (isCameraAvailable()) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) !=
                     PackageManager.PERMISSION_GRANTED) { // If no permission -> ask, else start
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 0);
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.CAMERA}, 0);
             } else {
                 Intent intent = new Intent(this, ZBarScannerActivity.class);
                 intent.putExtra("FLASH", _chkFlash.isChecked());
                 startActivityForResult(intent, ZBAR_SCANNER_REQUEST);
             }
         } else {
-            Toast.makeText(this, "Rear Facing Camera Unavailable", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Rear facing camera unavailable", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -72,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case ZBAR_SCANNER_REQUEST:
-            case ZBAR_QR_SCANNER_REQUEST:
                 if (resultCode == RESULT_OK) {
                     dataToSend = data.getStringExtra(ZBarConstants.SCAN_RESULT);
                     sendDataToServer(dataToSend);
@@ -87,14 +88,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void sendDataToServer(String data) {
-        ConnectionTask task = new ConnectionTask(_editIP.getText().toString(), 100, data);
         try {
+            ConnectionTask task = new ConnectionTask(_editIP.getText().toString(),
+                    Integer.parseInt(_editPort.getText().toString()), data);
             serverResponse = task.execute().get();
             _txtResponse.setText(serverResponse);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         } catch (ExecutionException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
+        } catch (NumberFormatException e) {
+            _txtResponse.setText("Wrong port format");
         }
     }
 

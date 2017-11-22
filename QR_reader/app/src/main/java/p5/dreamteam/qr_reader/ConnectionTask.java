@@ -28,13 +28,17 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
 
     @Override
     protected String doInBackground(Void... voids) {
-        sendDataToServer(data);
-        String response = receiveDataFromServer();
+        String response;
+
         try {
+            sendDataToServer(data);
+            response = receiveDataFromServer();
             socket.close();
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            response = "Server not found";
+            Log.e(TAG, "Server not found - doInBackground()");
         }
+
         return response;
     }
 
@@ -43,29 +47,22 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
         super.onPostExecute(s);
     }
 
-    private String receiveDataFromServer() {
+    private String receiveDataFromServer() throws IOException {
         StringBuilder response = new StringBuilder();
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-                response.append(line);
-            }
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+        BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+        for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+            response.append(line);
         }
 
         return response.substring(0, response.length() - 5); // Remove <EOF> from displayed response
     }
 
-    private void sendDataToServer(String data) {
-        try {
-            socket = new Socket(ip, port);
-            PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
-            writer.print(data + "<EOF>"); // Server expects <EOF>, since we can send more lines in one message
-            writer.flush();
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
-        }
+    private void sendDataToServer(String data) throws IOException {
+        socket = new Socket(ip, port);
+        PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
+        writer.print(data + "<EOF>"); // Server expects <EOF>, since we can send more lines in one message
+        writer.flush();
     }
 }
