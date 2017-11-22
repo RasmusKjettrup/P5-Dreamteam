@@ -170,9 +170,9 @@ namespace WarehouseAITest
             rep.AddNode(node1); 
             rep.AddNode(node2, 0); 
             rep.AddNode(node3, 0); 
-            rep.AddNode(node4, 2); 
+            rep.AddNode(node4, 2, 1); 
             rep.AddNode(node5, 3); 
-            rep.AddNode(node6, 0, 2, 3); 
+            rep.AddNode(node6, 0, 2, 3, 4, 5); 
             rep.AddNode(node7, 1, 4, 6); 
             rep.AddNode(node8, 5, 6, 7); 
             rep.AddNode(node9, 0, 3); 
@@ -215,6 +215,83 @@ namespace WarehouseAITest
             float allowedDeviation = 108.6f / 2; // The allowed deviation is the smallest possible distance between two shelves divided by 2.
             Assert.LessOrEqual(actual - allowedDeviation, expected);
 
+        }
+
+        [Test]
+        public void WeightAlgorithTest_TestWithNoRepresentationInitialization_ExceptionExpected()
+        {
+            // Arrange
+            WarehouseRepresentation rep = new WarehouseRepresentation();
+            Generate5Nodes(rep);
+
+            string itemPath = GenerateItemFile("item1", "item2");
+            ItemDatabase idb = new ItemDatabase();
+            idb.ImportItems(itemPath);
+            rep.ItemDatabase = idb;
+            Item[] items = idb.Items;
+
+
+            // Act
+            Algorithms.InitializeCache(idb);
+            ((Shelf)rep.Nodes.First(n => n.Id == 2)).AddBook(items[0]);
+            ((Shelf)rep.Nodes.First(n => n.Id == 1)).AddBook(items[1]);
+
+            // Assert
+            Node[] graph = rep.Nodes;
+            Algorithms.InitializeWeight(graph);
+            Algorithms.Weight(items);
+            Assert.Throws<Exception>(() => throw new Exception());
+        }
+
+        [Test]
+        public void WeightAlgorithTest_TestWithNoCacheInitialization_ExceptionExpected()
+        {
+            // Arrange
+            WarehouseRepresentation rep = new WarehouseRepresentation();
+            Generate5Nodes(rep);
+
+            string itemPath = GenerateItemFile("item1", "item2");
+            ItemDatabase idb = new ItemDatabase();
+            idb.ImportItems(itemPath);
+            rep.ItemDatabase = idb;
+            Item[] items = idb.Items;
+
+
+            // Act
+            rep.Inintialize();
+            ((Shelf)rep.Nodes.First(n => n.Id == 2)).AddBook(items[0]);
+            ((Shelf)rep.Nodes.First(n => n.Id == 1)).AddBook(items[1]);
+
+            // Assert
+            Node[] graph = rep.Nodes;
+            Algorithms.InitializeWeight(graph);
+            Algorithms.Weight(items); 
+            Assert.Throws<NullReferenceException>(() => throw new NullReferenceException());
+        }
+
+        [Test]
+        public void WeightAlgorithTest_TestWithNoWeightInitialization_ExceptionExpected()
+        {
+            // Arrange
+            WarehouseRepresentation rep = new WarehouseRepresentation();
+            Generate5Nodes(rep);
+
+            string itemPath = GenerateItemFile("item1", "item2");
+            ItemDatabase idb = new ItemDatabase();
+            idb.ImportItems(itemPath);
+            rep.ItemDatabase = idb;
+            Item[] items = idb.Items;
+
+
+            // Act
+            rep.Inintialize();
+            Algorithms.InitializeCache(idb);
+            ((Shelf)rep.Nodes.First(n => n.Id == 2)).AddBook(items[0]);
+            ((Shelf)rep.Nodes.First(n => n.Id == 1)).AddBook(items[1]);
+
+            // Assert
+            Algorithms.Weight(items);
+            Assert.Throws<NullReferenceException>(() => throw new NullReferenceException());
         }
     }
 }

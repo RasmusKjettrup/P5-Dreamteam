@@ -91,6 +91,8 @@ namespace WarehouseAI
         /// <returns></returns>
         public static float Weight(Item[] itemSet)
         {
+            if (_minimalShortestPathGraph == null)
+                throw new NullReferenceException("Expected a shortest path graph, did you remember to run InitializeWeight?");
             return Weight(_minimalShortestPathGraph.AllNodes.Cast<Node>().ToArray(), itemSet);
         }
 
@@ -143,6 +145,8 @@ namespace WarehouseAI
             //The "books" field in Frontiers are the books that still need to be collected on the trip.
             frontiers.Add(new Frontier(new[] { dropoff }, itemSet, 0));
 
+            if(_cache == null)
+                throw new NullReferenceException("Expected a initialize WeightCache did you run InitializeCache?");
             //While the cache element that we are interested in are marked for updating, keep exploring frontiers.
             while (cache[itemSet].Marked)
             {
