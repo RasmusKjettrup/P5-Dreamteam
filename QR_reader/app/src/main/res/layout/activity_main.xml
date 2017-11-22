@@ -41,7 +41,7 @@
             android:id="@+id/btn_allScan"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:onClick="launchScanner"
+            android:onClick="checkCamPermissionAndLaunchScanner"
             android:text="Scan"
             />
 

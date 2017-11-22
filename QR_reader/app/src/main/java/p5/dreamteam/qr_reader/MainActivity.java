@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -51,20 +50,18 @@ public class MainActivity extends AppCompatActivity {
         _editPort.setText("100");
     }
 
-    public void launchScanner(View v) {
-        if (isCameraAvailable()) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) !=
-                    PackageManager.PERMISSION_GRANTED) { // If no permission -> ask, else start
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.CAMERA}, 0);
-            } else {
-                Intent intent = new Intent(this, ZBarScannerActivity.class);
-                intent.putExtra("FLASH", _chkFlash.isChecked());
-                startActivityForResult(intent, ZBAR_SCANNER_REQUEST);
-            }
+    public void checkCamPermissionAndLaunchScanner(View v) {
+        if (isCameraAvailable()) { // Next line: request permissions and wait for user response
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 0);
         } else {
             Toast.makeText(this, "Rear facing camera unavailable", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void launchScanner() {
+        Intent intent = new Intent(this, ZBarScannerActivity.class);
+        intent.putExtra("FLASH", _chkFlash.isChecked());
+        startActivityForResult(intent, ZBAR_SCANNER_REQUEST);
     }
 
     public boolean isCameraAvailable() {
@@ -85,6 +82,15 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 break;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            launchScanner();
+        } else {
+            Toast.makeText(this, "Camera permission denied. Cannot scan.", Toast.LENGTH_LONG).show();
         }
     }
 
