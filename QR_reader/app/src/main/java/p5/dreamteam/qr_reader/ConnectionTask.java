@@ -32,11 +32,17 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
 
         try {
             sendDataToServer(_data);
-            response = receiveDataFromServer();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        response = receiveDataFromServer(); //TODO: Test non-running server with local IP
+
+        try {
             _socket.close();
         } catch (IOException e) {
-            response = "Server not found";
-            Log.e(TAG, "Server not found - doInBackground()");
+            Log.e(TAG, "Cannot close socket.");
         }
 
         return response;
@@ -47,13 +53,16 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
         super.onPostExecute(s);
     }
 
-    private String receiveDataFromServer() throws IOException {
+    private String receiveDataFromServer() {
         StringBuilder response = new StringBuilder();
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
-
-        for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-            response.append(line);
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
+            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+                response.append(line);
+            }
+        } catch (IOException e) {
+            return null;
         }
 
         return response.substring(0, response.length() - 5); // Remove <EOF> from displayed response

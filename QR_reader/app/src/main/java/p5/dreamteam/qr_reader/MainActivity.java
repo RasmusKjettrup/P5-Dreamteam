@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -18,6 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Main class that the user meets on app launch.
@@ -102,24 +105,45 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void sendDataToServer(String data) {
+    public int sendDataToServer(String data) {
         try {
             ConnectionTask task = new ConnectionTask(_editIP.getText().toString(),
                     Integer.parseInt(_editPort.getText().toString()), data);
-            _serverResponse = task.execute().get();
-            _txtResponse.setText(_serverResponse);
+            _serverResponse = task.execute().get(2, TimeUnit.SECONDS);
+
+            // Horrible workaround to handle missing exceptions in other thread
+            if (_serverResponse == null) {
+                makeCentreToast("Server not found");
+                return 1;
+            } else if (_serverResponse.equals("")) {
+                makeCentreToast("Found IP, but server not responding");
+                return 1;
+            } else {
+                _txtResponse.setText(_serverResponse);
+                return 0;
+            }
         } catch (InterruptedException e) {
-            Log.e(TAG, e.getMessage());
+            makeCentreToast("Interrupted error");
+            return 1;
         } catch (ExecutionException e) {
-            Log.e(TAG, e.getMessage());
-        } catch (NumberFormatException e) {
-            _txtResponse.setText("Wrong port format");
+            makeCentreToast("Execution error");
+            return 1;
+        } catch (TimeoutException e) {
+            makeCentreToast("Server timeout");
+            return 1;
         }
     }
 
+    private void makeCentreToast(String message) {
+        Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
+
     public void sendDataButtonClick(View view) {
-        sendDataToServer(_editTextToSend.getText().toString());
-        _txtResponse.setText(_serverResponse);
-        _editTextToSend.setText("");
+        if (sendDataToServer(_editTextToSend.getText().toString()) == 0) {
+            _txtResponse.setText(_serverResponse);
+            _editTextToSend.setText("");
+        }
     }
 }
