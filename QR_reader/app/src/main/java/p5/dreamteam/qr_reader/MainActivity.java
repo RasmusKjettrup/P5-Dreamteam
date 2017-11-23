@@ -41,11 +41,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         _txtResponse = findViewById(R.id.txt_response);
-        _editTextToSend = findViewById(R.id.edt_text_to_send);
+        _editTextToSend = findViewById(R.id.edit_textToSend);
         _editIP = findViewById(R.id.edit_ip);
         _editPort = findViewById(R.id.edit_port);
-        _chkFlash = findViewById(R.id.check_flash);
-        _chkSendImmediately = findViewById(R.id.check_sendImmediately);
+        _chkFlash = findViewById(R.id.chk_flash);
+        _chkSendImmediately = findViewById(R.id.chk_sendImmediately);
 
         _editIP.setInputType(InputType.TYPE_CLASS_PHONE);
         _editPort.setInputType(InputType.TYPE_CLASS_PHONE);

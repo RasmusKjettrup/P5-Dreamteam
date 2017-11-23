@@ -12,99 +12,98 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        >
+        android:focusable="true"
+        android:focusableInTouchMode="true">
 
         <EditText
             android:id="@+id/edit_ip"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
             android:hint="IP Address"
+            android:layout_weight="3"
+            android:inputType="numberPassword"
+            android:maxWidth="0dp"
             />
 
         <EditText
             android:id="@+id/edit_port"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Port"
-            />
+            android:maxWidth="0dp"
+            android:inputType="numberPassword"
+            android:hint="Port"/>
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        >
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
         <Button
             android:id="@+id/btn_allScan"
-            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:onClick="checkCamPermissionAndLaunchScanner"
             android:text="Scan"
-            />
-
-        <Space
-            android:layout_width="10dp"
-            android:layout_height="wrap_content"
-            />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Flash"
-            />
-
-        <CheckBox
-            android:id="@+id/check_flash"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-
-        <Space
-            android:layout_width="20dp"
-            android:layout_height="wrap_content"
-            />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Send to server on scan"/>
-        <CheckBox
-            android:id="@+id/check_sendImmediately"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+            android:layout_marginBottom="10dp"/>
 
         <Button
             android:id="@+id/btn_updateUI"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/btn_allScan"
             android:onClick="sendDataButtonClick"
-            android:text="Send"
-            />
+            android:text="Send"/>
 
-        <Space
-            android:layout_width="5dp"
+        <TextView
+            android:id="@+id/txt_flash"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            />
+            android:text="Flash"
+            android:layout_toRightOf="@id/btn_allScan"
+            android:layout_alignTop="@id/btn_allScan"
+            android:layout_toEndOf="@id/btn_allScan"
+            android:layout_marginLeft="4dp"
+            android:paddingTop="2dp"/>
+
+        <TextView
+            android:id="@+id/txt_sendImmediately"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Send on scan"
+            android:layout_toRightOf="@id/btn_allScan"
+            android:layout_alignBottom="@id/btn_allScan"
+            android:paddingBottom="2dp"
+            android:layout_toEndOf="@id/btn_allScan"
+            android:paddingLeft="4dp"/>
+
+        <CheckBox
+            android:id="@+id/chk_flash"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/btn_allScan"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="-4dp"
+            android:layout_alignParentEnd="true"/>
+
+        <CheckBox
+            android:id="@+id/chk_sendImmediately"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/btn_allScan"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="-4dp"
+            android:layout_alignParentEnd="true"/>
 
         <EditText
-            android:id="@+id/edt_text_to_send"
+            android:id="@+id/edit_textToSend"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
-            android:hint="Text to send"
-            />
-    </LinearLayout>
+            android:layout_toRightOf="@id/btn_updateUI"
+            android:layout_alignBottom="@+id/btn_updateUI"
+            android:hint="Text to send"/>
+
+    </RelativeLayout>
 
 
     <ScrollView
@@ -117,7 +116,108 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Server response"
-
             />
     </ScrollView>
+
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--&gt;-->
+
+        <!--<EditText-->
+            <!--android:id="@+id/edit_ip"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="3"-->
+            <!--android:hint="IP Address"-->
+            <!--/>-->
+
+        <!--<EditText-->
+            <!--android:id="@+id/edit_port"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:hint="Port"-->
+            <!--/>-->
+    <!--</LinearLayout>-->
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--&gt;-->
+
+        <!--<Button-->
+            <!--android:id="@+id/btn_allScan"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:onClick="checkCamPermissionAndLaunchScanner"-->
+            <!--android:text="Scan"-->
+            <!--/>-->
+
+        <!--<Space-->
+            <!--android:layout_width="10dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--/>-->
+
+        <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Flash"-->
+            <!--/>-->
+
+        <!--<CheckBox-->
+            <!--android:id="@+id/check_flash"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--/>-->
+
+        <!--<Space-->
+            <!--android:layout_width="20dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--/>-->
+
+        <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Send to server on scan"/>-->
+        <!--<CheckBox-->
+            <!--android:id="@+id/check_sendImmediately"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--/>-->
+    <!--</LinearLayout>-->
+
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal">-->
+
+        <!--<Button-->
+            <!--android:id="@+id/btn_updateUI"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:onClick="sendDataButtonClick"-->
+            <!--android:text="Send"-->
+            <!--/>-->
+
+        <!--<Space-->
+            <!--android:layout_width="5dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--/>-->
+
+        <!--<EditText-->
+            <!--android:id="@+id/edt_text_to_send"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:inputType="text"-->
+            <!--android:hint="Text to send"-->
+            <!--/>-->
+    <!--</LinearLayout>-->
+
+
+
 </LinearLayout>
