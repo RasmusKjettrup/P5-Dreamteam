@@ -145,7 +145,7 @@ namespace WarehouseAI
             //The "books" field in Frontiers are the books that still need to be collected on the trip.
             frontiers.Add(new Frontier(new[] { dropoff }, itemSet, 0));
 
-            if(_cache == null)
+            if (_cache == null)
                 throw new NullReferenceException("Expected a initialize WeightCache did you run InitializeCache?");
             //While the cache element that we are interested in are marked for updating, keep exploring frontiers.
             while (cache[itemSet].Marked)
@@ -207,11 +207,12 @@ namespace WarehouseAI
                     CacheElement c = cache[itemSet.Except(resultingFrontier.books).ToArray()];
                     c.Marked = false;
                     c.Weight = resultingFrontier.weight;
-                    path = resultingFrontier.route;
+                    c.Path = resultingFrontier.route;
                 }
             }
 
-            //Whenever the cache element for the requested itemset is updated, the weight of the cache element is returned.
+            //Whenever the cache element for the requested itemset is updated, the path can be set, and the weight of the cache element is returned.
+            path = cache[itemSet].Path;
             return cache[itemSet].Weight;
         }
 
@@ -221,28 +222,28 @@ namespace WarehouseAI
         /// <param name="frontiers"></param>
         /// <param name="potentialNodes"></param>
         /// <returns></returns>
-private static bool NotExplored(Frontier[] frontiers, Node[] potentialNodes)
-{
-    foreach (Frontier frontier in frontiers)
-    {
-        if (frontier.route.Length != potentialNodes.Length)
+        private static bool NotExplored(Frontier[] frontiers, Node[] potentialNodes)
         {
-            continue;
-        }
-        for (int i = 0; i < frontier.route.Length; i++)
-        {
-            if (potentialNodes[i] != frontier.route[i])
+            foreach (Frontier frontier in frontiers)
             {
-                break;
+                if (frontier.route.Length != potentialNodes.Length)
+                {
+                    continue;
+                }
+                for (int i = 0; i < frontier.route.Length; i++)
+                {
+                    if (potentialNodes[i] != frontier.route[i])
+                    {
+                        break;
+                    }
+                    if (i == frontier.route.Length - 1)
+                    {
+                        return false;
+                    }
+                }
             }
-            if (i == frontier.route.Length - 1)
-            {
-                return false;
-            }
+            return true;
         }
-    }
-    return true;
-}
 
         /// <summary>
         /// Uses a DistanceMap to find the distance between two nodes, and returns the result.
