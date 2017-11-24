@@ -10,7 +10,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.CheckBox;
@@ -130,6 +129,9 @@ public class MainActivity extends AppCompatActivity {
             return 1;
         } catch (TimeoutException e) {
             makeCentreToast("Server timeout");
+            return 1;
+        } catch (NumberFormatException e) {
+            makeCentreToast("Wrong port format");
             return 1;
         }
     }
