@@ -20,8 +20,7 @@ namespace WarehouseAI {
                 socket.Listen(ConnectionQueueAmount);
                 while (true) {
                     allDone.Reset();
-
-                    Console.WriteLine("Waiting for a connection...");
+                    
                     socket.BeginAccept(new AsyncCallback(AcceptCallback), socket);
 
                     allDone.WaitOne(); // Block current thread and wait for signal from other thread
@@ -56,7 +55,7 @@ namespace WarehouseAI {
 
                 var content = state.sb.ToString();
                 if (content.EndsWith("<EOF>")) {
-                    Console.WriteLine("Read {0} bytes from socket. \n Data : {1}", content.Length, content);
+                    Console.WriteLine("Read {0} bytes from socket. \n Data : {1}", content.Length, content); // Todo Save in a log instead
                     Send(handler, "sErVeR sAyS hElLo!!! as well as " + content);
                     Console.WriteLine("Message sent.");
                 }

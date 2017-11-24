@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using WarehouseAI.Representation;
 
 namespace WarehouseAI.UI
@@ -10,6 +11,7 @@ namespace WarehouseAI.UI
     {
         public WarehouseRepresentation warehouse { get; set; }
         public ItemDatabase itemDatabase { get; set; }
+        private Thread _serverThread;
 
         private readonly Dictionary<string, Action<string[]>> commands;
 
@@ -38,6 +40,8 @@ namespace WarehouseAI.UI
         public void Start(params string[] args)
         {
             string arg = "";
+            new Thread(WarehouseServerIO.StartListening).Start();
+
             foreach (string s in args)
             {
                 arg += s + " ";
@@ -50,6 +54,7 @@ namespace WarehouseAI.UI
 
             while (!quit)
             {
+                Console.WriteLine("Please enter a command.\nFor a list of all commands type: help");
                 Command(Console.ReadLine());
             }
         }
@@ -59,6 +64,7 @@ namespace WarehouseAI.UI
             string[] inputStrings = input.Split(' ').Where(s => s != "").ToArray();
 
             Action<string[]> c;
+            if (input.Length <= 0) return;
             if (commands.TryGetValue(inputStrings[0].ToLower(), out c))
             {
                 c(inputStrings.Skip(1).ToArray());
@@ -259,7 +265,7 @@ namespace WarehouseAI.UI
         private void Quit()
         {
             Console.WriteLine("Now quitting...");
-            quit = true;
+            Environment.Exit(0);
         }
 
         private void PrintWarehouse()
@@ -285,27 +291,18 @@ namespace WarehouseAI.UI
                 Console.WriteLine(@"{0} {1} ({2}) [{3}]", node.Id, typ, node.X + " " + node.Y, neighbours);
             }
         }
-
-        /// <summary>
-        /// Marks the error with red
-        /// </summary>
-        /// <param name="s">Error occured</param>
-        private static void ServerOnErrorOccured(string s)
-        {
-            ConsoleColor currentConsoleColor = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(s);
-            Console.ForegroundColor = currentConsoleColor;
-        }
+        
         /// <summary>
         /// Prints all commands available
         /// </summary>
         private void PrintAllCommands(string[] args)
         {
+            Console.ForegroundColor = ConsoleColor.Green;
             foreach (string commandsKey in commands.Keys)
             {
                 Console.WriteLine(commandsKey);
             }
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         private static void ServerOnMessageRecieved(string data, string client)
