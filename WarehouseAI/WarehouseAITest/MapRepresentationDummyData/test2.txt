@@ -1,0 +1,7 @@
+ID, TYPE, POS, NEIGHBOURS
+0, Node, 1 1, 1 2 4 
+1, Node, 1 1.5, 0 2 3 5 
+2, Shelf, 1 2, 0 1 4
+3, Shelf, 2 1, 1 4 5
+4, Shelf, 2 1.5, 0 2 3
+5, Node, 2 2, 1 5

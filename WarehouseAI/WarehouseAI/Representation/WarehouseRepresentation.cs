@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -109,8 +110,10 @@ namespace WarehouseAI.Representation
         /// </summary>
         /// <param name="newNode"></param>
         /// <param name="neighbourIds"></param>
-        public void AddNode(Node newNode, int[] neighbourIds)
+        public void AddNode(Node newNode, params int[] neighbourIds)
         {
+            if(_nodes != null && _nodes.Exists(n => n.Id == newNode.Id))
+                throw new ArgumentException($"A node with the Id {newNode.Id} already exists.");
             if (_nodes == null)
             {
                 _nodes = new List<Node>();
@@ -128,8 +131,6 @@ namespace WarehouseAI.Representation
             {
                 node.Edges = node.Edges.Append(new Edge<Node>() { @from = node, to = newNode, weight = node.EuclidDistance(newNode) }).ToArray();
             }
-
-            newNode.Id = _nodes.Max(n => n.Id) + 1;
 
             _nodes.Add(newNode);
         }

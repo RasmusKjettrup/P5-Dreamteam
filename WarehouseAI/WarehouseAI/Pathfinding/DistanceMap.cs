@@ -79,7 +79,7 @@ namespace WarehouseAI.Pathfinding
                         bool add = true;
                         foreach (Tuple<Node, float> frontier in frontiers)
                         {
-                            if (frontier.Item1 == edge.to && frontier.Item2 < newWeight)
+                            if (frontier.Item1 == edge.to && frontier.Item2 <= newWeight)
                             {
                                 add = false;
                                 break;
