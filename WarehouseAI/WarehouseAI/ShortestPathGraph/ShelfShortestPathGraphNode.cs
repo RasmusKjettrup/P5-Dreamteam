@@ -7,6 +7,14 @@ namespace WarehouseAI.ShortestPathGraph
     {
         public Node Parent { get; set; }
 
+        public override Item[] Items
+        {
+            get
+            {
+                return ((Shelf)Parent).Items;
+            }
+        }
+
         public ShelfShortestPathGraphNode(Shelf parent)
         {
             Parent = parent;

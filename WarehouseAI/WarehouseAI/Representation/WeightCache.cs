@@ -76,5 +76,6 @@ namespace WarehouseAI.Representation
     {
         public bool Marked = true;
         public float Weight = 0;
+        public Node[] Path;
     }
 }

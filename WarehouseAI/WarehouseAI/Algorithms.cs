@@ -91,6 +91,8 @@ namespace WarehouseAI
         /// <returns></returns>
         public static float Weight(Item[] itemSet)
         {
+            if (_minimalShortestPathGraph == null)
+                throw new NullReferenceException("Expected a shortest path graph, did you remember to run InitializeWeight?");
             return Weight(_minimalShortestPathGraph.AllNodes.Cast<Node>().ToArray(), itemSet);
         }
 
@@ -143,6 +145,8 @@ namespace WarehouseAI
             //The "books" field in Frontiers are the books that still need to be collected on the trip.
             frontiers.Add(new Frontier(new[] { dropoff }, itemSet, 0));
 
+            if (_cache == null)
+                throw new NullReferenceException("Expected a initialize WeightCache did you run InitializeCache?");
             //While the cache element that we are interested in are marked for updating, keep exploring frontiers.
             while (cache[itemSet].Marked)
             {
@@ -203,11 +207,12 @@ namespace WarehouseAI
                     CacheElement c = cache[itemSet.Except(resultingFrontier.books).ToArray()];
                     c.Marked = false;
                     c.Weight = resultingFrontier.weight;
-                    path = resultingFrontier.route;
+                    c.Path = resultingFrontier.route;
                 }
             }
 
-            //Whenever the cache element for the requested itemset is updated, the weight of the cache element is returned.
+            //Whenever the cache element for the requested itemset is updated, the path can be set, and the weight of the cache element is returned.
+            path = cache[itemSet].Path;
             return cache[itemSet].Weight;
         }
 
@@ -231,7 +236,7 @@ namespace WarehouseAI
                     {
                         break;
                     }
-                    if (i == frontier.route.Length-1)
+                    if (i == frontier.route.Length - 1)
                     {
                         return false;
                     }
@@ -250,7 +255,10 @@ namespace WarehouseAI
         private static float Distance(DistanceMap distanceMap, Node from, Node to)
         {
             float f;
-            distanceMap.TryGet(from.Id, to.Id, out f);
+            if (!distanceMap.TryGet(from.Id, to.Id, out f))
+            {
+                throw new ArgumentException("A distance from " + from.Id + " to " + to.Id + " was not found.");
+            }
             return f;
         }
     }

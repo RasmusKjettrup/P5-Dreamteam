@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using WarehouseAI.Representation;
 
 namespace WarehouseAI.Pathfinding
@@ -10,10 +11,26 @@ namespace WarehouseAI.Pathfinding
     public class DistanceMap
     {
         private Dictionary<int, Dictionary<int, float>> _dictionary;
+        private Node[] _fullGraph;
 
         public DistanceMap(Node[] graph)
         {
             InitializeDistanceMap(graph);
+            List<Node> allNodes = new List<Node>();
+            allNodes.Add(graph[0]);
+            int i = 0;
+            while (i != allNodes.Count)
+            {
+                foreach (Node neighbour in allNodes[i].Neighbours)
+                {
+                    if (!allNodes.Contains(neighbour))
+                    {
+                        allNodes.Add(neighbour);
+                    }
+                }
+                i++;
+            }
+            _fullGraph = allNodes.ToArray();
             foreach (Node node in graph)
             {
                 DistancesFromNode(node);
@@ -50,33 +67,55 @@ namespace WarehouseAI.Pathfinding
             }
         }
 
+        private class DijkstraData
+        {
+            public float Distance;
+            public bool Visited;
+        }
+
         private void DistancesFromNode(Node node)
         {
             Dictionary<int, float> nodeSubDictionary;
             if (_dictionary.TryGetValue(node.Id, out nodeSubDictionary))
             {
-                List<Node> markedNodes = new List<Node>();
-                Queue<Tuple<Node, float>> frontiers = new Queue<Tuple<Node, float>>();
-
-                frontiers.Enqueue(new Tuple<Node, float>(node, 0));
-
-                while (frontiers.Count != 0)
+                Dictionary<Node, DijkstraData> dijkstraDict = new Dictionary<Node, DijkstraData>();
+                foreach (Node n in _fullGraph)
                 {
-                    Tuple<Node, float> currentFront = frontiers.Dequeue();
-                    markedNodes.Add(currentFront.Item1);
-
-                    float dummy;
-                    if (nodeSubDictionary.TryGetValue(currentFront.Item1.Id, out dummy))
+                    dijkstraDict.Add(n,new DijkstraData()
                     {
-                        nodeSubDictionary[currentFront.Item1.Id] = 
-                            Math.Min(currentFront.Item2, nodeSubDictionary[currentFront.Item1.Id]);
+                        Distance = float.MaxValue,
+                        Visited = false,
+                    });
+                }
+                dijkstraDict[node].Distance = 0;
+
+                Node currentNode = node;
+
+                while (nodeSubDictionary.ContainsValue(float.MaxValue))
+                {
+                    foreach (Edge<Node> edge in currentNode.Edges)
+                    {
+                        float dist = edge.weight + dijkstraDict[currentNode].Distance;
+                        if (dist < dijkstraDict[edge.to].Distance)
+                        {
+                            dijkstraDict[edge.to].Distance = dist;
+                        }
                     }
 
-                    foreach (Edge<Node> edge in currentFront.Item1.Edges)
+                    float dummy;
+                    if (nodeSubDictionary.TryGetValue(currentNode.Id, out dummy))
                     {
-                        if (!markedNodes.Contains(edge.to))
+                        nodeSubDictionary[currentNode.Id] = dijkstraDict[currentNode].Distance;
+                    }
+                    dijkstraDict[currentNode].Visited = true;
+
+                    float minDistance = float.MaxValue;
+                    foreach (KeyValuePair<Node,DijkstraData> pair in dijkstraDict.Where(pair => pair.Value.Visited == false))
+                    {
+                        if (pair.Value.Distance<minDistance)
                         {
-                            frontiers.Enqueue(new Tuple<Node, float>(edge.to, currentFront.Item2 + edge.weight));
+                            minDistance = pair.Value.Distance;
+                            currentNode = pair.Key;
                         }
                     }
                 }

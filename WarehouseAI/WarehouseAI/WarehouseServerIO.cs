@@ -10,8 +10,7 @@ namespace WarehouseAI {
         public static ManualResetEvent allDone = new ManualResetEvent(false);
 
         public static void StartListening() {
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddress = ipHostInfo.AddressList[0];
+            IPAddress ipAddress = GetIP();
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 100);
 
             Socket socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -86,6 +85,20 @@ namespace WarehouseAI {
                 Console.WriteLine(e.ToString());
             }
         }
+
+        private static IPAddress GetIP()
+        {
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ipAddress in host.AddressList)
+            {
+                if (ipAddress.AddressFamily==AddressFamily.InterNetwork)
+                {
+                    return ipAddress;
+                }
+            }
+            return null;
+        }
+
 
         private class StateObject {
             public Socket workSocket = null;
