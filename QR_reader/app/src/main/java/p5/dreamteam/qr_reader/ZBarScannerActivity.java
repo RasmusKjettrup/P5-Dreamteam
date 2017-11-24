@@ -24,6 +24,7 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
     private CameraPreview _preview;
     private Camera _camera;
     private ImageScanner _scanner;
+    private boolean _flash;
 
     static {
         System.loadLibrary("iconv");
@@ -39,6 +40,8 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
             return;
         }
 
+        _flash = getIntent().getBooleanExtra("FLASH", _flash);
+
         // Hide the window title.
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -48,7 +51,7 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
 
         // Create a RelativeLayout container that will hold a SurfaceView,
         // and set it as the content of our activity.
-        _preview = new CameraPreview(this, this);
+        _preview = new CameraPreview(this, this, _flash);
         setContentView(_preview);
     }
 
@@ -69,10 +72,9 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
     @Override
     protected void onResume() {
         super.onResume();
-        // Open the default i.e. the first rear facing camera.
-        _camera = Camera.open();
+
+        _camera = Camera.open(); // rear
         if(_camera == null) {
-            // Cancel request if _camera is null.
             cancelRequest();
             return;
         }
@@ -110,8 +112,6 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
     protected void onPause() {
         super.onPause();
 
-        // Because the Camera object is a shared resource, it's very
-        // important to release it when the activity is paused.
         if (_camera != null) {
             _preview.setCamera(null);
             _camera.cancelAutoFocus();

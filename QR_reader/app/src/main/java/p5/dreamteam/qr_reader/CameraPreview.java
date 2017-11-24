@@ -17,11 +17,13 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
 
     private Camera _camera;
     private Camera.PreviewCallback _previewCallback;
+    private boolean _flash;
 
-    public CameraPreview(Context context, Camera.PreviewCallback previewCallback) {
+    public CameraPreview(Context context, Camera.PreviewCallback previewCallback, boolean flash) {
         super(context);
 
         this._previewCallback = previewCallback;
+        this._flash = flash;
 
         SurfaceHolder holder = getHolder();
         holder.addCallback(this);
@@ -47,15 +49,15 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         if (_camera != null) {
             Camera.Parameters parameters = _camera.getParameters();
-            List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
-            for (Camera.Size size : previewSizes) {
-                Log.i(TAG, "Height: " + size.height + "     Width: " + size.width);
-            }
-//            Camera.Size previewSize = previewSizes.get(0); // 1280 x 720 on Huawei Y530
-//            parameters.setPreviewSize(previewSize.width, previewSize.height);
+//            List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
+//            for (Camera.Size size : previewSizes) {
+//                Log.i(TAG, "Height: " + size.height + "     Width: " + size.width);
+//            }
             parameters.setPreviewSize(1280, 720);
             parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-            parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+            if (_flash) {
+                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+            }
             requestLayout();
 
             _camera.setDisplayOrientation(90);

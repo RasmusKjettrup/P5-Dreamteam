@@ -11,30 +11,40 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 /**
- * TODO: Add a class header comment!
+ * Task that asynchronously creates a connection to a server, and terminates on server response.
  */
 public class ConnectionTask extends AsyncTask<Void, Void, String> {
     private static final String TAG = "ConnectionTask";
-    private String ip;
-    private int port;
-    private String data;
-    private Socket socket;
+    private String _ip;
+    private int _port;
+    private String _data;
+    private Socket _socket;
 
     ConnectionTask(String ip, int port, String data) {
-        this.ip = ip;
-        this.port = port;
-        this.data = data;
+        this._ip = ip;
+        this._port = port;
+        this._data = data;
     }
 
     @Override
     protected String doInBackground(Void... voids) {
-        sendDataToServer(data);
-        String response = receiveDataFromServer();
+        String response;
+
         try {
-            socket.close();
+            sendDataToServer(_data);
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            e.printStackTrace();
+            return null;
         }
+
+        response = receiveDataFromServer(); //TODO: Test non-running server with local IP
+
+        try {
+            _socket.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Cannot close socket.");
+        }
+
         return response;
     }
 
@@ -45,27 +55,23 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
 
     private String receiveDataFromServer() {
         StringBuilder response = new StringBuilder();
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 response.append(line);
             }
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            return null;
         }
 
         return response.substring(0, response.length() - 5); // Remove <EOF> from displayed response
     }
 
-    private void sendDataToServer(String data) {
-        try {
-            socket = new Socket(ip, port);
-            PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
-            writer.print(data + "<EOF>"); // Server expects <EOF>, since we can send more lines in one message
-            writer.flush();
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
-        }
+    private void sendDataToServer(String data) throws IOException {
+        _socket = new Socket(_ip, _port);
+        PrintWriter writer = new PrintWriter(new OutputStreamWriter(_socket.getOutputStream()));
+        writer.print(data + "<EOF>"); // Server expects <EOF>, since we can send more lines in one message
+        writer.flush();
     }
 }
