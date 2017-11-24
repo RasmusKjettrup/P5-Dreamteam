@@ -33,6 +33,32 @@ namespace WarehouseAI.Representation
         private WeightCache _cache;
 
         /// <summary>
+        /// Evaluates the state of the warehouse, returning the efficiency of the current configuration
+        /// </summary>
+        /// <returns></returns>
+        public double Evaluate()
+        {
+            double result = 0;
+
+            ShortestPathGraph<ShelfShortestPathGraphNode> graph = new ShortestPathGraph<ShelfShortestPathGraphNode>(
+                Nodes, n => n is Shelf, n => new ShelfShortestPathGraphNode((Shelf)n));
+            DistanceMap map = new DistanceMap(Nodes);
+            Item[][] itemSets = AddedItems.Power().ToArray();
+            WeightCache cache = new WeightCache(itemSets);
+
+            foreach (Item[] items in itemSets)
+            {
+                float importance = Algorithms.Importance(items);
+                if (importance > 0)
+                {
+                    result += importance * Algorithms.Weight(graph.Nodes, items, cache, map);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Imports the warehouse from a specific file.
         /// </summary>
         /// <param name="path">The path to the file</param>
@@ -173,7 +199,7 @@ namespace WarehouseAI.Representation
                 PlaceBooks(itemQuanities.ToArray());
             }
         }
-        
+
         /// <summary>
         /// Places the specific books in the warehouse, after transforming it to a set of item quanities
         /// </summary>
@@ -197,7 +223,7 @@ namespace WarehouseAI.Representation
 
             AddBook(targetItem.Item);
             UpdatePriorities(targetItem.Item);
-            
+
             targetItem.Quantity--;
 
             PlaceBooks(itemQuantities);

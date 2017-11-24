@@ -23,7 +23,7 @@ namespace WarehouseAI
         {
             float a = 0; // Number of Arcs
             if (setOfItems == null || setOfItems.Length == 0)
-                throw new ArgumentException("setOfItems Was empty");
+                return 0;
             int n = setOfItems.Length; // Number of nodes in the setOfItems
             foreach (Item item in setOfItems)
             {

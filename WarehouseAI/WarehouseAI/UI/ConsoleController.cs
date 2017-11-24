@@ -22,6 +22,8 @@ namespace WarehouseAI.UI
                 {"importwarehouse", ImportWarehouse},
                 {"importitems", ImportItems},
                 {"importrelations", ImportRelations},
+                {"evaluate", s=> EvaluateWarehouse() },
+                {"eval", s=> EvaluateWarehouse() },
                 {"addnode", AddNode },
                 {"addbook", AddBook},
                 {"addbooks", AddBooks},
@@ -103,32 +105,66 @@ namespace WarehouseAI.UI
             Console.WriteLine("Import complete.");
         }
 
+        private void EvaluateWarehouse()
+        {
+            Console.WriteLine("Evaulating warehouse state...");
+            double result = warehouse.Evaluate();
+            Console.WriteLine("Result: " + result);
+            Console.WriteLine("Evaluation finished.");
+        }
+
         private void AddBook(string[] args)
         {
             Console.WriteLine("Adding item...");
-            Item item = itemDatabase.Items.First(i => i.Id == int.Parse(args[0]));
+            Item item;
+            try
+            {
+                item = itemDatabase.Items.First(i => i.Id == int.Parse(args[0]));
+            }
+            catch
+            {
+                Console.WriteLine("The book with the specified ID was not found in the database.");
+                return;
+            }
             if (args.Length == 1)
             {
                 warehouse.AddBook(item);
             }
             else
             {
-                Shelf shelf = (Shelf) warehouse.Nodes.First(n => n.Id == int.Parse(args[1]));
+                Shelf shelf;
+                try
+                {
+                    shelf = (Shelf)warehouse.Nodes.First(n => n.Id == int.Parse(args[1]));
+                }
+                catch
+                {
+                    Console.WriteLine("The specified shelf ID was not found in the database.");
+                    return;
+                }
                 shelf.AddBook(item);
             }
 
             PrintItemsOnShelves();
             Console.WriteLine("Book added.");
         }
-        
+
         private void AddBooks(string[] args)
         {
             Console.WriteLine("Adding items...");
             List<Item> items = new List<Item>();
             foreach (string s in args)
             {
-                Item item = itemDatabase.Items.First(i => i.Id == int.Parse(s));
-                items.Add(item);
+                try
+                {
+                    Item item = itemDatabase.Items.First(i => i.Id == int.Parse(s));
+                    items.Add(item);
+                }
+                catch
+                {
+                    Console.WriteLine("One or more of the specified ID's was not found in the database, or in the wrong format");
+                    return;
+                }
             }
             warehouse.AddBooks(items.ToArray());
 
@@ -180,12 +216,12 @@ namespace WarehouseAI.UI
                         relationalIndex--;
                         break;
                 }
-                newNode.X = float.Parse(args[relationalIndex+1], NumberStyles.Any, c);
-                newNode.Y = float.Parse(args[relationalIndex+2], NumberStyles.Any, c);
+                newNode.X = float.Parse(args[relationalIndex + 1], NumberStyles.Any, c);
+                newNode.Y = float.Parse(args[relationalIndex + 2], NumberStyles.Any, c);
             }
             catch { }
 
-            warehouse.AddNode(newNode,args.Skip(relationalIndex+3).Select(s => int.Parse(s)).ToArray());
+            warehouse.AddNode(newNode, args.Skip(relationalIndex + 3).Select(s => int.Parse(s)).ToArray());
 
             PrintWarehouse();
             Console.WriteLine("Node added.");
