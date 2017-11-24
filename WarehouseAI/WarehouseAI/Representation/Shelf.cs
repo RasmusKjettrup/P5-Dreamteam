@@ -31,6 +31,13 @@ namespace WarehouseAI.Representation
             get { return _itemInstances.Select(i => i.item).ToArray(); }
         }
 
+        public virtual int GetNumberOfItem(Item item)
+        {
+            if (!_itemInstances.Select(i => i.item).Contains(item))
+                return 0;
+            return _itemInstances.First(i => i.item == item).instances;
+        }
+
         /// <summary>
         /// Adds an item to the shelf.
         /// </summary>
