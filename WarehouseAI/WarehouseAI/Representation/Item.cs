@@ -34,7 +34,7 @@ namespace WarehouseAI.Representation
             Priority++;
         }
 
-        public void AddIngoingRelations(Item relatedItem)
+        private void AddIngoingRelations(Item relatedItem)
         {
             IngoingRelations.Add(relatedItem);
         }

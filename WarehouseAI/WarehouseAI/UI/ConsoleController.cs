@@ -24,6 +24,7 @@ namespace WarehouseAI.UI
                 {"importrelations", ImportRelations},
                 {"addnode", AddNode },
                 {"addbook", AddBook},
+                {"addbooks", AddBooks},
                 {"distance", Distance},
                 {"dist", Distance},
                 {"quit", s => Quit()},
@@ -116,6 +117,27 @@ namespace WarehouseAI.UI
                 shelf.AddBook(item);
             }
 
+            PrintItemsOnShelves();
+            Console.WriteLine("Book added.");
+        }
+        
+        private void AddBooks(string[] args)
+        {
+            Console.WriteLine("Adding items...");
+            List<Item> items = new List<Item>();
+            foreach (string s in args)
+            {
+                Item item = itemDatabase.Items.First(i => i.Id == int.Parse(s));
+                items.Add(item);
+            }
+            warehouse.AddBooks(items.ToArray());
+
+            PrintItemsOnShelves();
+            Console.WriteLine("Books added.");
+        }
+
+        private void PrintItemsOnShelves()
+        {
             foreach (Node node in warehouse.Nodes)
             {
                 if (node is Shelf)
@@ -133,7 +155,6 @@ namespace WarehouseAI.UI
                     Console.WriteLine(@"{0}: [{1}]", node.Id, items);
                 }
             }
-            Console.WriteLine("Book added.");
         }
 
         private void AddNode(string[] args)

@@ -112,7 +112,7 @@ namespace WarehouseAI.Representation
         /// <param name="neighbourIds"></param>
         public void AddNode(Node newNode, params int[] neighbourIds)
         {
-            if(_nodes != null && _nodes.Exists(n => n.Id == newNode.Id))
+            if (_nodes != null && _nodes.Exists(n => n.Id == newNode.Id))
                 throw new ArgumentException($"A node with the Id {newNode.Id} already exists.");
             if (_nodes == null)
             {
@@ -133,6 +133,87 @@ namespace WarehouseAI.Representation
             }
 
             _nodes.Add(newNode);
+        }
+
+        private class ItemQuantity
+        {
+            public Item Item;
+            public int Quantity;
+        }
+
+        /// <summary>
+        /// Adds a set of items to the warehouse.
+        /// </summary>
+        /// <param name="items"></param>
+        public void AddBooks(params Item[] items)
+        {
+            if (items.Length == 1)
+            {
+                AddBook(items[0]);
+            }
+            else
+            {
+                List<ItemQuantity> itemQuanities = new List<ItemQuantity>();
+                foreach (Item item in items)
+                {
+                    ItemQuantity tup = itemQuanities.Find(i => i.Item == item);
+                    if (tup == null)
+                    {
+                        itemQuanities.Add(new ItemQuantity
+                        {
+                            Item = item,
+                            Quantity = 1,
+                        });
+                    }
+                    else
+                    {
+                        tup.Quantity++;
+                    }
+                }
+                PlaceBooks(itemQuanities.ToArray());
+            }
+        }
+        
+        /// <summary>
+        /// Places the specific books in the warehouse, after transforming it to a set of item quanities
+        /// </summary>
+        /// <param name="itemQuantities"></param>
+        private void PlaceBooks(ItemQuantity[] itemQuantities)
+        {
+            ItemQuantity targetItem = null;
+            int maxPriority = int.MinValue;
+            foreach (ItemQuantity iq in itemQuantities.Where(iq => iq.Quantity > 0))
+            {
+                if (iq.Item.Priority > maxPriority)
+                {
+                    targetItem = iq;
+                    maxPriority = iq.Item.Priority;
+                }
+            }
+            if (targetItem == null)
+            {
+                return;
+            }
+
+            AddBook(targetItem.Item);
+            UpdatePriorities(targetItem.Item);
+            
+            targetItem.Quantity--;
+
+            PlaceBooks(itemQuantities);
+        }
+
+        /// <summary>
+        /// Updates the priority of the specific item, and its neighbours
+        /// </summary>
+        /// <param name="item"></param>
+        private void UpdatePriorities(Item item)
+        {
+            item.Priority--;
+            foreach (Item neighbour in item.Neighbours())
+            {
+                neighbour.Priority++;
+            }
         }
 
         /// <summary>

@@ -33,46 +33,6 @@ namespace WarehouseAI
             return a / n;
         }
 
-        public static void PlacementAlgorithm(List<Item> setOfItems)
-        {
-            foreach (Item item in setOfItems)
-            {
-                // Place Book | AddBook
-                UpdatePriorities(item);
-                setOfItems = SortByPriority(setOfItems, item);
-            }
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Reduces the priority of given item by a constant k, and enhances priority on al of the items' relations.
-        /// </summary>
-        /// <param name="item">The most recently placed item.</param>
-        public static void UpdatePriorities(Item item)
-        {
-            const int k = 1;
-            item.Priority -= k;
-            foreach (Item outgoingRelation in item.Neighbours())
-            {
-                outgoingRelation.Priority++;
-            }
-        }
-
-        /// <summary>
-        /// Removes an item from a given set and sorts the set by highest priority.
-        /// </summary>
-        /// <param name="setOfItems">The set of items to be sorted</param>
-        /// <param name="lastPlacedItem">The most recently placed item that is to be removed.</param>
-        /// <returns></returns>
-        public static List<Item> SortByPriority(List<Item> setOfItems, Item lastPlacedItem)
-        {
-            if (!setOfItems.Contains(lastPlacedItem))
-                throw new ArgumentException("The set of items didn't contain the last placed item.");
-            setOfItems.Remove(lastPlacedItem);
-            List<Item> items = setOfItems.OrderBy(i => i.Priority).Reverse().ToList();
-            return items;
-        }
-
         public static void InitializeWeight(params Node[] nodes)
         {
             _minimalShortestPathGraph = new ShortestPathGraph<ShelfShortestPathGraphNode>(nodes, n => n is Shelf, n => new ShelfShortestPathGraphNode((Shelf)n));
@@ -145,7 +105,7 @@ namespace WarehouseAI
             //The "books" field in Frontiers are the books that still need to be collected on the trip.
             frontiers.Add(new Frontier(new[] { dropoff }, itemSet, 0));
 
-            if (_cache == null)
+            if (cache == null)
                 throw new NullReferenceException("Expected a initialize WeightCache did you run InitializeCache?");
             //While the cache element that we are interested in are marked for updating, keep exploring frontiers.
             while (cache[itemSet].Marked)
