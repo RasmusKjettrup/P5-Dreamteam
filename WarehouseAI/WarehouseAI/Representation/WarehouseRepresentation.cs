@@ -235,7 +235,7 @@ namespace WarehouseAI.Representation
         /// <param name="item"></param>
         private void UpdatePriorities(Item item)
         {
-            item.Priority--;
+            item.Priority-=6;
             foreach (Item neighbour in item.Neighbours())
             {
                 neighbour.Priority++;
@@ -306,6 +306,20 @@ namespace WarehouseAI.Representation
             //Marks the item in the cache, making sure the weight of the item gets updated in the next evaluation
             //of the weight of the item.
             _cache.MarkItem(item);
+        }
+
+        public void RandomlyAddBooks(params Item[] items)
+        {
+            List<Shelf> shelves = new List<Shelf>();
+            foreach (Shelf s in Nodes.Where(n => n is Shelf).Cast<Shelf>())
+            {
+                shelves.Add(s);
+            }
+
+            foreach (Item item in items)
+            {
+                shelves.Where(s => s.RemaningCapacity > 0).Random().AddBook(item);
+            }
         }
 
         /// <summary>

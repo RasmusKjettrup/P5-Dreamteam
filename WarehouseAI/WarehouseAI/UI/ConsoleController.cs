@@ -24,11 +24,12 @@ namespace WarehouseAI.UI
                 {"importwarehouse", ImportWarehouse},
                 {"importitems", ImportItems},
                 {"importrelations", ImportRelations},
-                {"evaluate", s=> EvaluateWarehouse() },
-                {"eval", s=> EvaluateWarehouse() },
+                {"evaluate", s => EvaluateWarehouse()},
+                {"eval", s => EvaluateWarehouse()},
                 {"addnode", AddNode },
                 {"addbook", AddBook},
                 {"addbooks", AddBooks},
+                {"randomaddbooks", RandomAddBooks},
                 {"distance", Distance},
                 {"dist", Distance},
                 {"quit", s => Quit()},
@@ -176,6 +177,29 @@ namespace WarehouseAI.UI
 
             PrintItemsOnShelves();
             Console.WriteLine("Books added.");
+        }
+
+        private void RandomAddBooks(string[] args)
+        {
+            Console.WriteLine("Adding books at random places...");
+            List<Item> items = new List<Item>();
+            foreach (string s in args)
+            {
+                try
+                {
+                    Item item = itemDatabase.Items.First(i => i.Id == int.Parse(s));
+                    items.Add(item);
+                }
+                catch
+                {
+                    Console.WriteLine("One or more of the specified ID's was not found in the database, or in the wrong format");
+                    return;
+                }
+            }
+            warehouse.RandomlyAddBooks(items.ToArray());
+
+            PrintItemsOnShelves();
+            Console.WriteLine("Done adding books.");
         }
 
         private void PrintItemsOnShelves()
