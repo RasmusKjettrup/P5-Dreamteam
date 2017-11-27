@@ -16,7 +16,6 @@ namespace WarehouseAI
     {
         private const string CommandList = "\\help";
         private static readonly Dictionary<string, Delegate> Commands = new Dictionary<string, Delegate>();
-        private static bool _running = true;
 
         private static void Main(string[] args)
         {
@@ -29,7 +28,6 @@ namespace WarehouseAI
             warehouse.ItemDatabase = itemDatabase;
 
             warehouse.Inintialize();
-            //WarehouseServerIO.StartListening(); Todo Move to controller
 
             consoleController.Start(args);
             

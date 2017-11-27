@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace WarehouseAI
 {
@@ -112,6 +113,18 @@ namespace WarehouseAI
             {
                 yield return t;
             }
+        }
+
+        private static Random _random;
+
+        public static T Random<T>(this IEnumerable<T> x)
+        {
+            if (_random == null)
+            {
+                _random = new Random(0);
+            }
+            T[] array = x.ToArray();
+            return array[_random.Next(0, array.Length)];
         }
     }
 }
