@@ -366,3 +366,15 @@ WarehouseAI/WarehouseAI/obj/Debug/WarehouseAI\.exe
 WarehouseAI/WarehouseAITest/obj/Debug/
 
 WarehouseAI/WarehouseAI/obj/Debug/
+
+*.iml
+
+QR_reader/local\.properties
+
+*.bin
+
+*.lock
+
+QR_reader/\.gradle/buildOutputCleanup/cache\.properties
+
+*.exe

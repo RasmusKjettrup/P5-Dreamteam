@@ -26,9 +26,7 @@ import java.util.concurrent.TimeoutException;
  * Main class that the user meets on app launch.
  */
 public class MainActivity extends AppCompatActivity {
-
     private static final int ZBAR_SCANNER_REQUEST = 0;
-    private TextView _txtResponse;
     private EditText _editTextToSend;
     private EditText _editIP;
     private EditText _editPort;
@@ -36,14 +34,13 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox _chkSendImmediately;
 
     private final static String TAG = "MainActivity";
-    private String _serverResponse;
+    private String _serverResponse = "";
 
     @SuppressLint("SetTextI18n")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        _txtResponse = findViewById(R.id.txt_response);
         _editTextToSend = findViewById(R.id.edit_textToSend);
         _editIP = findViewById(R.id.edit_ip);
         _editPort = findViewById(R.id.edit_port);
@@ -118,8 +115,11 @@ public class MainActivity extends AppCompatActivity {
             } else if (_serverResponse.equals("")) {
                 makeCentreToast("Found IP, but server not responding");
                 return 1;
-            } else {
-                _txtResponse.setText(_serverResponse);
+            } else if(_serverResponse.endsWith("<EOF>")) {
+                _serverResponse.replace("<EOF>", "");
+                return 0;
+            } else
+            {
                 return 0;
             }
         } catch (InterruptedException e) {
@@ -142,8 +142,16 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendDataButtonClick(View view) {
         if (sendDataToServer(_editTextToSend.getText().toString()) == 0) {
-            _txtResponse.setText(_serverResponse);
             _editTextToSend.setText("");
         }
+    }
+
+    public void requestButtonClick(View view){
+        int errorCode = sendDataToServer("@req");
+        if (errorCode != 0)
+            return;
+        Intent intent = new Intent(this, VisualRepresentationActivity.class);
+        intent.putExtra("RepresentationData", _serverResponse);
+        startActivity(intent);
     }
 }
