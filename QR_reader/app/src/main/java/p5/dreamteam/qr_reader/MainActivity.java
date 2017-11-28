@@ -26,9 +26,7 @@ import java.util.concurrent.TimeoutException;
  * Main class that the user meets on app launch.
  */
 public class MainActivity extends AppCompatActivity {
-
     private static final int ZBAR_SCANNER_REQUEST = 0;
-    private TextView _txtResponse;
     private EditText _editTextToSend;
     private EditText _editIP;
     private EditText _editPort;
@@ -43,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        _txtResponse = findViewById(R.id.txt_response);
         _editTextToSend = findViewById(R.id.edit_textToSend);
         _editIP = findViewById(R.id.edit_ip);
         _editPort = findViewById(R.id.edit_port);
@@ -110,27 +107,30 @@ public class MainActivity extends AppCompatActivity {
             ConnectionTask task = new ConnectionTask(_editIP.getText().toString(),
                     Integer.parseInt(_editPort.getText().toString()), data);
             _serverResponse = task.execute().get(2, TimeUnit.SECONDS);
-
             // Horrible workaround to handle missing exceptions in other thread
             if (_serverResponse == null) {
                 makeCentreToast("Server not found");
                 return 1;
             } else if (_serverResponse.equals("")) {
                 makeCentreToast("Found IP, but server not responding");
-                return 1;
-            } else {
-                _txtResponse.setText(_serverResponse);
+                return 2;
+            } else if(_serverResponse.endsWith("<EOF>")) {
+                _serverResponse.replace("<EOF>", "");
                 return 0;
+            } else
+            {
+                makeCentreToast("Message lost in during connection");
+                return 3;
             }
         } catch (InterruptedException e) {
             makeCentreToast("Interrupted error");
-            return 1;
+            return 4;
         } catch (ExecutionException e) {
             makeCentreToast("Execution error");
-            return 1;
+            return 5;
         } catch (TimeoutException e) {
             makeCentreToast("Server timeout");
-            return 1;
+            return 6;
         }
     }
 
@@ -142,8 +142,16 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendDataButtonClick(View view) {
         if (sendDataToServer(_editTextToSend.getText().toString()) == 0) {
-            _txtResponse.setText(_serverResponse);
             _editTextToSend.setText("");
         }
+    }
+
+    public void requestButtonClick(View view){
+        int errorCode = sendDataToServer("@req");
+        if (errorCode != 0)
+            return;
+        Intent intent = new Intent(this, VisualRepresentationActivity.class);
+        intent.putExtra("RepresentationData", _serverResponse);
+        startActivity(intent);
     }
 }

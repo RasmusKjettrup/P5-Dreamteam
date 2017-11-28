@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -7,7 +8,26 @@ using System.Threading;
 namespace WarehouseAI {
     public static class WarehouseServerIO {
         private const int ConnectionQueueAmount = 1;
-        public static ManualResetEvent allDone = new ManualResetEvent(false);
+        public static ManualResetEvent AllDone = new ManualResetEvent(false);
+        private static readonly List<string> MessageLog = new List<string>();
+        private static readonly Queue<string> DataQueue = new Queue<string>();
+
+        public static string GetMessageLogs()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (string s in MessageLog)
+            {
+                sb.AppendLine(s);
+            }
+            return sb.ToString();
+        }
+
+        public static void ClearMessageLog() => MessageLog.Clear();
+
+        public static void EnqueueRoute(string route)
+        {
+            DataQueue.Enqueue(route);
+        }
 
         public static void StartListening() {
             IPAddress ipAddress = GetIP();
@@ -19,54 +39,59 @@ namespace WarehouseAI {
                 socket.Bind(localEndPoint);
                 socket.Listen(ConnectionQueueAmount);
                 while (true) {
-                    allDone.Reset();
+                    AllDone.Reset();
                     
                     socket.BeginAccept(new AsyncCallback(AcceptCallback), socket);
 
-                    allDone.WaitOne(); // Block current thread and wait for signal from other thread
+                    AllDone.WaitOne(); // Block current thread and wait for signal from other thread
                 }
             } catch (Exception e) {
-                Console.WriteLine(e.ToString());
+                MessageLog.Add(e.ToString());
             }
-
-            Console.WriteLine("\nPress enter to continue...");
+            
             Console.Read();
         }
 
         private static void AcceptCallback(IAsyncResult ar) { 
-            allDone.Set();
+            AllDone.Set();
 
             Socket listener = (Socket) ar.AsyncState;
             Socket handler = listener.EndAccept(ar);
 
             StateObject state = new StateObject();
-            state.workSocket = handler;
-            handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallback), state);
+            state.WorkSocket = handler;
+            handler.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallback), state);
         }
 
         private static void ReadCallback(IAsyncResult ar) {
             StateObject state = (StateObject) ar.AsyncState;
-            Socket handler = state.workSocket;
+            Socket handler = state.WorkSocket;
 
             int bytesRead = handler.EndReceive(ar);
 
-            if (bytesRead > 0) {
-                state.sb.Append(Encoding.UTF8.GetString(state.buffer, 0, bytesRead));
+            if (bytesRead <= 0) return;
+            state.Sb.Append(Encoding.UTF8.GetString(state.Buffer, 0, bytesRead));
 
-                var content = state.sb.ToString();
-                if (content.EndsWith("<EOF>")) {
-                    Console.WriteLine("Read {0} bytes from socket. \n Data : {1}", content.Length, content); // Todo Save in a log instead
-                    Send(handler, "sErVeR sAyS hElLo!!! as well as " + content);
-                    Console.WriteLine("Message sent.");
+            string content = state.Sb.ToString();
+            if (content.EndsWith("<EOF>")) {
+                MessageLog.Add($"Read {content.Length} chars from socket. \n Data : {content}");
+                if (content == "@req")
+                    if (DataQueue.Count <= 0)
+                        Send(handler, "No routes available");
+                    else
+                        Send(handler, DataQueue.Dequeue());
+                else
+                {
+                    Send(handler, "Message recieved");
                 }
-                else {
-                    handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallback), state);
-                }
+            }
+            else {
+                handler.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallback), state);
             }
         }
 
         private static void Send(Socket handler, string data) {
-            byte[] byteData = Encoding.UTF8.GetBytes(data);
+            byte[] byteData = Encoding.UTF8.GetBytes(data + "<EOF>");
 
             handler.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), handler);
         }
@@ -76,19 +101,19 @@ namespace WarehouseAI {
                 Socket handler = (Socket) ar.AsyncState;
 
                 int bytesSent = handler.EndSend(ar);
-                Console.WriteLine("Sent {0} bytes to client.\n", bytesSent);
+                MessageLog.Add($"Sent {bytesSent} bytes to client.\n");
 
                 handler.Shutdown(SocketShutdown.Both);
                 handler.Close();
             } catch (Exception e) {
-                Console.WriteLine(e.ToString());
+                MessageLog.Add(e.ToString());
             }
         }
 
-        private static IPAddress GetIP()
+        internal static IPAddress GetIP()
         {
-            var host = Dns.GetHostEntry(Dns.GetHostName());
-            foreach (var ipAddress in host.AddressList)
+            IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (IPAddress ipAddress in host.AddressList)
             {
                 if (ipAddress.AddressFamily==AddressFamily.InterNetwork)
                 {
@@ -100,10 +125,10 @@ namespace WarehouseAI {
 
 
         private class StateObject {
-            public Socket workSocket = null;
+            public Socket WorkSocket = null;
             public const int BufferSize = 1024;
-            public byte[] buffer = new byte[BufferSize];
-            public StringBuilder sb = new StringBuilder();
+            public byte[] Buffer = new byte[BufferSize];
+            public StringBuilder Sb = new StringBuilder();
         }
     }
 }

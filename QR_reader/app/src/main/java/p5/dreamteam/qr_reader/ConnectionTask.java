@@ -65,7 +65,7 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
             return null;
         }
 
-        return response.substring(0, response.length() - 5); // Remove <EOF> from displayed response
+        return response.substring(0, response.length()); // Remove <EOF> from displayed response
     }
 
     private void sendDataToServer(String data) throws IOException {
