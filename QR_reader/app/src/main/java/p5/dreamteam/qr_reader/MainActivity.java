@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox _chkSendImmediately;
 
     private final static String TAG = "MainActivity";
-    private String _serverResponse = "";
+    private String _serverResponse;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -107,30 +107,30 @@ public class MainActivity extends AppCompatActivity {
             ConnectionTask task = new ConnectionTask(_editIP.getText().toString(),
                     Integer.parseInt(_editPort.getText().toString()), data);
             _serverResponse = task.execute().get(2, TimeUnit.SECONDS);
-
             // Horrible workaround to handle missing exceptions in other thread
             if (_serverResponse == null) {
                 makeCentreToast("Server not found");
                 return 1;
             } else if (_serverResponse.equals("")) {
                 makeCentreToast("Found IP, but server not responding");
-                return 1;
+                return 2;
             } else if(_serverResponse.endsWith("<EOF>")) {
                 _serverResponse.replace("<EOF>", "");
                 return 0;
             } else
             {
-                return 0;
+                makeCentreToast("Message lost in during connection");
+                return 3;
             }
         } catch (InterruptedException e) {
             makeCentreToast("Interrupted error");
-            return 1;
+            return 4;
         } catch (ExecutionException e) {
             makeCentreToast("Execution error");
-            return 1;
+            return 5;
         } catch (TimeoutException e) {
             makeCentreToast("Server timeout");
-            return 1;
+            return 6;
         }
     }
 

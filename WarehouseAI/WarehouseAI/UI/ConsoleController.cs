@@ -11,15 +11,14 @@ namespace WarehouseAI.UI
     {
         public WarehouseRepresentation warehouse { get; set; }
         public ItemDatabase itemDatabase { get; set; }
-        private Thread _serverThread;
 
-        private readonly Dictionary<string, Action<string[]>> commands;
+        private readonly Dictionary<string, Action<string[]>> _commands;
 
         private bool quit = false;
 
         public ConsoleController()
         {
-            commands = new Dictionary<string, Action<string[]>>
+            _commands = new Dictionary<string, Action<string[]>>
             {
                 {"importwarehouse", ImportWarehouse},
                 {"importitems", ImportItems},
@@ -35,6 +34,9 @@ namespace WarehouseAI.UI
                 {"quit", s => Quit()},
                 {"q", s => Quit()},
                 {"help", PrintAllCommands},
+                {"getserverlog",  s => Console.WriteLine(WarehouseServerIO.GetMessageLogs())},
+                {"clearserverlog",  s => WarehouseServerIO.ClearMessageLog()},
+                {"showip", s => Console.WriteLine(WarehouseServerIO.GetIP().ToString()) }
             };
         }
 
@@ -66,7 +68,7 @@ namespace WarehouseAI.UI
 
             Action<string[]> c;
             if (input.Length <= 0) return;
-            if (commands.TryGetValue(inputStrings[0].ToLower(), out c))
+            if (_commands.TryGetValue(inputStrings[0].ToLower(), out c))
             {
                 c(inputStrings.Skip(1).ToArray());
             }
@@ -322,7 +324,7 @@ namespace WarehouseAI.UI
         private void PrintAllCommands(string[] args)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            foreach (string commandsKey in commands.Keys)
+            foreach (string commandsKey in _commands.Keys)
             {
                 Console.WriteLine(commandsKey);
             }
