@@ -11,6 +11,7 @@ namespace WarehouseAI {
         public static ManualResetEvent AllDone = new ManualResetEvent(false);
         private static readonly List<string> MessageLog = new List<string>();
         private static readonly Queue<string> DataQueue = new Queue<string>();
+        public static event Action<string> MessageRecievedEvent;
 
         public static string GetMessageLogs()
         {
@@ -83,6 +84,7 @@ namespace WarehouseAI {
                 else
                 {
                     Send(handler, "Message recieved");
+                    MessageRecievedEvent?.Invoke(content.Remove(content.Length - 5));
                 }
             }
             else {
