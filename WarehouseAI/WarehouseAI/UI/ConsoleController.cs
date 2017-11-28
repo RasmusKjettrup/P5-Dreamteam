@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using WarehouseAI.Representation;
 
@@ -54,12 +55,61 @@ namespace WarehouseAI.UI
                 Console.WriteLine(s);
                 Command(s);
             }
+            
+            StringBuilder sb = new StringBuilder();
 
+            Console.WriteLine("Please enter a command.\nFor a list of all commands type: help\n");
+            Console.Write("> ");
             while (!quit)
             {
-                Console.WriteLine("Please enter a command.\nFor a list of all commands type: help");
-                Command(Console.ReadLine());
+                ConsoleKey key = Console.ReadKey().Key;
+                while (key != ConsoleKey.Tab && key != ConsoleKey.Enter)
+                {
+                    if (key == ConsoleKey.Backspace && sb.Length > 0)
+                    {
+                        sb.Remove(sb.Length - 1, 1);
+                    }
+                    if (char.IsLetterOrDigit((char)key))
+                    {
+                        sb.Append(key);   
+                    }
+                    key = Console.ReadKey().Key;
+                }
+
+                #region colour
+                ConsoleColor orig = Console.ForegroundColor;
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("\n-- commands --\n");
+                Console.ForegroundColor = orig;
+                #endregion
+                List<string> commands = new List<string>();
+                
+                foreach (string cmd in _commands.Keys)
+                {
+                    if (cmd.StartsWith(sb.ToString().ToLower()))
+                    {
+                        commands.Add(cmd);
+                    }
+
+                    for (int i = 0; i < commands[0].Length; i++)
+                    {
+                        for (int j = 0; j < commands.Count; j++)
+                        {
+                            if (commands[0][i]!=commands[j][i])
+                            {
+                                sb = new StringBuilder(commands[0], 0, i - 1, 100);
+                                break;
+                            }
+                            
+                        }
+                        
+                    }
+                }
+                string input = sb.ToString();
+                
+                Console.Write(input.ToLower());
             }
+            StringBuilder jfd = new StringBuilder("Hello");
         }
 
         private void Command(string input)
