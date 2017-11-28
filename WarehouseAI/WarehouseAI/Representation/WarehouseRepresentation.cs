@@ -315,10 +315,16 @@ namespace WarehouseAI.Representation
             {
                 shelves.Add(s);
             }
+            DistanceMap map = new DistanceMap(Nodes[0].Append(shelves).ToArray());
 
             foreach (Item item in items)
             {
-                shelves.Where(s => s.RemaningCapacity > 0).Random().AddBook(item);
+                shelves.Where(s => s.RemaningCapacity > 0).OrderBy(shelf =>
+                {
+                    float f;
+                    map.TryGet(shelf.Id, Nodes[0].Id, out f);
+                    return f;
+                }).Take(3).Random().AddBook(item);
             }
         }
 
