@@ -13,18 +13,18 @@ namespace WarehouseAI.Representation
         public ItemDatabase ItemDatabase;
         private Item[] AddedItems {
             get {
-                List<Item> accu = new List<Item>();
+                List<Item> accumulatedItems = new List<Item>();
                 foreach (Item[] items in _nodes.Where(n => n is Shelf).Cast<Shelf>().Select(s => s.Items))
                 {
                     foreach (Item item in items)
                     {
-                        if (!accu.Contains(item))
+                        if (!accumulatedItems.Contains(item))
                         {
-                            accu.Add(item);
+                            accumulatedItems.Add(item);
                         }
                     }
                 }
-                return accu.ToArray();
+                return accumulatedItems.ToArray();
             }
         }
 
