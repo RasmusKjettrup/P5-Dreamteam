@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using WarehouseAI.Representation;
 
@@ -34,10 +35,54 @@ namespace WarehouseAI.UI
                 {"quit", s => Quit()},
                 {"q", s => Quit()},
                 {"help", PrintAllCommands},
-                {"getserverlog",  s => Console.WriteLine(WarehouseServerIO.GetMessageLogs())},
-                {"clearserverlog",  s => WarehouseServerIO.ClearMessageLog()},
-                {"showip", s => Console.WriteLine(WarehouseServerIO.GetIP().ToString()) }
+                {"printlog",  s => Console.WriteLine(WarehouseServerIO.GetMessageLogs())},
+                {"clearlog",  s => WarehouseServerIO.ClearMessageLog()},
+                {"showip", s => Console.WriteLine(WarehouseServerIO.GetIP().ToString()) },
+                {"orderbooks", OrderBooks }
             };
+            WarehouseServerIO.MessageRecievedEvent += WarehouseServerIOOnMessageRecievedEvent;
+        }
+
+        private void OrderBooks(string[] books)
+        {
+            if (itemDatabase.Items.Length <= 0 || warehouse.Nodes == null)
+            {
+                Console.WriteLine("Error: no items in the database or warehouse did not contain any nodes");
+                return;
+            }
+            /*Adds item to idb if books contains item id*/
+            Item[] idb = itemDatabase.Items.Where(item => books.Contains(item.Id.ToString())).ToArray();
+            try
+            {
+                Node[] nodes;
+                Algorithms.Weight(warehouse.Nodes, idb, out nodes);
+                StringBuilder sb = new StringBuilder();
+                foreach (Node node in nodes)
+                {
+                    Shelf shelf = node as Shelf;
+                    if (shelf == null) continue;
+                    sb.Append(shelf.Id);
+                    foreach (Item item in shelf.Items)
+                    {
+                        if (books.Contains(item.Id.ToString()))
+                        {
+                            sb.AppendLine(item.Name);
+                            books[Array.IndexOf(books, item.Id.ToString())] = null;
+                        }
+                    }
+                }
+                WarehouseServerIO.EnqueueRoute(sb.ToString());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            
+        }
+
+        private void WarehouseServerIOOnMessageRecievedEvent(string message)
+        {
+            AddBook(new[] { message });
         }
 
         public void Start(params string[] args)
@@ -61,6 +106,8 @@ namespace WarehouseAI.UI
                 Command(Console.ReadLine());
             }
         }
+
+
 
         private void Command(string input)
         {

@@ -13,18 +13,18 @@ namespace WarehouseAI.Representation
         public ItemDatabase ItemDatabase;
         private Item[] AddedItems {
             get {
-                List<Item> accu = new List<Item>();
+                List<Item> accumulatedItems = new List<Item>();
                 foreach (Item[] items in _nodes.Where(n => n is Shelf).Cast<Shelf>().Select(s => s.Items))
                 {
                     foreach (Item item in items)
                     {
-                        if (!accu.Contains(item))
+                        if (!accumulatedItems.Contains(item))
                         {
-                            accu.Add(item);
+                            accumulatedItems.Add(item);
                         }
                     }
                 }
-                return accu.ToArray();
+                return accumulatedItems.ToArray();
             }
         }
 
@@ -315,10 +315,16 @@ namespace WarehouseAI.Representation
             {
                 shelves.Add(s);
             }
+            DistanceMap map = new DistanceMap(Nodes[0].Append(shelves).ToArray());
 
             foreach (Item item in items)
             {
-                shelves.Where(s => s.RemaningCapacity > 0).Random().AddBook(item);
+                shelves.Where(s => s.RemaningCapacity > 0).OrderBy(shelf =>
+                {
+                    float f;
+                    map.TryGet(shelf.Id, Nodes[0].Id, out f);
+                    return f;
+                }).Take(3).Random().AddBook(item);
             }
         }
 
