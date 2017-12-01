@@ -72,7 +72,7 @@ namespace WarehouseAITest
             // Assert
             if (numberOfItems == 0)
             {
-                Assert.Throws<ArgumentException>(() => Algorithms.Importance(items.ToArray()));
+                Assert.AreEqual(0, Algorithms.Importance(items.ToArray()));
             }
             else
             {
