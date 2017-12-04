@@ -67,6 +67,7 @@ namespace WarehouseAI.UI
                         if (books.Contains(item.Id.ToString()))
                         {
                             sb.AppendLine(item.Name);
+                            shelf.RemoveBook(item);
                             books[Array.IndexOf(books, item.Id.ToString())] = null;
                         }
                     }
@@ -77,7 +78,6 @@ namespace WarehouseAI.UI
             {
                 Console.WriteLine(e);
             }
-            
         }
 
         private void WarehouseServerIOOnMessageRecievedEvent(string message)
