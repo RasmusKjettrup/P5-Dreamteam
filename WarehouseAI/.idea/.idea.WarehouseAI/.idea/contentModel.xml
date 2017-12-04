@@ -4,24 +4,61 @@
     <e p="$USER_HOME$/.Rider2017.2/system/resharper-host/local/Transient/ReSharperHost/v10/SolutionCaches/_WarehouseAI.-736882253.00" t="ExcludeRecursive" />
     <e p="$PROJECT_DIR$" t="IncludeFlat">
       <e p="WarehouseAI" t="IncludeRecursive">
+        <e p="Algorithms.cs" t="Include" />
         <e p="App.config" t="Include" />
+        <e p="Extensions.cs" t="Include" />
         <e p="Frontier.cs" t="Include" />
-        <e p="Item.cs" t="Include" />
-        <e p="Node.cs" t="Include" />
-        <e p="PlacementAlgorithmClass.cs" t="Include" />
+        <e p="Pathfinding" t="Include">
+          <e p="AStarAlgorithm.cs" t="Include" />
+          <e p="DijkstraAlgorithm.cs" t="Include" />
+          <e p="DistanceMap.cs" t="Include" />
+        </e>
         <e p="Program.cs" t="Include" />
         <e p="Properties" t="Include">
           <e p="AssemblyInfo.cs" t="Include" />
         </e>
-        <e p="Shelf.cs" t="Include" />
+        <e p="Representation" t="Include">
+          <e p="Item.cs" t="Include" />
+          <e p="ItemDatabase.cs" t="Include" />
+          <e p="Node.cs" t="Include" />
+          <e p="Shelf.cs" t="Include" />
+          <e p="WarehouseRepresentation.cs" t="Include" />
+          <e p="WeightCache.cs" t="Include" />
+        </e>
+        <e p="ShortestPathGraph" t="Include">
+          <e p="FilteredShelfShortestPathGraphNode.cs" t="Include" />
+          <e p="IShortestPathGraphNode.cs" t="Include" />
+          <e p="ShelfShortestPathGraphNode.cs" t="Include" />
+          <e p="ShortestPathGraph.cs" t="Include" />
+          <e p="ShortestPathGraphNode.cs" t="Include" />
+        </e>
+        <e p="UI" t="Include">
+          <e p="ConsoleController.cs" t="Include" />
+          <e p="IController.cs" t="Include" />
+        </e>
         <e p="WarehouseAI.csproj" t="IncludeRecursive" />
-        <e p="WarehouseIO.cs" t="Include" />
         <e p="WarehouseServerIO.cs" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
         <e p="obj" t="ExcludeRecursive" />
+        <e p="packages.config" t="Include" />
       </e>
       <e p="WarehouseAI.sln" t="IncludeFlat" />
-      <e p="WarehouseAITest/WarehouseAITest.csproj" t="IncludeRecursive" />
+      <e p="WarehouseAITest" t="IncludeRecursive">
+        <e p="App.config" t="Include" />
+        <e p="ExtensionTests.cs" t="Include" />
+        <e p="ImportanceAlgorithmTests.cs" t="Include" />
+        <e p="ItemDatabaseTest.cs" t="Include" />
+        <e p="PlacementAlgorithmTests.cs" t="Include" />
+        <e p="Program.cs" t="Include" />
+        <e p="Properties" t="Include">
+          <e p="AssemblyInfo.cs" t="Include" />
+        </e>
+        <e p="WarehouseAITest.csproj" t="IncludeRecursive" />
+        <e p="WeightAlgorithmTests.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="obj" t="ExcludeRecursive" />
+        <e p="packages.config" t="Include" />
+      </e>
       <e p="packages" t="ExcludeRecursive" />
     </e>
   </component>
