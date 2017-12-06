@@ -15,8 +15,6 @@ namespace WarehouseAI.UI
 
         private readonly Dictionary<string, Action<string[]>> _commands;
 
-        private bool quit = false;
-
         public ConsoleController()
         {
             _commands = new Dictionary<string, Action<string[]>>
@@ -67,6 +65,7 @@ namespace WarehouseAI.UI
                         if (books.Contains(item.Id.ToString()))
                         {
                             sb.AppendLine(item.Name);
+                            shelf.RemoveBook(item);
                             books[Array.IndexOf(books, item.Id.ToString())] = null;
                         }
                     }
@@ -77,7 +76,6 @@ namespace WarehouseAI.UI
             {
                 Console.WriteLine(e);
             }
-            
         }
 
         private void WarehouseServerIOOnMessageRecievedEvent(string message)
@@ -100,14 +98,12 @@ namespace WarehouseAI.UI
                 Command(s);
             }
 
-            while (!quit)
+            while (true) //Run until termination by Quit()
             {
                 Console.WriteLine("Please enter a command.\nFor a list of all commands type: help");
                 Command(Console.ReadLine());
             }
         }
-
-
 
         private void Command(string input)
         {
@@ -255,11 +251,11 @@ namespace WarehouseAI.UI
         {
             foreach (Node node in warehouse.Nodes)
             {
-                if (node is Shelf)
+                Shelf shelf = node as Shelf;
+                if (shelf != null)
                 {
-                    Shelf shelf = (Shelf)node;
                     string items = "";
-                    for (var i = 0; i < shelf.Items.Length; i++)
+                    for (int i = 0; i < shelf.Items.Length; i++)
                     {
                         items += shelf.Items[i].Id;
                         if (i != shelf.Items.Length - 1)
@@ -267,7 +263,7 @@ namespace WarehouseAI.UI
                             items += " ";
                         }
                     }
-                    Console.WriteLine(@"{0}: [{1}]", node.Id, items);
+                    Console.WriteLine(@"{0}: [{1}]", shelf.Id, items);
                 }
             }
         }
@@ -295,10 +291,12 @@ namespace WarehouseAI.UI
                         relationalIndex--;
                         break;
                 }
+                // Parse any float format with current culture
                 newNode.X = float.Parse(args[relationalIndex + 1], NumberStyles.Any, c);
                 newNode.Y = float.Parse(args[relationalIndex + 2], NumberStyles.Any, c);
+            } catch (Exception e) {
+                Console.WriteLine(e.Message);
             }
-            catch { }
 
             warehouse.AddNode(newNode, args.Skip(relationalIndex + 3).Select(s => int.Parse(s)).ToArray());
 
@@ -371,21 +369,12 @@ namespace WarehouseAI.UI
         private void PrintAllCommands(string[] args)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            foreach (string commandsKey in _commands.Keys)
+            // Sort commands alphabetically and print
+            foreach (string commandsKey in _commands.Keys.OrderBy(key => key))
             {
                 Console.WriteLine(commandsKey);
             }
             Console.ForegroundColor = ConsoleColor.White;
-        }
-
-        private static void ServerOnMessageRecieved(string data, string client)
-        {
-            switch (data[0])
-            {
-                case 'Q': break; // Todo: Qr Message was recieved from client
-                case 'R': break; // Todo: Route request recieved from client
-                default: Console.WriteLine($"The following message was recieved from the IP {client}: {data}"); break;
-            }
         }
     }
 }

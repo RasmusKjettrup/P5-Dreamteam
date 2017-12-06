@@ -265,8 +265,7 @@ namespace WarehouseAITest
             // Assert
             Node[] graph = rep.Nodes;
             Algorithms.InitializeWeight(graph);
-            Algorithms.Weight(items); 
-            Assert.Throws<NullReferenceException>(() => throw new NullReferenceException());
+            Assert.Throws<NullReferenceException>(() => Algorithms.Weight(items));
         }
 
         [Test]
@@ -290,8 +289,7 @@ namespace WarehouseAITest
             ((Shelf)rep.Nodes.First(n => n.Id == 1)).AddBook(items[1]);
 
             // Assert
-            Algorithms.Weight(items);
-            Assert.Throws<NullReferenceException>(() => throw new NullReferenceException());
+            Assert.Throws<NullReferenceException>(() => Algorithms.Weight(items));
         }
     }
 }
