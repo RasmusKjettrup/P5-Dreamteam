@@ -128,6 +128,10 @@ namespace WarehouseAI.Representation
         /// </summary>
         public void Inintialize()
         {
+            if (ItemDatabase == null || ItemDatabase.Items.Length < 1)
+            {
+                throw new NullReferenceException();
+            }
             _cache = new WeightCache(ItemDatabase.Items.Power().ToArray());
         }
 
@@ -173,6 +177,11 @@ namespace WarehouseAI.Representation
         /// <param name="items"></param>
         public void AddBooks(params Item[] items)
         {
+            if (items == null)
+                throw new NullReferenceException();
+            if (items.Length < 1)
+                throw new ArgumentException();
+
             if (items.Length == 1)
             {
                 AddBook(items[0]);
@@ -182,6 +191,10 @@ namespace WarehouseAI.Representation
                 List<ItemQuantity> itemQuanities = new List<ItemQuantity>();
                 foreach (Item item in items)
                 {
+                    if (!(ItemDatabase.Items.Count(i => i.Id == item.Id && i.Name == item.Name) < 1))
+                    {
+                        throw new ArgumentException("Item doesn't exist in database");
+                    }
                     ItemQuantity tup = itemQuanities.Find(i => i.Item == item);
                     if (tup == null)
                     {
