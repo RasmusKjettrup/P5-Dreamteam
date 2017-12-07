@@ -2,23 +2,30 @@ package p5.dreamteam.qr_reader;
 
 import android.content.Context;
 import android.hardware.Camera;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * TODO: Add a class header comment!
  */
 class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
-    private static final String TAG = "CameraPreview";
+    private static final String TAG = "CameraPreview"; // For logging
 
     private Camera _camera;
     private Camera.PreviewCallback _previewCallback;
     private boolean _flash;
 
+    /**
+     * "Real" constructor. Android Studio asked for the others, since the layout editor
+     * (and possibly the emulator) needs them.
+     * @param context The activity from which the preview is called. Usually {@link ZBarScannerActivity}.
+     * @param previewCallback Used to deliver preview frames to ZBar in addition to actually displaying on screen.
+     * @param flash Should flash be used? {@link MainActivity#_chkFlash}
+     */
     public CameraPreview(Context context, Camera.PreviewCallback previewCallback, boolean flash) {
         super(context);
 
@@ -27,6 +34,18 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
 
         SurfaceHolder holder = getHolder();
         holder.addCallback(this);
+    }
+
+    public CameraPreview(Context context) {
+        super(context);
+    }
+
+    public CameraPreview(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public CameraPreview(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
     }
 
     public void setCamera(Camera camera) {

@@ -16,6 +16,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import net.sourceforge.zbar.Symbol;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -71,10 +73,11 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Check if flash checkbox is checked, and launch {@link ZBarScannerActivity},
-     * and send result to {@link #onActivityResult(int, int, Intent)}
+     * and send scan result to {@link #onActivityResult(int, int, Intent)}
      */
     private void launchScanner() {
         Intent intent = new Intent(this, ZBarScannerActivity.class);
+        intent.putExtra(ZBarConstants.SCAN_MODES, new int[] {Symbol.EAN13}); // Only look for EAN13
         intent.putExtra("FLASH", _chkFlash.isChecked());
         startActivityForResult(intent, ZBAR_SCANNER_REQUEST);
     }

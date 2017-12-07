@@ -35,7 +35,6 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
         super.onCreate(savedInstanceState);
 
         if(!isCameraAvailable()) {
-            // Cancel request if there is no rear-facing camera.
             cancelRequest();
             return;
         }
@@ -57,8 +56,6 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
 
     public void setupScanner() {
         _scanner = new ImageScanner();
-        _scanner.setConfig(0, Config.X_DENSITY, 3);
-        _scanner.setConfig(0, Config.Y_DENSITY, 3);
 
         int[] symbols = getIntent().getIntArrayExtra(SCAN_MODES);
         if (symbols != null) {
