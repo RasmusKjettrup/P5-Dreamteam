@@ -16,7 +16,12 @@ import net.sourceforge.zbar.Symbol;
 import net.sourceforge.zbar.SymbolSet;
 
 /**
- * TODO: Add a class header comment!
+ * This is where ZBar is actually implemented. Uses {@link CameraPreview} to scan images, and then decodes them.
+ * --
+ * @see <a href="https://developer.android.com/guide/components/activities/activity-lifecycle.html">
+ *     Android Developers: The Activity Lifecycle</a> for more information about the methods in this class
+ * @see <a href="https://github.com/ZBar/ZBar/tree/master/zbar">The ZBar GitHub repository, ZBar folder</a>
+ * (actually a clone of a Mercurial repository)
  */
 public class ZBarScannerActivity extends Activity implements Camera.PreviewCallback, ZBarConstants {
 
@@ -26,10 +31,14 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
     private ImageScanner _scanner;
     private boolean _flash;
 
-    static {
+    static { // Unix tool used to convert from one encoding to another. TODO: No idea if this is required
         System.loadLibrary("iconv");
     }
 
+    /**
+     * Called when activity is created. If camera not available, exit activity. Check if user wants flash. Fullscreen
+     * layout. Set up scanner. Enter camera preview.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,11 +50,9 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
 
         _flash = getIntent().getBooleanExtra("FLASH", _flash);
 
-        // Hide the window title.
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        // Create and configure the ImageScanner;
         setupScanner();
 
         // Create a RelativeLayout container that will hold a SurfaceView,
@@ -54,9 +61,21 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
         setContentView(_preview);
     }
 
+    /**
+     * Sets up the image scanner with required stride (10) and required codes (EAN13).
+     */
     public void setupScanner() {
         _scanner = new ImageScanner();
 
+        // Specify the pixel stride for each axis. 0 completely disables scanning in a specific direction. We want to
+        // be able to scan both in landscape and portrait mode, however, without letting Android rotate the
+        // UI, which means that both need to be > 0, sacrificing a small amount of processing power. TODO: How much?
+        // We choose a stride of 10 in each direction, which seems to be a good middle ground for performance and
+        // fast scanability.
+        _scanner.setConfig(10, Config.X_DENSITY, 10);
+        _scanner.setConfig(10, Config.Y_DENSITY, 10);
+
+        // Check if we only need to recognise certain codes. Then disable everything and enable the required ones
         int[] symbols = getIntent().getIntArrayExtra(SCAN_MODES);
         if (symbols != null) {
             _scanner.setConfig(Symbol.NONE, Config.ENABLE, 0);
@@ -66,11 +85,14 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
         }
     }
 
+    /**
+     * Open camera and preview when activity is resumed from pause (e.g. from a turned off screen, or phone call ends)
+     */
     @Override
     protected void onResume() {
         super.onResume();
 
-        _camera = Camera.open(); // rear
+        _camera = Camera.open(); // Rear
         if(_camera == null) {
             cancelRequest();
             return;
@@ -79,6 +101,9 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
         _preview.setCamera(_camera);
     }
 
+    /**
+     * Need to disable camera so that other apps may use it when user leaves activity.
+     */
     @Override
     protected void onStop() {
         super.onStop();
@@ -120,11 +145,18 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
         }
     }
 
+    /**
+     * Check if camera is available. TODO: Isn't this in MainActivity already?
+     * @return whether or not phone has camera.
+     */
     public boolean isCameraAvailable() {
         PackageManager pm = getPackageManager();
         return pm.hasSystemFeature(PackageManager.FEATURE_CAMERA);
     }
 
+    /**
+     * Exit the activity with error info if camera is unavailable.
+     */
     public void cancelRequest() {
         Intent dataIntent = new Intent();
         dataIntent.putExtra(ERROR_INFO, "Camera unavailable");
@@ -132,6 +164,11 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
         finish();
     }
 
+    /**
+     * TODO
+     * @param data
+     * @param camera
+     */
     public void onPreviewFrame(byte[] data, Camera camera) {
         Camera.Parameters parameters = camera.getParameters();
         Camera.Size size = parameters.getPreviewSize();

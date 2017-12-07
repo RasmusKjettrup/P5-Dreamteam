@@ -10,7 +10,7 @@ import android.view.SurfaceView;
 import java.io.IOException;
 
 /**
- * TODO: Add a class header comment!
+ * Scans an image. Displays on screen. Sends scanned images to {@link ZBarScannerActivity} to scan with the callback.
  */
 class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private static final String TAG = "CameraPreview"; // For logging
@@ -68,10 +68,6 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         if (_camera != null) {
             Camera.Parameters parameters = _camera.getParameters();
-//            List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
-//            for (Camera.Size size : previewSizes) {
-//                Log.i(TAG, "Height: " + size.height + "     Width: " + size.width);
-//            }
             parameters.setPreviewSize(1280, 720);
             parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
             if (_flash) {
