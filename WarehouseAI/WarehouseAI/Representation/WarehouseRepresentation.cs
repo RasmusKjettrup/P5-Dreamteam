@@ -128,7 +128,7 @@ namespace WarehouseAI.Representation
         /// </summary>
         public void Inintialize()
         {
-            if (ItemDatabase == null || ItemDatabase.Items.Length < 1)
+            if (ItemDatabase == null)
             {
                 throw new NullReferenceException();
             }
@@ -191,7 +191,7 @@ namespace WarehouseAI.Representation
                 List<ItemQuantity> itemQuanities = new List<ItemQuantity>();
                 foreach (Item item in items)
                 {
-                    if (!(ItemDatabase.Items.Count(i => i.Id == item.Id && i.Name == item.Name) < 1))
+                    if ((ItemDatabase.Items.Count(i => i.Id == item.Id && i.Name == item.Name) < 1))
                     {
                         throw new ArgumentException("Item doesn't exist in database");
                     }
@@ -261,6 +261,10 @@ namespace WarehouseAI.Representation
         /// <param name="item"></param>
         public void AddBook(Item item)
         {
+            if ((ItemDatabase.Items.Count(i => i.Id == item.Id && i.Name == item.Name) < 1))
+            {
+                throw new ArgumentException("Item doesn't exist in database");
+            }
             //The filterShortestPathGraph is used as a tempoary graph where evaluations of the state are run on.
             //Only shelves and the dropoff point is added to the shortestPathGraph.
             //Each node is a new "FilteredShelfShortestPathGraphNode", with an all pairs connection to eachother.
