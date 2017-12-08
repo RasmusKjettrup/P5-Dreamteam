@@ -11,7 +11,11 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 /**
- * Task that asynchronously creates a connection to a server, and terminates on server response.
+ * Task that "asynchronously" creates a connection to a server, and terminates on server response.
+ * "Asynchronously" meaning that it still waits for a server response before terminating.
+ * No parameters (Void) sent to the task.
+ * No progress update needed (Void).
+ * Results in a String (server response) on termination.
  */
 public class ConnectionTask extends AsyncTask<Void, Void, String> {
     private static final String TAG = "ConnectionTask";
@@ -20,12 +24,24 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
     private String _data;
     private Socket _socket;
 
+    /**
+     * Constructor. Connects using socket.
+     * @param ip IP to connect to.
+     * @param port Using specified port. Server listens on 100 by default.
+     * @param data Data to send to server.
+     */
     ConnectionTask(String ip, int port, String data) {
         this._ip = ip;
         this._port = port;
         this._data = data;
     }
 
+    /**
+     * Send {@link #_data} to server, and wait for server response.
+     * Timeout is handled in MainActivity.
+     * Makes asynchronous less smart, but oh well...
+     * @return the server response.
+     */
     @Override
     protected String doInBackground(Void... voids) {
         String response;
@@ -37,7 +53,7 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
             return null;
         }
 
-        response = receiveDataFromServer(); //TODO: Test non-running server with local IP
+        response = receiveDataFromServer();
 
         try {
             _socket.close();
@@ -48,11 +64,10 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
         return response;
     }
 
-    @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
-    }
-
+    /**
+     * Retrieves data from the server by reading lines from response and stripping EOF
+     * @return the response from the server.
+     */
     private String receiveDataFromServer() {
         StringBuilder response = new StringBuilder();
 
@@ -65,9 +80,19 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
             return null;
         }
 
-        return response.substring(0, response.length()); // Remove <EOF> from displayed response
+        if (response.toString().endsWith("<EOF>")) {
+            return response.substring(0, response.length());
+        } else {
+            return response.toString();
+        }
     }
 
+    /**
+     * Creates a new {@link Socket} to communicate with server on local network on specified IP and port.
+     * Socket is closed in {@link #receiveDataFromServer()}.
+     * @param data String to be sent to server. Ends with EOF string.
+     * @throws IOException if something goes wrong with the socket.
+     */
     private void sendDataToServer(String data) throws IOException {
         _socket = new Socket(_ip, _port);
         PrintWriter writer = new PrintWriter(new OutputStreamWriter(_socket.getOutputStream()));
