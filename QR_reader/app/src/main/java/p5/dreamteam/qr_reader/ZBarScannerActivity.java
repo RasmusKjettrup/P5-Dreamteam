@@ -72,8 +72,8 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
         // UI, which means that both need to be > 0, sacrificing a small amount of processing power. TODO: How much?
         // We choose a stride of 10 in each direction, which seems to be a good middle ground for performance and
         // fast scanability.
-        _scanner.setConfig(10, Config.X_DENSITY, 10);
-        _scanner.setConfig(10, Config.Y_DENSITY, 10);
+        _scanner.setConfig(0, Config.X_DENSITY, 10);
+        _scanner.setConfig(0, Config.Y_DENSITY, 10);
 
         // Check if we only need to recognise certain codes. Then disable everything and enable the required ones
         int[] symbols = getIntent().getIntArrayExtra(SCAN_MODES);
