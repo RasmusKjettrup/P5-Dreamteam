@@ -74,7 +74,7 @@ namespace WarehouseAI.UI
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Console.WriteLine("Error: " + e.Message);
             }
         }
 
@@ -119,50 +119,98 @@ namespace WarehouseAI.UI
 
         private void ImportWarehouse(string[] args)
         {
+            if (args == null || args.Length < 1)
+            {
+                Console.WriteLine("Import warehouse expects a path to a warehouse database");
+                return;
+            }
             Console.WriteLine("Now importing warehouse...");
-            warehouse.ImportWarehouse(args[0]);
+            try
+            {
+                warehouse.ImportWarehouse(args[0]);
+                PrintWarehouse();
 
-            PrintWarehouse();
-            Console.WriteLine("Import complete.");
+                Console.WriteLine("Import complete.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Import failed...");
+                Console.WriteLine("Error: " + e.Message);
+            }
+
         }
 
         private void ImportItems(string[] args)
         {
-            Console.WriteLine("Importing items...");
-            itemDatabase.ImportItems(args[0]);
-            foreach (Item item in itemDatabase.Items)
+            if (args == null || args.Length < 1)
             {
-                Console.WriteLine(@"{0}: {1}", item.Id, item.Name);
+                Console.WriteLine("Import items expects a path to a item database");
+                return;
             }
-            Console.WriteLine("Import complete.");
+            Console.WriteLine("Importing items...");
+            try
+            {
+                itemDatabase.ImportItems(args[0]);
+                foreach (Item item in itemDatabase.Items)
+                {
+                    Console.WriteLine(@"{0}: {1}", item.Id, item.Name);
+                }
+                Console.WriteLine("Import complete.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Import failed...");
+                Console.WriteLine("Error: " + e.Message);
+            }
         }
 
         private void ImportRelations(string[] args)
         {
-            Console.WriteLine("Importing relations on items...");
-            itemDatabase.ImportRelations(args[0]);
-            foreach (Item item in itemDatabase.Items)
+            if (args == null || args.Length < 1)
             {
-                string neighbours = "";
-                for (int i = 0; i < item.Neighbours().Length; i++)
-                {
-                    neighbours += item.Neighbours()[i].Id;
-                    if (i != item.Neighbours().Length - 1)
-                    {
-                        neighbours += " ";
-                    }
-                }
-                Console.WriteLine(@"{0}: [{1}]", item.Id, neighbours);
+                Console.WriteLine("Import relations expects a path to a relation database");
+                return;
             }
-            Console.WriteLine("Import complete.");
+            Console.WriteLine("Importing relations on items...");
+            try
+            {
+                itemDatabase.ImportRelations(args[0]);
+                foreach (Item item in itemDatabase.Items)
+                {
+                    string neighbours = "";
+                    for (int i = 0; i < item.Neighbours().Length; i++)
+                    {
+                        neighbours += item.Neighbours()[i].Id;
+                        if (i != item.Neighbours().Length - 1)
+                        {
+                            neighbours += " ";
+                        }
+                    }
+                    Console.WriteLine(@"{0}: [{1}]", item.Id, neighbours);
+                }
+                Console.WriteLine("Import complete.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Import failed...");
+                Console.WriteLine("Error: " + e.Message);
+            }
         }
 
         private void EvaluateWarehouse()
         {
             Console.WriteLine("Evaulating warehouse state...");
-            double result = warehouse.Evaluate();
-            Console.WriteLine("Result: " + result);
-            Console.WriteLine("Evaluation finished.");
+            try
+            {
+                double result = warehouse.Evaluate();
+                Console.WriteLine("Result: " + result);
+                Console.WriteLine("Evaluation finished.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Evaluation failed...");
+                Console.WriteLine("Error: " + e.Message);
+            }
         }
 
         private void AddBook(string[] args)
@@ -175,7 +223,7 @@ namespace WarehouseAI.UI
             }
             catch
             {
-                Console.WriteLine("The book with the specified ID was not found in the database.");
+                Console.WriteLine("Error: The book with the specified ID was not found in the database.");
                 return;
             }
             if (args.Length == 1)
@@ -191,7 +239,7 @@ namespace WarehouseAI.UI
                 }
                 catch
                 {
-                    Console.WriteLine("The specified shelf ID was not found in the database.");
+                    Console.WriteLine("Error: The specified shelf ID was not found in the database.");
                     return;
                 }
                 shelf.AddBook(item);
@@ -214,14 +262,21 @@ namespace WarehouseAI.UI
                 }
                 catch
                 {
-                    Console.WriteLine("One or more of the specified ID's was not found in the database, or in the wrong format");
+                    Console.WriteLine("Error: One or more of the specified ID's was not found in the database, or in the wrong format");
                     return;
                 }
             }
-            warehouse.AddBooks(items.ToArray());
+            try
+            {
+                warehouse.AddBooks(items.ToArray());
 
-            PrintItemsOnShelves();
-            Console.WriteLine("Books added.");
+                PrintItemsOnShelves();
+                Console.WriteLine("Books added.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: " + e.Message);
+            }
         }
 
         private void RandomAddBooks(string[] args)
@@ -237,14 +292,23 @@ namespace WarehouseAI.UI
                 }
                 catch
                 {
-                    Console.WriteLine("One or more of the specified ID's was not found in the database, or in the wrong format");
+                    Console.WriteLine("Error: One or more of the specified ID's was not found in the database, or in the wrong format");
                     return;
                 }
             }
-            warehouse.RandomlyAddBooks(items.ToArray());
+            try
+            {
+                warehouse.RandomlyAddBooks(items.ToArray());
 
-            PrintItemsOnShelves();
-            Console.WriteLine("Done adding books.");
+                PrintItemsOnShelves();
+                Console.WriteLine("Done adding books.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Adding books failed...");
+                Console.WriteLine("Error: " + e.Message);
+            }
+
         }
 
         private void PrintItemsOnShelves()
@@ -290,18 +354,21 @@ namespace WarehouseAI.UI
                         newNode = new Node();
                         relationalIndex--;
                         break;
+                    
                 }
                 // Parse any float format with current culture
                 newNode.X = float.Parse(args[relationalIndex + 1], NumberStyles.Any, c);
                 newNode.Y = float.Parse(args[relationalIndex + 2], NumberStyles.Any, c);
+
+                warehouse.AddNode(newNode, args.Skip(relationalIndex + 3).Select(s => int.Parse(s)).ToArray());
+
+                PrintWarehouse();
+                Console.WriteLine("Node added.");
             } catch (Exception e) {
-                Console.WriteLine(e.Message);
+                Console.WriteLine("Node was not added...");
+                Console.WriteLine("Error: " + e.Message);
             }
 
-            warehouse.AddNode(newNode, args.Skip(relationalIndex + 3).Select(s => int.Parse(s)).ToArray());
-
-            PrintWarehouse();
-            Console.WriteLine("Node added.");
         }
 
         private void Distance(string[] args)
@@ -317,19 +384,19 @@ namespace WarehouseAI.UI
             }
             catch (FormatException)
             {
-                Console.WriteLine("The supplied arguments was not in the correct format.");
+                Console.WriteLine("Error: The supplied arguments was not in the correct format.");
             }
             catch (IndexOutOfRangeException)
             {
-                Console.WriteLine("Not enough arguments was supplied.");
+                Console.WriteLine("Error: Not enough arguments was supplied.");
             }
             catch (InvalidOperationException)
             {
-                Console.WriteLine("The specified node id's was not found in the database.");
+                Console.WriteLine("Error: The specified node id's was not found in the database.");
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Console.WriteLine("Error: " + e.Message);
             }
         }
 
