@@ -28,8 +28,7 @@
         <activity
             android:name=".ZBarScannerActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".SettingsActivity"></activity>
-        <activity android:name=".VisualRepresentationActivity"></activity>
+        <activity android:name=".VisualRepresentationActivity"/>
     </application>
 
 </manifest>
