@@ -48,10 +48,10 @@
   <ItemGroup>
     <Compile Include="ExtensionTests.cs" />
     <Compile Include="ImportanceAlgorithmTests.cs" />
-    <Compile Include="PlacementAlgorithmTests.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ItemDatabaseTest.cs" />
+    <Compile Include="WarehouseRepresentationTests.cs" />
     <Compile Include="WeightAlgorithmTests.cs" />
   </ItemGroup>
   <ItemGroup>
