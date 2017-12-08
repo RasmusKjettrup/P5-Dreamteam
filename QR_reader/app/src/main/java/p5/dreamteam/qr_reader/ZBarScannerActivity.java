@@ -23,11 +23,25 @@ import net.sourceforge.zbar.SymbolSet;
  * (actually a clone of a Mercurial repository)
  */
 public class ZBarScannerActivity extends Activity implements Camera.PreviewCallback, ZBarConstants {
-
+    /**
+     * Tag used for logging
+     */
     private static final String TAG = "ZBarScannerActivity";
+    /**
+     * The actual instance of the camera preview in the activity
+     */
     private CameraPreview _preview;
+    /**
+     * The actual camera instance of the activity
+     */
     private Camera _camera;
+    /**
+     * ZBar's image scanner. Reads barcodes from images provided by {@link #_camera}
+     */
     private ImageScanner _scanner;
+    /**
+     * Enables flash if true
+     */
     private boolean _flash;
 
     static { // Unix tool used to convert from one encoding to another. TODO: No idea if this is required

@@ -26,13 +26,39 @@ import java.util.concurrent.TimeoutException;
  * Main class that the user meets on app launch.
  */
 public class MainActivity extends AppCompatActivity {
-    private EditText _editTextToSend;
-    private EditText _editIP;
-    private EditText _editPort;
-    private CheckBox _chkFlash;
-    private CheckBox _chkSendImmediately;
+    /**
+     * Tag for logging
+     */
+    private final static String TAG = "MainActivity";
 
-    private final static String TAG = "MainActivity"; // Tag for logging
+    /**
+     * UI editable text field that is either modified by user or by scanner.
+     * Used to send to server
+     */
+    private EditText _editTextToSend;
+    /**
+     * UI editable text field that specifies the IP to connect to.
+     * Has a default value of "192.168.43.7"
+     */
+    private EditText _editIP;
+    /**
+     * UI editable text field that specifies the port to connect through.
+     * Has a default value of "100"
+     */
+    private EditText _editPort;
+    /**
+     * UI editable checkbox that specifies whether or not the user wants flash when scanning
+     */
+    private CheckBox _chkFlash;
+
+    /**
+     * UI editable checkbox that specifies whether or not the user wants to send scanned data immediately,
+     * or wait for "Send" button press
+     */
+    private CheckBox _chkSendImmediately;
+    /**
+     * Server response
+     */
     private String _serverResponse;
 
     /**
@@ -50,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         _chkFlash = findViewById(R.id.chk_flash);
         _chkSendImmediately = findViewById(R.id.chk_sendImmediately);
 
+        // Type of keyboard used for text fields
         _editIP.setInputType(InputType.TYPE_CLASS_PHONE);
         _editPort.setInputType(InputType.TYPE_CLASS_PHONE);
         _editIP.setText("192.168.43.7");

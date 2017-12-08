@@ -13,10 +13,21 @@ import java.io.IOException;
  * Scans an image. Displays on screen. Sends scanned images to {@link ZBarScannerActivity} to scan with the callback.
  */
 class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
-    private static final String TAG = "CameraPreview"; // For logging
-
+    /**
+     * Tag for logging
+     */
+    private static final String TAG = "CameraPreview";
+    /**
+     * TODO
+     */
     private Camera _camera;
+    /**
+     * TODO
+     */
     private Camera.PreviewCallback _previewCallback;
+    /**
+     * TODO
+     */
     private boolean _flash;
 
     /**
@@ -36,14 +47,23 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
         holder.addCallback(this);
     }
 
+    /**
+     * {See {@link CameraPreview#CameraPreview(Context, Camera.PreviewCallback, boolean)}}
+     */
     public CameraPreview(Context context) {
         super(context);
     }
 
+    /**
+     * {See {@link CameraPreview#CameraPreview(Context, Camera.PreviewCallback, boolean)}}
+     */
     public CameraPreview(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
+    /**
+     * {See {@link CameraPreview#CameraPreview(Context, Camera.PreviewCallback, boolean)}}
+     */
     public CameraPreview(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
@@ -55,6 +75,10 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
+    /**
+     * TODO
+     * @param holder
+     */
     public void surfaceCreated(SurfaceHolder holder) {
         if (_camera != null) {
             try {
@@ -65,6 +89,13 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
+    /**
+     * TODO
+     * @param holder
+     * @param format
+     * @param width
+     * @param height
+     */
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         if (_camera != null) {
             Camera.Parameters parameters = _camera.getParameters();
@@ -82,6 +113,10 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
+    /**
+     * TODO
+     * @param holder
+     */
     public void surfaceDestroyed(SurfaceHolder holder) {
         if (_camera != null) {
             _camera.cancelAutoFocus();
