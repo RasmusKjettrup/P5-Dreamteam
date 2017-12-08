@@ -1,7 +1,7 @@
 package p5.dreamteam.qr_reader;
 
 /**
- * TODO: Add a class header comment!
+ * String constants used by ZBar
  */
 public interface ZBarConstants {
     String SCAN_MODES = "SCAN_MODES";

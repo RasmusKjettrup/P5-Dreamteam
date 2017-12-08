@@ -9,17 +9,17 @@ import android.widget.ListView;
  * Activity for displaying a route from an array of Strings
  */
 public class VisualRepresentationActivity extends Activity {
-    ListView _view;
-    String[] _strings;
-    ArrayAdapter<String> _adapter;
-
+    /**
+     * Sets layout from intent getStringExtra() split by newline
+     * @param savedInstanceState Get previous activity state of activity if applicaple (e.g. when rotated)
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_visual_representation);
-        _view = findViewById(R.id.list);
-        _strings = getIntent().getStringExtra("RepresentationData").split("\n");
-        _adapter = new ArrayAdapter<>(this, R.layout.list_item, _strings);
+        ListView _view = findViewById(R.id.list);
+        String[] _strings = getIntent().getStringExtra("RepresentationData").split("\n");
+        ArrayAdapter<String> _adapter = new ArrayAdapter<>(this, R.layout.list_item, _strings);
 
         _view.setAdapter(_adapter);
     }
