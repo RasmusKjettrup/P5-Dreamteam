@@ -13,30 +13,30 @@ namespace WarehouseAI.UI
         public WarehouseRepresentation warehouse { get; set; }
         public ItemDatabase itemDatabase { get; set; }
 
-        private readonly Dictionary<string, Action<string[]>> _commands;
+        private readonly Dictionary<string, Tuple<Action<string[]>,string>> _commands;
 
         public ConsoleController()
         {
-            _commands = new Dictionary<string, Action<string[]>>
+            _commands = new Dictionary<string, Tuple<Action<string[]>, string>>
             {
-                {"importwarehouse", ImportWarehouse},
-                {"importitems", ImportItems},
-                {"importrelations", ImportRelations},
-                {"evaluate", s => EvaluateWarehouse()},
-                {"eval", s => EvaluateWarehouse()},
-                {"addnode", AddNode },
-                {"addbook", AddBook},
-                {"addbooks", AddBooks},
-                {"randomaddbooks", RandomAddBooks},
-                {"distance", Distance},
-                {"dist", Distance},
-                {"quit", s => Quit()},
-                {"q", s => Quit()},
-                {"help", PrintAllCommands},
-                {"printlog",  s => Console.WriteLine(WarehouseServerIO.GetMessageLogs())},
-                {"clearlog",  s => WarehouseServerIO.ClearMessageLog()},
-                {"showip", s => Console.WriteLine(WarehouseServerIO.GetIP().ToString()) },
-                {"orderbooks", OrderBooks }
+                {"importwarehouse", new Tuple<Action<string[]>, string>(ImportWarehouse, "Imports a warehouse from a file, expects the path to a file.")},
+                {"importitems", new Tuple<Action<string[]>, string>(ImportItems, "Imports items from a file, expects the path to a file.")},
+                {"importrelations", new Tuple<Action<string[]>, string>(ImportRelations, "Imports relations from a file, expects the path to a file.")},
+                {"evaluate", new Tuple<Action<string[]>, string>(s => EvaluateWarehouse(), "Evaluates the warehouse.")},
+                {"eval", new Tuple<Action<string[]>, string>(s => EvaluateWarehouse(), "Evaluates the warehouse.")},
+                {"addnode", new Tuple<Action<string[]>, string>(AddNode, "Adds a node to the warehouse, expects the type of node(shelf or node), the x coordinate, and the y coodinate.")},
+                {"addbook", new Tuple<Action<string[]>, string>(AddBook, "Adds a book to the warehouse, expects the ID of a book.")},
+                {"addbooks", new Tuple<Action<string[]>, string>(AddBooks, "Adds books to the warehouse, expects the ID of the books.")},
+                {"randomaddbooks", new Tuple<Action<string[]>, string>(RandomAddBooks, "Adds books to random places of the warehouse, expects the ID of the books.")},
+                {"distance", new Tuple<Action<string[]>, string>(Distance, "Calculates the distance between two nodes, expects the id of the first node, and the id of the second node.")},
+                {"dist", new Tuple<Action<string[]>, string>(Distance, "Calculates the distance between two nodes, expects the id of the first node, and the id of the second node.")},
+                {"quit", new Tuple<Action<string[]>, string>(s => Quit(), "Terminates the program.")},
+                {"q", new Tuple<Action<string[]>, string>(s => Quit(), "Terminates the program.")},
+                {"help", new Tuple<Action<string[]>, string>(PrintAllCommands, "Prints all commands or specifies specific commands.")},
+                {"printlog",  new Tuple<Action<string[]>, string>(s => Console.WriteLine(WarehouseServerIO.GetMessageLogs()), "Prints the serverlogs between client and server.")},
+                {"clearlog",  new Tuple<Action<string[]>, string>(s => WarehouseServerIO.ClearMessageLog(), "Clears the serverlogs between client and server.")},
+                {"showip", new Tuple<Action<string[]>, string>(s => Console.WriteLine(WarehouseServerIO.GetIP().ToString()), "Shows the IP-address of the server.")},
+                {"orderbooks", new Tuple<Action<string[]>, string>(OrderBooks, "Sends an order of bought books to the warehouse, expects the id of each bought book.")}
             };
             WarehouseServerIO.MessageRecievedEvent += WarehouseServerIOOnMessageRecievedEvent;
         }
@@ -97,10 +97,9 @@ namespace WarehouseAI.UI
                 Console.WriteLine(s);
                 Command(s);
             }
-
+            Console.WriteLine("Please enter a command.\nFor a list of all commands type: help");
             while (true) //Run until termination by Quit()
             {
-                Console.WriteLine("Please enter a command.\nFor a list of all commands type: help");
                 Command(Console.ReadLine());
             }
         }
@@ -109,11 +108,11 @@ namespace WarehouseAI.UI
         {
             string[] inputStrings = input.Split(' ').Where(s => s != "").ToArray();
 
-            Action<string[]> c;
+            Tuple<Action<string[]>, string> c;
             if (input.Length <= 0) return;
             if (_commands.TryGetValue(inputStrings[0].ToLower(), out c))
             {
-                c(inputStrings.Skip(1).ToArray());
+                c.Item1(inputStrings.Skip(1).ToArray());
             }
         }
 
@@ -435,6 +434,20 @@ namespace WarehouseAI.UI
         /// </summary>
         private void PrintAllCommands(string[] args)
         {
+            if (args != null && args.Length > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                foreach (string s in args)
+                {
+                    if (_commands.ContainsKey(s))
+                    {
+                        Console.WriteLine(s + " - " + _commands[s].Item2);
+                    }
+                }
+                Console.ForegroundColor = ConsoleColor.White;
+                return;
+            }
+            Console.WriteLine("The help command followed by any number of commands will describe the function of each command.");
             Console.ForegroundColor = ConsoleColor.Green;
             // Sort commands alphabetically and print
             foreach (string commandsKey in _commands.Keys.OrderBy(key => key))
