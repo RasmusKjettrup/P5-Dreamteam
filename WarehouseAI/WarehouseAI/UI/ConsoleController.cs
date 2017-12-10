@@ -13,30 +13,28 @@ namespace WarehouseAI.UI
         public WarehouseRepresentation warehouse { get; set; }
         public ItemDatabase itemDatabase { get; set; }
 
-        private readonly Dictionary<string, Tuple<Action<string[]>,string>> _commands;
+        private readonly Dictionary<string, Command> _commands;
 
-        public ConsoleController()
-        {
-            _commands = new Dictionary<string, Tuple<Action<string[]>, string>>
-            {
-                {"importwarehouse", new Tuple<Action<string[]>, string>(ImportWarehouse, "Imports a warehouse from a file, expects the path to a file.")},
-                {"importitems", new Tuple<Action<string[]>, string>(ImportItems, "Imports items from a file, expects the path to a file.")},
-                {"importrelations", new Tuple<Action<string[]>, string>(ImportRelations, "Imports relations from a file, expects the path to a file.")},
-                {"evaluate", new Tuple<Action<string[]>, string>(s => EvaluateWarehouse(), "Evaluates the warehouse.")},
-                {"eval", new Tuple<Action<string[]>, string>(s => EvaluateWarehouse(), "Evaluates the warehouse.")},
-                {"addnode", new Tuple<Action<string[]>, string>(AddNode, "Adds a node to the warehouse, expects the type of node(shelf or node), the x coordinate, and the y coodinate.")},
-                {"addbook", new Tuple<Action<string[]>, string>(AddBook, "Adds a book to the warehouse, expects the ID of a book.")},
-                {"addbooks", new Tuple<Action<string[]>, string>(AddBooks, "Adds books to the warehouse, expects the ID of the books.")},
-                {"randomaddbooks", new Tuple<Action<string[]>, string>(RandomAddBooks, "Adds books to random places of the warehouse, expects the ID of the books.")},
-                {"distance", new Tuple<Action<string[]>, string>(Distance, "Calculates the distance between two nodes, expects the id of the first node, and the id of the second node.")},
-                {"dist", new Tuple<Action<string[]>, string>(Distance, "Calculates the distance between two nodes, expects the id of the first node, and the id of the second node.")},
-                {"quit", new Tuple<Action<string[]>, string>(s => Quit(), "Terminates the program.")},
-                {"q", new Tuple<Action<string[]>, string>(s => Quit(), "Terminates the program.")},
-                {"help", new Tuple<Action<string[]>, string>(PrintAllCommands, "Prints all commands or specifies specific commands.")},
-                {"printlog",  new Tuple<Action<string[]>, string>(s => Console.WriteLine(WarehouseServerIO.GetMessageLogs()), "Prints the serverlogs between client and server.")},
-                {"clearlog",  new Tuple<Action<string[]>, string>(s => WarehouseServerIO.ClearMessageLog(), "Clears the serverlogs between client and server.")},
-                {"showip", new Tuple<Action<string[]>, string>(s => Console.WriteLine(WarehouseServerIO.GetIP().ToString()), "Shows the IP-address of the server.")},
-                {"orderbooks", new Tuple<Action<string[]>, string>(OrderBooks, "Sends an order of bought books to the warehouse, expects the id of each bought book.")}
+        public ConsoleController() {
+            _commands = new Dictionary<string, Command> {
+                {"importwarehouse", new Command(ImportWarehouse, "Imports a warehouse from a file, expects the path to a file")},
+                {"importitems", new Command(ImportItems, "Imports items from a file, expects the path to a file.")},
+                {"importrelations", new Command(ImportRelations, "Imports relations from a file, expects the path to a file.")},
+                {"evaluate", new Command(s => EvaluateWarehouse(), "Evaluates the warehouse.")},
+                {"eval", new Command(s => EvaluateWarehouse(), "Evaluates the warehouse.")},
+                {"addnode", new Command(AddNode, "Adds a node to the warehouse, expects the type of node(shelf or node), the x coordinate, and the y coodinate.")},
+                {"addbook", new Command(AddBook, "Adds a book to the warehouse, expects the ID of a book.")},
+                {"addbooks", new Command(AddBooks, "Adds books to the warehouse, expects the ID of the books.")},
+                {"randomaddbooks", new Command(RandomAddBooks, "Adds books to random places of the warehouse, expects the ID of the books.")},
+                {"distance", new Command(Distance, "Calculates the distance between two nodes, expects the id of the first node, and the id of the second node.")},
+                {"dist", new Command(Distance, "Calculates the distance between two nodes, expects the id of the first node, and the id of the second node.")},
+                {"quit", new Command(s => Quit(), "Terminates the program.")},
+                {"q", new Command(s => Quit(), "Terminates the program.")},
+                {"help", new Command(PrintAllCommands, "Prints all commands or specifies specific commands.")},
+                {"printlog",  new Command(s => Console.WriteLine(WarehouseServerIO.GetMessageLogs()), "Prints the serverlogs between client and server.")},
+                {"clearlog",  new Command(s => WarehouseServerIO.ClearMessageLog(), "Clears the serverlogs between client and server.")},
+                {"showip", new Command(s => Console.WriteLine(WarehouseServerIO.GetIP().ToString()), "Shows the IP-address of the server.")},
+                {"orderbooks", new Command(OrderBooks, "Sends an order of bought books to the warehouse, expects the id of each bought book.")}
             };
             WarehouseServerIO.MessageRecievedEvent += WarehouseServerIOOnMessageRecievedEvent;
         }
@@ -108,11 +106,11 @@ namespace WarehouseAI.UI
         {
             string[] inputStrings = input.Split(' ').Where(s => s != "").ToArray();
 
-            Tuple<Action<string[]>, string> c;
+            Command c;
             if (input.Length <= 0) return;
             if (_commands.TryGetValue(inputStrings[0].ToLower(), out c))
             {
-                c.Item1(inputStrings.Skip(1).ToArray());
+                c.Action(inputStrings.Skip(1).ToArray());
             }
         }
 
@@ -152,7 +150,7 @@ namespace WarehouseAI.UI
                 itemDatabase.ImportItems(args[0]);
                 foreach (Item item in itemDatabase.Items)
                 {
-                    Console.WriteLine(@"{0}: {1}", item.Id, item.Name);
+                    Console.WriteLine($"{item.Id}: {item.Name}");
                 }
                 Console.WriteLine("Import complete.");
             }
@@ -185,7 +183,7 @@ namespace WarehouseAI.UI
                             neighbours += " ";
                         }
                     }
-                    Console.WriteLine(@"{0}: [{1}]", item.Id, neighbours);
+                    Console.WriteLine($"{item.Id}: [{neighbours}]");
                 }
                 Console.WriteLine("Import complete.");
             }
@@ -326,7 +324,7 @@ namespace WarehouseAI.UI
                             items += " ";
                         }
                     }
-                    Console.WriteLine(@"{0}: [{1}]", shelf.Id, items);
+                    Console.WriteLine($"{shelf.Id}: [{items}]");
                 }
             }
         }
@@ -336,11 +334,11 @@ namespace WarehouseAI.UI
             Console.WriteLine("Adding node...");
 
             CultureInfo c = (CultureInfo)CultureInfo.CurrentCulture.Clone();
-            Node newNode = null;
 
             int relationalIndex = 0;
             try
             {
+                Node newNode;
                 switch (args[relationalIndex])
                 {
                     case "Node":
@@ -399,7 +397,7 @@ namespace WarehouseAI.UI
             }
         }
 
-        private void Quit()
+        private static void Quit()
         {
             Console.WriteLine("Now quitting...");
             Environment.Exit(0);
@@ -425,7 +423,7 @@ namespace WarehouseAI.UI
                     }
                 }
 
-                Console.WriteLine(@"{0} {1} ({2}) [{3}]", node.Id, typ, node.X + " " + node.Y, neighbours);
+                Console.WriteLine($"{node.Id} {typ} ({node.X + " " + node.Y}) [{neighbours}]");
             }
         }
         
@@ -441,7 +439,7 @@ namespace WarehouseAI.UI
                 {
                     if (_commands.ContainsKey(s))
                     {
-                        Console.WriteLine(s + " - " + _commands[s].Item2);
+                        Console.WriteLine(s + " - " + _commands[s].Description);
                     }
                 }
                 Console.ForegroundColor = ConsoleColor.White;
