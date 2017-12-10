@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Pathfinding\AStarAlgorithm.cs" />
     <Compile Include="Pathfinding\DijkstraAlgorithm.cs" />
+    <Compile Include="UI\Command.cs" />
     <Compile Include="UI\ConsoleController.cs" />
     <Compile Include="Pathfinding\DistanceMap.cs" />
     <Compile Include="Extensions.cs" />
