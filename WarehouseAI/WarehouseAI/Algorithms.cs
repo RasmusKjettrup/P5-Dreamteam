@@ -111,7 +111,7 @@ namespace WarehouseAI
             while (cache[itemSet].Marked)
             {
                 //The resultingfrontier is the result of this specific iteration of the while loop.
-                Frontier resultingFrontier = new Frontier(null, null, int.MaxValue);
+                Frontier resultingFrontier = new Frontier(null, null, float.MaxValue);
                 //Loop through each frontier in frontiers
                 foreach (Frontier frontier in frontiers)
                 {

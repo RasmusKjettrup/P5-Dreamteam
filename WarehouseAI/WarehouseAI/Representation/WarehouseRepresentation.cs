@@ -294,7 +294,7 @@ namespace WarehouseAI.Representation
             float lowestEvaluation = float.MaxValue;
             //Whenever "cont" is not set back to "true" after running the while loop, new lowest local evaluations are still being found.
             bool cont = true;
-            //A list of marked nodes are maintained, to prevent evaluating the same node twice
+            //A collection of marked nodes are maintained, to prevent evaluating the same node twice
             HashSet<FilteredShelfShortestPathGraphNode> markedNodes = new HashSet<FilteredShelfShortestPathGraphNode>();
 
             while (cont)
