@@ -12,8 +12,8 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import net.sourceforge.zbar.Symbol;
@@ -47,15 +47,15 @@ public class MainActivity extends AppCompatActivity {
      */
     private EditText _editPort;
     /**
-     * UI editable checkbox that specifies whether or not the user wants flash when scanning
+     * UI editable switch that specifies whether or not the user wants flash when scanning
      */
-    private CheckBox _chkFlash;
+    private Switch _swcFlash;
 
     /**
-     * UI editable checkbox that specifies whether or not the user wants to send scanned data immediately,
+     * UI editable switch that specifies whether or not the user wants to send scanned data immediately,
      * or wait for "Send" button press
      */
-    private CheckBox _chkSendImmediately;
+    private Switch _swcSendImmediately;
     /**
      * Server response
      */
@@ -73,8 +73,8 @@ public class MainActivity extends AppCompatActivity {
         _editTextToSend = findViewById(R.id.edit_textToSend);
         _editIP = findViewById(R.id.edit_ip);
         _editPort = findViewById(R.id.edit_port);
-        _chkFlash = findViewById(R.id.chk_flash);
-        _chkSendImmediately = findViewById(R.id.chk_sendImmediately);
+        _swcFlash = findViewById(R.id.swc_flash);
+        _swcSendImmediately = findViewById(R.id.swc_sendImmediately);
 
         // Type of keyboard used for text fields
         _editIP.setInputType(InputType.TYPE_CLASS_PHONE);
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
     private void launchScanner() {
         Intent intent = new Intent(this, ZBarScannerActivity.class);
         intent.putExtra(ZBarConstants.SCAN_MODES, new int[] {Symbol.EAN13}); // Only look for EAN13
-        intent.putExtra("FLASH", _chkFlash.isChecked());
+        intent.putExtra("FLASH", _swcFlash.isChecked());
         startActivityForResult(intent, 0);
     }
 
@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             String dataToSend = data.getStringExtra(ZBarConstants.SCAN_RESULT);
-            if (_chkSendImmediately.isChecked()) {
+            if (_swcSendImmediately.isChecked()) {
                 sendDataToServer(dataToSend);
             } else {
                 _editTextToSend.setText(dataToSend);
