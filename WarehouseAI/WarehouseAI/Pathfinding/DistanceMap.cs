@@ -37,6 +37,13 @@ namespace WarehouseAI.Pathfinding
             }
         }
 
+        /// <summary>
+        /// Gets the distance from one node to another via lookup from the ID of the node.
+        /// </summary>
+        /// <param name="x">The ID of the first node</param>
+        /// <param name="y">The ID of the second node</param>
+        /// <param name="weight">The output variable</param>
+        /// <returns>Returns true if successful, false otherwise.</returns>
         public bool TryGet(int x, int y, out float weight)
         {
             Dictionary<int, float> subdict;
