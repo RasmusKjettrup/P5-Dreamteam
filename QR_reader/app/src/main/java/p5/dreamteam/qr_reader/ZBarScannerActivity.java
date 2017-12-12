@@ -186,6 +186,9 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
         // Pixel format
         Image barcode = new Image(size.width, size.height, "Y800");
         barcode.setData(data);
+//        barcode.setCrop(300,200,680,320); // In pixels
+
+//        long start = System.nanoTime();
 
         // How many symbols were found?
         int result = _scanner.scanImage(barcode);
@@ -197,6 +200,9 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
             SymbolSet syms = _scanner.getResults();
             for (Symbol sym : syms) { // Should only be 1 symbol
                 String symData = sym.getData(); // Actually decode the barcode to get the data
+
+//                long end = System.nanoTime();
+//                Log.e(TAG, String.valueOf((end-start)/1000000)); // In milliseconds
                 if (!TextUtils.isEmpty(symData)) {
                     Intent dataIntent = new Intent();
                     dataIntent.putExtra(SCAN_RESULT, symData);
