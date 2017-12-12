@@ -26,14 +26,39 @@ import java.util.concurrent.TimeoutException;
  * Main class that the user meets on app launch.
  */
 public class MainActivity extends AppCompatActivity {
-    private static final int ZBAR_SCANNER_REQUEST = 0;
-    private EditText _editTextToSend;
-    private EditText _editIP;
-    private EditText _editPort;
-    private CheckBox _chkFlash;
-    private CheckBox _chkSendImmediately;
+    /**
+     * Tag for logging
+     */
+    private final static String TAG = "MainActivity";
 
-    private final static String TAG = "MainActivity"; // Tag for logging
+    /**
+     * UI editable text field that is either modified by user or by scanner.
+     * Used to send to server
+     */
+    private EditText _editTextToSend;
+    /**
+     * UI editable text field that specifies the IP to connect to.
+     * Has a default value of "192.168.43.7"
+     */
+    private EditText _editIP;
+    /**
+     * UI editable text field that specifies the port to connect through.
+     * Has a default value of "100"
+     */
+    private EditText _editPort;
+    /**
+     * UI editable checkbox that specifies whether or not the user wants flash when scanning
+     */
+    private CheckBox _chkFlash;
+
+    /**
+     * UI editable checkbox that specifies whether or not the user wants to send scanned data immediately,
+     * or wait for "Send" button press
+     */
+    private CheckBox _chkSendImmediately;
+    /**
+     * Server response
+     */
     private String _serverResponse;
 
     /**
@@ -51,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         _chkFlash = findViewById(R.id.chk_flash);
         _chkSendImmediately = findViewById(R.id.chk_sendImmediately);
 
+        // Type of keyboard used for text fields
         _editIP.setInputType(InputType.TYPE_CLASS_PHONE);
         _editPort.setInputType(InputType.TYPE_CLASS_PHONE);
         _editIP.setText("192.168.43.7");
@@ -79,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ZBarScannerActivity.class);
         intent.putExtra(ZBarConstants.SCAN_MODES, new int[] {Symbol.EAN13}); // Only look for EAN13
         intent.putExtra("FLASH", _chkFlash.isChecked());
-        startActivityForResult(intent, ZBAR_SCANNER_REQUEST);
+        startActivityForResult(intent, 0);
     }
 
     /**
@@ -93,28 +119,23 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Called when code is scanned and sends data to server if result is OK. Otherwise displays toast.
      * Also checks if data must be send immediately upon scan, or if it can be appended to {@link #_editTextToSend}.
-     * @param requestCode A request for ZBar scanner. Trouble if not 0.
      * @param resultCode Is the result OK?
      * @param data The data that the scanner obtains. Converted to string and sent to server.
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ZBAR_SCANNER_REQUEST) {
-            if (resultCode == RESULT_OK) {
-                String dataToSend = data.getStringExtra(ZBarConstants.SCAN_RESULT);
-                if (_chkSendImmediately.isChecked()) {
-                    sendDataToServer(dataToSend);
-                } else {
-                    _editTextToSend.setText(dataToSend);
-                }
-            } else if(resultCode == RESULT_CANCELED && data != null) { // Result is not OK, show toast.
-                String error = data.getStringExtra(ZBarConstants.ERROR_INFO);
-                if(!TextUtils.isEmpty(error)) {
-                    Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
-                }
+        if (resultCode == RESULT_OK) {
+            String dataToSend = data.getStringExtra(ZBarConstants.SCAN_RESULT);
+            if (_chkSendImmediately.isChecked()) {
+                sendDataToServer(dataToSend);
+            } else {
+                _editTextToSend.setText(dataToSend);
             }
-        } else {
-            makeCentreToast("I knew you were trouble when you walked in\nOh, oh, trouble, trouble, trouble");
+        } else if(resultCode == RESULT_CANCELED && data != null) { // Result is not OK, show toast.
+            String error = data.getStringExtra(ZBarConstants.ERROR_INFO);
+            if (!TextUtils.isEmpty(error)) {
+                Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

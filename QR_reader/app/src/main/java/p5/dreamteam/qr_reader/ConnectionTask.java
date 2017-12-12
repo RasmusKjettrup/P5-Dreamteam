@@ -18,10 +18,25 @@ import java.net.Socket;
  * Results in a String (server response) on termination.
  */
 public class ConnectionTask extends AsyncTask<Void, Void, String> {
+    /**
+     * Tag for logging
+     */
     private static final String TAG = "ConnectionTask";
+    /**
+     * The ip to connect to
+     */
     private String _ip;
+    /**
+     * Port to connect through
+     */
     private int _port;
+    /**
+     * Data to send to server. Either scanned or custom message
+     */
     private String _data;
+    /**
+     * The socket to connect through using {@link ConnectionTask#_ip} and {@link ConnectionTask#_port}
+     */
     private Socket _socket;
 
     /**
