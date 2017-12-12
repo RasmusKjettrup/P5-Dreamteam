@@ -129,7 +129,11 @@ public class MainActivity extends AppCompatActivity {
             if (_swcSendImmediately.isChecked()) {
                 sendDataToServer(dataToSend);
             } else {
-                _editTextToSend.setText(dataToSend);
+                if (TextUtils.isEmpty(_editTextToSend.getText())) {
+                    _editTextToSend.setText(dataToSend);
+                } else {
+                    _editTextToSend.append(" " + dataToSend);
+                }
             }
         } else if(resultCode == RESULT_CANCELED && data != null) { // Result is not OK, show toast.
             String error = data.getStringExtra(ZBarConstants.ERROR_INFO);
@@ -203,6 +207,10 @@ public class MainActivity extends AppCompatActivity {
     public void sendDataButtonClick(View view) {
         if (TextUtils.isEmpty(_editIP.getText()) || TextUtils.isEmpty(_editPort.getText())) {
             Toast.makeText(this, "IP or port is empty", Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (TextUtils.isEmpty(_editTextToSend.getText())) {
+            Toast.makeText(this, "No data to send", Toast.LENGTH_LONG).show();
             return;
         }
         showToastFromSendDataErrorCode(sendDataToServer(_editTextToSend.getText().toString()));
