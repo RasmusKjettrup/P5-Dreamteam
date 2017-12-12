@@ -201,6 +201,10 @@ public class MainActivity extends AppCompatActivity {
      * @param view Button instance that was pressed.
      */
     public void sendDataButtonClick(View view) {
+        if (TextUtils.isEmpty(_editIP.getText()) || TextUtils.isEmpty(_editPort.getText())) {
+            Toast.makeText(this, "IP or port is empty", Toast.LENGTH_LONG).show();
+            return;
+        }
         showToastFromSendDataErrorCode(sendDataToServer(_editTextToSend.getText().toString()));
     }
 
