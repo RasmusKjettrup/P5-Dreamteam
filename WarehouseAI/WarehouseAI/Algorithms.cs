@@ -33,11 +33,19 @@ namespace WarehouseAI
             return a / n;
         }
 
+        /// <summary>
+        /// Inintializes the default shortest path graph, used in weight calculations.
+        /// </summary>
+        /// <param name="nodes"></param>
         public static void InitializeWeight(params Node[] nodes)
         {
             _minimalShortestPathGraph = new ShortestPathGraph<ShelfShortestPathGraphNode>(nodes, n => n is Shelf, n => new ShelfShortestPathGraphNode((Shelf)n));
         }
 
+        /// <summary>
+        /// Initializes the cache of weights.
+        /// </summary>
+        /// <param name="itemDatabase"></param>
         public static void InitializeCache(ItemDatabase itemDatabase)
         {
             _cache = new WeightCache(itemDatabase.Items.Power().ToArray());

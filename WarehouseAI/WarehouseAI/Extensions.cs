@@ -117,6 +117,12 @@ namespace WarehouseAI
 
         private static Random _random;
 
+        /// <summary>
+        /// Returns an element of the IEnumerable chosen at random.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static T Random<T>(this IEnumerable<T> x)
         {
             if (_random == null)
