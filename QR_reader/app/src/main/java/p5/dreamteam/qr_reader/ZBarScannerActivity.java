@@ -44,9 +44,9 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
      */
     private boolean _flash;
 
-    static { // Unix tool used to convert from one encoding to another. TODO: No idea if this is required
-        System.loadLibrary("iconv");
-    }
+//    static { // Unix tool used to convert from one encoding to another. TODO: No idea if this is required
+//        System.loadLibrary("iconv");
+//    }
 
     /**
      * Called when activity is created. If camera not available, exit activity. Check if user wants flash. Fullscreen

@@ -18,15 +18,15 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
      */
     private static final String TAG = "CameraPreview";
     /**
-     * TODO
+     * The active camera instance
      */
     private Camera _camera;
     /**
-     * TODO
+     * Delivers copies of preview frames as they are displayed
      */
     private Camera.PreviewCallback _previewCallback;
     /**
-     * TODO
+     * Should flash be enabled when previewing?
      */
     private boolean _flash;
 
@@ -35,7 +35,7 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
      * (and possibly the emulator) needs them.
      * @param context The activity from which the preview is called. Usually {@link ZBarScannerActivity}.
      * @param previewCallback Used to deliver preview frames to ZBar in addition to actually displaying on screen.
-     * @param flash Should flash be used? {@link MainActivity#_chkFlash}
+     * @param flash Should flash be used? {@link MainActivity#_swcFlash}
      */
     public CameraPreview(Context context, Camera.PreviewCallback previewCallback, boolean flash) {
         super(context);
@@ -76,8 +76,9 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     /**
-     * TODO
-     * @param holder
+     * Called by Android immediately on surface creation.
+     * Attempt to set camera preview to active SurfacePreview
+     * @param holder Contains the Surface on which to place preview
      */
     public void surfaceCreated(SurfaceHolder holder) {
         if (_camera != null) {
@@ -90,11 +91,12 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     /**
-     * TODO
-     * @param holder
-     * @param format
-     * @param width
-     * @param height
+     * Called by Android after any structural changes to the surface (including startup)
+     * Sets Resolution, autofocus, flash, layout, orientation, preview callback, and starts preview.
+     * @param holder The holder whose surface has changed
+     * @param format Not relevant
+     * @param width Not relevant
+     * @param height Not relevant
      */
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         if (_camera != null) {
@@ -114,8 +116,9 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     /**
-     * TODO
-     * @param holder
+     * Called by Android before surface is being destroyed.
+     * Disables camera, and stops preview
+     * @param holder The holder whose surface is destroyed
      */
     public void surfaceDestroyed(SurfaceHolder holder) {
         if (_camera != null) {
