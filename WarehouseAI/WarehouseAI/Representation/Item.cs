@@ -13,10 +13,18 @@ namespace WarehouseAI.Representation
         /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Placement priority of the item, used when placing an array of books.
+        /// </summary>
         public int Priority { get; set; }
 
+        /// <summary>
+        /// All items that has a relation to this item.
+        /// </summary>
         private List<Item> IngoingRelations { get; }
-
+        /// <summary>
+        /// All items that this item relates to.
+        /// </summary>
         private List<Item> OutgoingRelations  { get; }
 
         public Item(int id, string name)
@@ -27,6 +35,10 @@ namespace WarehouseAI.Representation
             IngoingRelations = new List<Item>();
         }
 
+        /// <summary>
+        /// Adds an outgoing relation to this item, and an ingoing relation to the related item.
+        /// </summary>
+        /// <param name="relatedItem">The item to make a relation to.</param>
         public void AddOutgoingRelation(Item relatedItem)
         {
             OutgoingRelations.Add(relatedItem);
@@ -39,10 +51,13 @@ namespace WarehouseAI.Representation
             IngoingRelations.Add(relatedItem);
         }
 
+        /// <summary>
+        /// The set of all items that this item has a relation to.
+        /// </summary>
+        /// <returns></returns>
         public Item[] Neighbours()
         {
             return OutgoingRelations.ToArray();
         }
-
     }
 }

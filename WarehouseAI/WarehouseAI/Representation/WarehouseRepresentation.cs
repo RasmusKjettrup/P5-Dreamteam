@@ -10,6 +10,9 @@ namespace WarehouseAI.Representation
 {
     public class WarehouseRepresentation
     {
+        /// <summary>
+        /// A reference to the item database that the books on the shelves in this warehouse belongs to.
+        /// </summary>
         public ItemDatabase ItemDatabase;
         private Item[] AddedItems {
             get {
@@ -29,6 +32,9 @@ namespace WarehouseAI.Representation
         }
 
         private List<Node> _nodes;
+        /// <summary>
+        /// All nodes in the warehouse.
+        /// </summary>
         public Node[] Nodes => _nodes.ToArray();
         private WeightCache _cache;
 
@@ -333,6 +339,10 @@ namespace WarehouseAI.Representation
             _cache.MarkItem(item);
         }
 
+        /// <summary>
+        /// Adds items in a random manner. Used for evaluating the placement algorithm against.
+        /// </summary>
+        /// <param name="items"></param>
         public void RandomlyAddBooks(params Item[] items)
         {
             List<Shelf> shelves = new List<Shelf>();

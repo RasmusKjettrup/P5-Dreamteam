@@ -8,6 +8,9 @@ namespace WarehouseAI.Representation
     {
         private List<Item> _items;
 
+        /// <summary>
+        /// All items that has been added to the 
+        /// </summary>
         public Item[] Items => _items.ToArray();
 
         public ItemDatabase()
@@ -59,6 +62,10 @@ namespace WarehouseAI.Representation
             }
         }
 
+        /// <summary>
+        /// Adds a book to the database of books.
+        /// </summary>
+        /// <param name="item">The item to add.</param>
         public void AddBook(Item item)
         {
             _items.Add(item);
