@@ -7,6 +7,11 @@ namespace WarehouseAI.Representation
     {
         private Dictionary<Item[], CacheElement> _cache;
 
+        /// <summary>
+        /// Gets a value using index.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public CacheElement this[Item[] index] {
             get {
                 CacheElement c;
@@ -33,6 +38,10 @@ namespace WarehouseAI.Representation
             }
         }
 
+        /// <summary>
+        /// Marks all sets where a specific item appears in.
+        /// </summary>
+        /// <param name="item">The item to look for.</param>
         public void MarkItem(Item item)
         {
             foreach (KeyValuePair<Item[], CacheElement> pair in _cache)
@@ -44,6 +53,12 @@ namespace WarehouseAI.Representation
             }
         }
 
+        /// <summary>
+        /// Attempts to get a cache element, based on a set of items. The match is found using a linear search.
+        /// </summary>
+        /// <param name="set">The set of items to look for.</param>
+        /// <param name="c">The output variable.</param>
+        /// <returns>Returns true if successful, false otherwise.</returns>
         public bool TryGet(Item[] set, out CacheElement c)
         {
             c = null;
@@ -72,6 +87,9 @@ namespace WarehouseAI.Representation
         }
     }
 
+    /// <summary>
+    /// An element in the weight cache.
+    /// </summary>
     public class CacheElement
     {
         public bool Marked = true;

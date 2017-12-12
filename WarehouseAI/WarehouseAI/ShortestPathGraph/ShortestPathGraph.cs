@@ -8,8 +8,17 @@ namespace WarehouseAI.ShortestPathGraph
 {
     public class ShortestPathGraph<T> where T : IShortestPathGraphNode
     {
+        /// <summary>
+        /// The dropoff point of the graph.
+        /// </summary>
         public readonly IShortestPathGraphNode Dropoff;
+        /// <summary>
+        /// All nodes in the graph, other than the dropoff node.
+        /// </summary>
         public readonly T[] Nodes;
+        /// <summary>
+        /// All nodes of the graph.
+        /// </summary>
         public IShortestPathGraphNode[] AllNodes => Dropoff.Append(Nodes.Cast<IShortestPathGraphNode>()).ToArray();
 
         /// <summary>
