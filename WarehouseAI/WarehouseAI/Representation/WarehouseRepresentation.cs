@@ -189,6 +189,8 @@ namespace WarehouseAI.Representation
             else
             {
                 List<ItemQuantity> itemQuanities = new List<ItemQuantity>();
+
+                //If there are multiple cases of the same book, add the instances together and increase 'Quantity'
                 foreach (Item item in items)
                 {
                     if ((ItemDatabase.Items.Count(i => i.Id == item.Id && i.Name == item.Name) < 1))
@@ -200,12 +202,14 @@ namespace WarehouseAI.Representation
                     {
                         itemQuanities.Add(new ItemQuantity
                         {
+                            //The case where a new book is found, to be placed
                             Item = item,
                             Quantity = 1,
                         });
                     }
                     else
                     {
+                        //The case where the book found, already exists in "list" of books to be placed.
                         tup.Quantity++;
                     }
                 }
