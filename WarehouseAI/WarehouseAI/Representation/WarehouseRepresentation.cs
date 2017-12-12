@@ -10,6 +10,9 @@ namespace WarehouseAI.Representation
 {
     public class WarehouseRepresentation
     {
+        /// <summary>
+        /// A reference to the item database that the books on the shelves in this warehouse belongs to.
+        /// </summary>
         public ItemDatabase ItemDatabase;
         private Item[] AddedItems {
             get {
@@ -29,6 +32,9 @@ namespace WarehouseAI.Representation
         }
 
         private List<Node> _nodes;
+        /// <summary>
+        /// All nodes in the warehouse.
+        /// </summary>
         public Node[] Nodes => _nodes.ToArray();
         private WeightCache _cache;
 
@@ -225,6 +231,8 @@ namespace WarehouseAI.Representation
         {
             ItemQuantity targetItem = null;
             int maxPriority = int.MinValue;
+
+            //Find the most important item, and add it.
             foreach (ItemQuantity iq in itemQuantities.Where(iq => iq.Quantity > 0))
             {
                 if (iq.Item.Priority > maxPriority)
@@ -243,6 +251,8 @@ namespace WarehouseAI.Representation
 
             targetItem.Quantity--;
 
+            //As we only add one instance of one book with each call
+            // we call PlaceBooks recursively untill we have exhausted the quantities of all books to be placed 
             PlaceBooks(itemQuantities);
         }
 
@@ -284,8 +294,8 @@ namespace WarehouseAI.Representation
             float lowestEvaluation = float.MaxValue;
             //Whenever "cont" is not set back to "true" after running the while loop, new lowest local evaluations are still being found.
             bool cont = true;
-            //A list of marked nodea are maintained, to prevent evaluating the same node twice
-            List<FilteredShelfShortestPathGraphNode> markedNodes = new List<FilteredShelfShortestPathGraphNode>();
+            //A list of marked nodes are maintained, to prevent evaluating the same node twice
+            HashSet<FilteredShelfShortestPathGraphNode> markedNodes = new HashSet<FilteredShelfShortestPathGraphNode>();
 
             while (cont)
             {
@@ -329,6 +339,10 @@ namespace WarehouseAI.Representation
             _cache.MarkItem(item);
         }
 
+        /// <summary>
+        /// Adds items in a random manner. Used for evaluating the placement algorithm against.
+        /// </summary>
+        /// <param name="items"></param>
         public void RandomlyAddBooks(params Item[] items)
         {
             List<Shelf> shelves = new List<Shelf>();

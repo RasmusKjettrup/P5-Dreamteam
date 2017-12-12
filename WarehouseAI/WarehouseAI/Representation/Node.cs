@@ -21,14 +21,26 @@ namespace WarehouseAI.Representation
         private Node cameFrom;
         #endregion AStar_Fields
         
+        /// <summary>
+        /// The X coordinate of the node.
+        /// </summary>
         public float X { get; set; }
+        /// <summary>
+        /// The Y coordinate of the node.
+        /// </summary>
         public float Y { get; set; }
 
+        /// <summary>
+        /// The neighbours of the node
+        /// </summary>
         public Node[] Neighbours
         {
             get { return _edges.Select(e => e.to).ToArray(); }
         }
 
+        /// <summary>
+        /// The set of all edges from the node to another node.
+        /// </summary>
         public Edge<Node>[] Edges
         {
             get { return _edges; }
@@ -57,6 +69,11 @@ namespace WarehouseAI.Representation
         }
         #endregion AStar_Props
 
+        /// <summary>
+        /// Gets an edge from this node to another, if it is contained in the set of edges.
+        /// </summary>
+        /// <param name="neighbour">The node to find an edge to.</param>
+        /// <returns></returns>
         public Edge<Node> GetEdgeToNeighbour(Node neighbour)
         {
             if (Neighbours.Contains<Node>(neighbour) != true)
@@ -73,6 +90,11 @@ namespace WarehouseAI.Representation
             throw new UnfittingNodeException("GetEdgeToNeighbour: The input node is recognized as a neighbour, but not found as part of any edge in Node.Edges");
         }
 
+        /// <summary>
+        /// Finds the distance form this node to another using Euclid's calculation of distance.
+        /// </summary>
+        /// <param name="node">The node to find distance to.</param>
+        /// <returns></returns>
         public float EuclidDistance(Node node)
         {
             return (float)Math.Sqrt(Math.Pow(node.X - X, 2) + Math.Pow(node.Y - Y, 2));

@@ -12,8 +12,15 @@ namespace WarehouseAI.Representation
             public int instances;
         }
 
+        /// <summary>
+        /// The maximum number of items that this shelf can contain
+        /// </summary>
         public int MaxCapacity { get; } = 5;
+        protected List<ItemInstance> _itemInstances = new List<ItemInstance>();
 
+        /// <summary>
+        /// The remaining space for items on the shelf.
+        /// </summary>
         public int RemaningCapacity {
             get {
                 int capacity = MaxCapacity;
@@ -25,6 +32,10 @@ namespace WarehouseAI.Representation
             }
         }
 
+        /// <summary>
+        /// Removes an instance of an item from a shelf.
+        /// </summary>
+        /// <param name="book">The item to remove</param>
         public void RemoveBook(Item book)
         {
             ItemInstance instance = _itemInstances.Find(i => i.item.Equals(book));
@@ -34,12 +45,18 @@ namespace WarehouseAI.Representation
                 throw new ArgumentException($"Shelf {Id} did not contain an instance of {book.Id}");
         }
 
-        protected List<ItemInstance> _itemInstances = new List<ItemInstance>();
-
+        /// <summary>
+        /// Gets all different items placed on the shelf
+        /// </summary>
         public virtual Item[] Items {
             get { return _itemInstances.Select(i => i.item).ToArray(); }
         }
 
+        /// <summary>
+        /// Get how many instances of a specific item that has been placed on the shelf
+        /// </summary>
+        /// <param name="item">The item to check for</param>
+        /// <returns></returns>
         public virtual int GetNumberOfItem(Item item)
         {
             if (!_itemInstances.Select(i => i.item).Contains(item))
