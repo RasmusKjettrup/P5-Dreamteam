@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using WarehouseAI.Representation;
@@ -16,8 +17,6 @@ namespace WarehouseAI.UI
         private readonly Dictionary<string, Command> _commands;
 
         public ConsoleController(WarehouseRepresentation warehouse, ItemDatabase itemDatabase) {
-            
-            
             _commands = new Dictionary<string, Command> {
                 {"importwarehouse", new Command(ImportWarehouse, "Imports a warehouse from a file, expects the path to a file")},
                 {"importitems", new Command(ImportItems, "Imports items from a file, expects the path to a file.")},
@@ -113,6 +112,10 @@ namespace WarehouseAI.UI
             if (_commands.TryGetValue(inputStrings[0].ToLower(), out c))
             {
                 c.Action(inputStrings.Skip(1).ToArray());
+            }
+            else
+            {
+                Console.WriteLine("Syntax error.");
             }
         }
 
@@ -220,11 +223,12 @@ namespace WarehouseAI.UI
             {
                 item = ItemDatabase.Items.First(i => i.Id == int.Parse(args[0]));
             }
-            catch
+            catch (Exception)
             {
                 Console.WriteLine("Error: The book with the specified ID was not found in the database.");
                 return;
             }
+            
             if (args.Length == 1)
             {
                 Warehouse.AddBook(item);
@@ -235,13 +239,13 @@ namespace WarehouseAI.UI
                 try
                 {
                     shelf = (Shelf)Warehouse.Nodes.First(n => n.Id == int.Parse(args[1]));
+                    shelf.AddBook(item);
                 }
-                catch
+                catch (Exception)
                 {
                     Console.WriteLine("Error: The specified shelf ID was not found in the database.");
                     return;
                 }
-                shelf.AddBook(item);
             }
 
             PrintItemsOnShelves();
