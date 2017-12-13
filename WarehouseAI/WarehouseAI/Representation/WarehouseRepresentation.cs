@@ -102,7 +102,9 @@ namespace WarehouseAI.Representation
 
                     _nodes.Add(newNode);
                 }
-                catch { }
+                catch (Exception e) {
+                    Console.WriteLine(e.Message);
+                }
             }
             foreach (string[] line in lines)
             {
@@ -118,14 +120,18 @@ namespace WarehouseAI.Representation
                         {
                             neighbourNodes.Add(_nodes.Find(n => n.Id == int.Parse(neighbour)));
                         }
-                        catch { }
+                        catch (Exception e) {
+                            Console.WriteLine(e.Message);
+                        }
                     }
 
                     Node node = _nodes.Find(n => n.Id == id);
                     node.Edges = neighbourNodes.Select(n => new Edge<Node> { @from = node, to = n, weight = node.EuclidDistance(n) })
                         .ToArray();
                 }
-                catch { }
+                catch (Exception e) {
+                    Console.WriteLine(e.Message);
+                }
             }
         }
 

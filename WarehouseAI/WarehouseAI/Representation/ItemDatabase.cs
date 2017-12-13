@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -36,7 +37,9 @@ namespace WarehouseAI.Representation
                     string name = line.Substring(commaIndex + 2);
                     items.Add(new Item(id, name));
                 }
-                catch { }
+                catch (Exception e) {
+                    Console.WriteLine(e.Message);
+                }
             }
             _items = items;
         }
@@ -58,7 +61,9 @@ namespace WarehouseAI.Representation
                     Item item = _items.Find(i => i.Id == int.Parse(nodes[0]));
                     item.AddOutgoingRelation(_items.Find(i => i.Id == int.Parse(nodes[1])));
                 }
-                catch { }
+                catch (Exception e) {
+                    Console.WriteLine(e.Message);
+                }
             }
         }
 
