@@ -4,8 +4,8 @@ namespace WarehouseAI.UI
 {
     public interface IController
     {
-        WarehouseRepresentation Warehouse { get; set; }
-        ItemDatabase ItemDatabase { get; set; }
+        WarehouseRepresentation warehouse { get; set; }
+        ItemDatabase itemDatabase { get; set; }
 
         void Start(params string[] args);
     }

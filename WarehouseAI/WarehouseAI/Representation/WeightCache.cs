@@ -68,7 +68,15 @@ namespace WarehouseAI.Representation
                 {
                     continue;
                 }
-                bool found = set.All(item => pair.Key.Contains(item));
+                bool found = true;
+                foreach (Item item in set)
+                {
+                    if (!pair.Key.Contains(item))
+                    {
+                        found = false;
+                        break;
+                    }
+                }
                 if (found)
                 {
                     c = pair.Value;

@@ -128,7 +128,8 @@ namespace WarehouseAI
 
                     //Foreach node neighbour of the last node, that is a shelf, and contains at least 
                     //one book that we are interested in...
-                    foreach (Shelf neighbour in lastNode.Neighbours.OfType<Shelf>().Where(s => s.Contains(frontier.books)))
+                    foreach (Shelf neighbour in lastNode.Neighbours.Where(n => n is Shelf).Cast<Shelf>()
+                        .Where(s => s.Contains(frontier.books)))
                     {
                         //Find the distance between the neighbour and the last node.
                         float distance = Distance(distanceMap, lastNode, neighbour);

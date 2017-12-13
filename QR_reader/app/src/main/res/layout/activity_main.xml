@@ -1,91 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:orientation="vertical"
-              android:padding="5dp"
-              android:gravity="top"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-    >
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:gravity="top"
+                android:orientation="vertical"
+                android:padding="5dp">
 
     <LinearLayout
+        android:id="@+id/lo_ipPort"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:focusable="true"
-        android:focusableInTouchMode="true">
-
-        <EditText
-            android:id="@+id/edit_ip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="IP Address"
-            android:layout_weight="3"
-            android:inputType="numberPassword"
-            android:maxWidth="0dp"
-            />
-
-        <EditText
-            android:id="@+id/edit_port"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:maxWidth="0dp"
-            android:inputType="numberPassword"
-            android:hint="Port"/>
-    </LinearLayout>
-
-    <RelativeLayout
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/btn_allScan"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="checkCamPermissionAndLaunchScanner"
-            android:text="Scan"
-            android:layout_marginBottom="10dp"/>
+    <EditText
+        android:id="@+id/edit_ip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="IP Address"
+        android:inputType="numberPassword"
+        android:layout_weight="6"
+        />
 
-        <Button
-            android:id="@+id/btn_updateUI"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/btn_allScan"
-            android:onClick="sendDataButtonClick"
-            android:text="Send"/>
+    <EditText
+        android:id="@+id/edit_port"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Port"
+        android:inputType="numberPassword"
+        android:layout_weight="3"
+        />
+    </LinearLayout>
 
-        <Switch
-            android:id="@+id/swc_flash"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Flash"
-            android:layout_toRightOf="@id/btn_allScan"/>
+    <Button
+        android:id="@+id/btn_scan"
+        android:onClick="checkCamPermissionAndLaunchScanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/swc_sendImmediately"
+        android:text="Scan"/>
 
-        <Switch
-            android:id="@+id/swc_sendImmediately"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Send immediately"
-            android:layout_below="@id/swc_flash"
-            android:layout_toRightOf="@id/btn_allScan"/>
+    <Switch
+        android:id="@+id/swc_flash"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Flash on scan"
+        android:layout_below="@id/lo_ipPort"/>
 
-        <EditText
-            android:id="@+id/edit_textToSend"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/btn_updateUI"
-            android:layout_alignBottom="@+id/btn_updateUI"
-            android:hint="Text to send"/>
+    <Switch
+        android:id="@+id/swc_sendImmediately"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/swc_flash"
+        android:text="Send immediately on scan" />
 
-    </RelativeLayout>
+    <EditText
+        android:id="@+id/edit_textToSend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/btn_sendData"
+        android:hint="Text to send"
+        android:maxLines="8"
+        android:inputType="textMultiLine|textLongMessage" />
+
+    <Button
+        android:id="@+id/btn_sendData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btn_requestRoute"
+        android:onClick="sendDataButtonClick"
+        android:text="Send" />
 
     <Button
         android:id="@+id/btn_requestRoute"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/btn_allScan"
+        android:layout_alignParentBottom="true"
+        android:minHeight="100dp"
         android:onClick="requestButtonClick"
         android:text="Request order" />
 
-</LinearLayout>
+</RelativeLayout>

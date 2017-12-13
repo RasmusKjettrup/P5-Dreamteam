@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using WarehouseAI.Representation;
@@ -11,12 +10,12 @@ namespace WarehouseAI.UI
 {
     public class ConsoleController : IController
     {
-        public WarehouseRepresentation Warehouse { get; set; }
-        public ItemDatabase ItemDatabase { get; set; }
+        public WarehouseRepresentation warehouse { get; set; }
+        public ItemDatabase itemDatabase { get; set; }
 
         private readonly Dictionary<string, Command> _commands;
 
-        public ConsoleController(WarehouseRepresentation warehouse, ItemDatabase itemDatabase) {
+        public ConsoleController() {
             _commands = new Dictionary<string, Command> {
                 {"importwarehouse", new Command(ImportWarehouse, "Imports a warehouse from a file, expects the path to a file")},
                 {"importitems", new Command(ImportItems, "Imports items from a file, expects the path to a file.")},
@@ -42,17 +41,17 @@ namespace WarehouseAI.UI
 
         private void OrderBooks(string[] books)
         {
-            if (ItemDatabase.Items.Length <= 0 || Warehouse.Nodes == null)
+            if (itemDatabase.Items.Length <= 0 || warehouse.Nodes == null)
             {
                 Console.WriteLine("Error: no items in the database or warehouse did not contain any nodes");
                 return;
             }
             /*Adds item to idb if books contains item id*/
-            Item[] idb = ItemDatabase.Items.Where(item => books.Contains(item.Id.ToString())).ToArray();
+            Item[] idb = itemDatabase.Items.Where(item => books.Contains(item.Id.ToString())).ToArray();
             try
             {
                 Node[] nodes;
-                Algorithms.Weight(Warehouse.Nodes, idb, out nodes);
+                Algorithms.Weight(warehouse.Nodes, idb, out nodes);
                 StringBuilder sb = new StringBuilder();
                 foreach (Node node in nodes)
                 {
@@ -113,10 +112,6 @@ namespace WarehouseAI.UI
             {
                 c.Action(inputStrings.Skip(1).ToArray());
             }
-            else
-            {
-                Console.WriteLine("Syntax error.");
-            }
         }
 
         private void ImportWarehouse(string[] args)
@@ -129,7 +124,7 @@ namespace WarehouseAI.UI
             Console.WriteLine("Now importing warehouse...");
             try
             {
-                Warehouse.ImportWarehouse(args[0]);
+                warehouse.ImportWarehouse(args[0]);
                 PrintWarehouse();
 
                 Console.WriteLine("Import complete.");
@@ -152,8 +147,8 @@ namespace WarehouseAI.UI
             Console.WriteLine("Importing items...");
             try
             {
-                ItemDatabase.ImportItems(args[0]);
-                foreach (Item item in ItemDatabase.Items)
+                itemDatabase.ImportItems(args[0]);
+                foreach (Item item in itemDatabase.Items)
                 {
                     Console.WriteLine($"{item.Id}: {item.Name}");
                 }
@@ -176,8 +171,8 @@ namespace WarehouseAI.UI
             Console.WriteLine("Importing relations on items...");
             try
             {
-                ItemDatabase.ImportRelations(args[0]);
-                foreach (Item item in ItemDatabase.Items)
+                itemDatabase.ImportRelations(args[0]);
+                foreach (Item item in itemDatabase.Items)
                 {
                     string neighbours = "";
                     for (int i = 0; i < item.Neighbours().Length; i++)
@@ -204,7 +199,7 @@ namespace WarehouseAI.UI
             Console.WriteLine("Evaulating warehouse state...");
             try
             {
-                double result = Warehouse.Evaluate();
+                double result = warehouse.Evaluate();
                 Console.WriteLine("Result: " + result);
                 Console.WriteLine("Evaluation finished.");
             }
@@ -221,31 +216,30 @@ namespace WarehouseAI.UI
             Item item;
             try
             {
-                item = ItemDatabase.Items.First(i => i.Id == int.Parse(args[0]));
+                item = itemDatabase.Items.First(i => i.Id == int.Parse(args[0]));
             }
-            catch (Exception)
+            catch
             {
                 Console.WriteLine("Error: The book with the specified ID was not found in the database.");
                 return;
             }
-            
             if (args.Length == 1)
             {
-                Warehouse.AddBook(item);
+                warehouse.AddBook(item);
             }
             else
             {
                 Shelf shelf;
                 try
                 {
-                    shelf = (Shelf)Warehouse.Nodes.First(n => n.Id == int.Parse(args[1]));
-                    shelf.AddBook(item);
+                    shelf = (Shelf)warehouse.Nodes.First(n => n.Id == int.Parse(args[1]));
                 }
-                catch (Exception)
+                catch
                 {
                     Console.WriteLine("Error: The specified shelf ID was not found in the database.");
                     return;
                 }
+                shelf.AddBook(item);
             }
 
             PrintItemsOnShelves();
@@ -260,7 +254,7 @@ namespace WarehouseAI.UI
             {
                 try
                 {
-                    Item item = ItemDatabase.Items.First(i => i.Id == int.Parse(s));
+                    Item item = itemDatabase.Items.First(i => i.Id == int.Parse(s));
                     items.Add(item);
                 }
                 catch
@@ -271,7 +265,7 @@ namespace WarehouseAI.UI
             }
             try
             {
-                Warehouse.AddBooks(items.ToArray());
+                warehouse.AddBooks(items.ToArray());
 
                 PrintItemsOnShelves();
                 Console.WriteLine("Books added.");
@@ -290,7 +284,7 @@ namespace WarehouseAI.UI
             {
                 try
                 {
-                    Item item = ItemDatabase.Items.First(i => i.Id == int.Parse(s));
+                    Item item = itemDatabase.Items.First(i => i.Id == int.Parse(s));
                     items.Add(item);
                 }
                 catch
@@ -301,7 +295,7 @@ namespace WarehouseAI.UI
             }
             try
             {
-                Warehouse.RandomlyAddBooks(items.ToArray());
+                warehouse.RandomlyAddBooks(items.ToArray());
 
                 PrintItemsOnShelves();
                 Console.WriteLine("Done adding books.");
@@ -316,7 +310,7 @@ namespace WarehouseAI.UI
 
         private void PrintItemsOnShelves()
         {
-            foreach (Node node in Warehouse.Nodes)
+            foreach (Node node in warehouse.Nodes)
             {
                 Shelf shelf = node as Shelf;
                 if (shelf != null)
@@ -363,7 +357,7 @@ namespace WarehouseAI.UI
                 newNode.X = float.Parse(args[relationalIndex + 1], NumberStyles.Any, c);
                 newNode.Y = float.Parse(args[relationalIndex + 2], NumberStyles.Any, c);
 
-                Warehouse.AddNode(newNode, args.Skip(relationalIndex + 3).Select(s => int.Parse(s)).ToArray());
+                warehouse.AddNode(newNode, args.Skip(relationalIndex + 3).Select(s => int.Parse(s)).ToArray());
 
                 PrintWarehouse();
                 Console.WriteLine("Node added.");
@@ -378,8 +372,8 @@ namespace WarehouseAI.UI
         {
             try
             {
-                Node from = Warehouse.Nodes.First(n => n.Id == int.Parse(args[0]));
-                Node to = Warehouse.Nodes.First(n => n.Id == int.Parse(args[1]));
+                Node from = warehouse.Nodes.First(n => n.Id == int.Parse(args[0]));
+                Node to = warehouse.Nodes.First(n => n.Id == int.Parse(args[1]));
                 //AStarAlgorithm aStar = new AStarAlgorithm();
                 //float weight = aStar.FindPath(warehouse.Nodes, from, to);
                 float weight = from.Edges.First(e => e.to == to).weight;
@@ -411,7 +405,7 @@ namespace WarehouseAI.UI
 
         private void PrintWarehouse()
         {
-            foreach (Node node in Warehouse.Nodes)
+            foreach (Node node in warehouse.Nodes)
             {
                 string typ = "Node";
                 if (node is Shelf)
@@ -440,7 +434,7 @@ namespace WarehouseAI.UI
         {
             if (args != null && args.Length > 0)
             {
-//                Console.ForegroundColor = ConsoleColor.Green;
+                Console.ForegroundColor = ConsoleColor.Green;
                 foreach (string s in args)
                 {
                     if (_commands.ContainsKey(s))
@@ -448,17 +442,17 @@ namespace WarehouseAI.UI
                         Console.WriteLine(s + " - " + _commands[s].Description);
                     }
                 }
-//                Console.ForegroundColor = ConsoleColor.White;
+                Console.ForegroundColor = ConsoleColor.White;
                 return;
             }
             Console.WriteLine("The help command followed by any number of commands will describe the function of each command.");
-//            Console.ForegroundColor = ConsoleColor.Green;
+            Console.ForegroundColor = ConsoleColor.Green;
             // Sort commands alphabetically and print
             foreach (string commandsKey in _commands.Keys.OrderBy(key => key))
             {
                 Console.WriteLine(commandsKey);
             }
-//            Console.ForegroundColor = ConsoleColor.White;
+            Console.ForegroundColor = ConsoleColor.White;
         }
     }
 }

@@ -13,13 +13,7 @@ namespace WarehouseAI.Representation
         /// <summary>
         /// A reference to the item database that the books on the shelves in this warehouse belongs to.
         /// </summary>
-        public ItemDatabase ItemDatabase { get; set; }
-
-        public WarehouseRepresentation(ItemDatabase itemDatabase)
-        {
-            ItemDatabase = itemDatabase;
-        }
-        
+        public ItemDatabase ItemDatabase;
         private Item[] AddedItems {
             get {
                 List<Item> accumulatedItems = new List<Item>();
@@ -161,7 +155,11 @@ namespace WarehouseAI.Representation
                 _nodes = new List<Node>();
             }
 
-            List<Node> neighbourNodes = neighbourIds.Select(id => _nodes.Find(n => n.Id == id)).ToList();
+            List<Node> neighbourNodes = new List<Node>();
+            foreach (int id in neighbourIds)
+            {
+                neighbourNodes.Add(_nodes.Find(n => n.Id == id));
+            }
 
             newNode.Edges = neighbourNodes.Select(n => new Edge<Node>() { @from = newNode, to = n, weight = newNode.EuclidDistance(n) })
                 .ToArray();
@@ -347,7 +345,11 @@ namespace WarehouseAI.Representation
         /// <param name="items"></param>
         public void RandomlyAddBooks(params Item[] items)
         {
-            List<Shelf> shelves = Nodes.OfType<Shelf>().ToList();
+            List<Shelf> shelves = new List<Shelf>();
+            foreach (Shelf s in Nodes.Where(n => n is Shelf).Cast<Shelf>())
+            {
+                shelves.Add(s);
+            }
             DistanceMap map = new DistanceMap(Nodes[0].Append(shelves).ToArray());
 
             foreach (Item item in items)
@@ -377,8 +379,14 @@ namespace WarehouseAI.Representation
             //Calculate distances between nodes only once, and pass them along to the weight algorithm.
             DistanceMap map = new DistanceMap(shortestPathGraph.AllNodes.Cast<Node>().ToArray());
 
-            //Return the sum of the evaluation of each item set in itemSets
-            return itemSets.Sum(set => EvaluateSet(shortestPathGraph, set, cache, map));
+            float result = 0;
+            //Find the sum of the evaluation of each item set in itemSets
+            foreach (Item[] set in itemSets)
+            {
+                result += EvaluateSet(shortestPathGraph, set, cache, map);
+            }
+
+            return result;
         }
 
         /// <summary>
