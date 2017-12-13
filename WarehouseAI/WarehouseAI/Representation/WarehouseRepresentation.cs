@@ -13,7 +13,13 @@ namespace WarehouseAI.Representation
         /// <summary>
         /// A reference to the item database that the books on the shelves in this warehouse belongs to.
         /// </summary>
-        public ItemDatabase ItemDatabase;
+        public ItemDatabase ItemDatabase { get; set; }
+
+        public WarehouseRepresentation(ItemDatabase itemDatabase)
+        {
+            ItemDatabase = itemDatabase;
+        }
+        
         private Item[] AddedItems {
             get {
                 List<Item> accumulatedItems = new List<Item>();

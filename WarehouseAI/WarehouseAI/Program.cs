@@ -7,13 +7,9 @@ namespace WarehouseAI
     {
         private static void Main(string[] args)
         {
-            IController consoleController = new ConsoleController();
-            WarehouseRepresentation warehouse = new WarehouseRepresentation();
             ItemDatabase itemDatabase = new ItemDatabase();
-
-            consoleController.warehouse = warehouse;
-            consoleController.itemDatabase = itemDatabase;
-            warehouse.ItemDatabase = itemDatabase;
+            WarehouseRepresentation warehouse = new WarehouseRepresentation(itemDatabase);
+            IController consoleController = new ConsoleController(warehouse, itemDatabase);
 
             warehouse.Inintialize();
 
