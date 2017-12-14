@@ -73,6 +73,7 @@ namespace WarehouseAI.UI
         /// <param name="books">The Ids of the books in the book order expected to be in numeral form.</param>
         private void OrderBooks(string[] books)
         {
+            Console.WriteLine("Ordering books...");
             if (ItemDatabase.Items.Length <= 0 || Warehouse.Nodes == null)
             {
                 Console.WriteLine("Error: no items in the database or warehouse did not contain any nodes");
@@ -103,6 +104,7 @@ namespace WarehouseAI.UI
                     }
                 }
                 WarehouseServerIO.EnqueueRoute(sb.ToString());
+                Console.WriteLine("Order placed.");
             }
             catch (Exception e)
             {
