@@ -416,9 +416,10 @@ namespace WarehouseAI.UI
         /// <summary>
         /// Adds a node to the warehouse and prints the warehouse afterwards.
         /// </summary>
-        /// <param name="args">Expects the first argument to be Either "Node" or "Shelf" but will default to Node.
+        /// <param name="args">Expects the first argument to be Either "Node" or "Shelf" but can also be left out to create a Node.
         /// Expects the second argument to be the nodes placement on the X axis.
-        /// Expects the second argument to be the nodes placement on the Y axis.</param>
+        /// Expects the second argument to be the nodes placement on the Y axis.
+        /// </param>
         private void AddNode(string[] args)
         {
             Console.WriteLine("Adding node...");
@@ -429,12 +430,12 @@ namespace WarehouseAI.UI
             try
             {
                 Node newNode;
-                switch (args[relationalIndex])
+                switch (args[relationalIndex].ToLower())
                 {
-                    case "Node":
+                    case "node":
                         newNode = new Node();
                         break;
-                    case "Shelf":
+                    case "shelf":
                         newNode = new Shelf();
                         break;
                     default:
@@ -446,6 +447,7 @@ namespace WarehouseAI.UI
                 // Parse any float format with current culture
                 newNode.X = float.Parse(args[relationalIndex + 1], NumberStyles.Any, c);
                 newNode.Y = float.Parse(args[relationalIndex + 2], NumberStyles.Any, c);
+                newNode.Id = Warehouse.Nodes.Length;
 
                 Warehouse.AddNode(newNode, args.Skip(relationalIndex + 3).Select(s => int.Parse(s)).ToArray());
 
