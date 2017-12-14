@@ -105,7 +105,7 @@ namespace WarehouseAITest
             
 
             // Assert;
-            Assert.DoesNotThrow(() => warehouseRepresentation.Inintialize());
+            Assert.DoesNotThrow(() => warehouseRepresentation.Initialize());
         }
 
 
@@ -123,7 +123,7 @@ namespace WarehouseAITest
             idb.ImportItems(itemPath);
 
             // Assert
-            Assert.Throws<NullReferenceException>(() => warehouseRepresentation.Inintialize());
+            Assert.Throws<NullReferenceException>(() => warehouseRepresentation.Initialize());
         }
 
         [Test]
@@ -367,7 +367,7 @@ namespace WarehouseAITest
             // Act
             idb.ImportItems(itemPath);
             warehouseRepresentation.ItemDatabase = idb;
-            warehouseRepresentation.Inintialize();
+            warehouseRepresentation.Initialize();
             int expected = 1;
 
             // Assert
@@ -389,7 +389,7 @@ namespace WarehouseAITest
             // Act
             idb.ImportItems(itemPath);
             warehouseRepresentation.ItemDatabase = idb;
-            warehouseRepresentation.Inintialize();
+            warehouseRepresentation.Initialize();
             int expected = 2;
 
             // Assert
@@ -411,7 +411,7 @@ namespace WarehouseAITest
             // Act
             idb.ImportItems(itemPath);
             warehouseRepresentation.ItemDatabase = idb;
-            warehouseRepresentation.Inintialize();
+            warehouseRepresentation.Initialize();
 
             // Assert
             Assert.Throws<ArgumentException>(() => warehouseRepresentation.AddBooks());
@@ -430,7 +430,7 @@ namespace WarehouseAITest
             // Act
             idb.ImportItems(itemPath);
             warehouseRepresentation.ItemDatabase = idb;
-            warehouseRepresentation.Inintialize();
+            warehouseRepresentation.Initialize();
 
             // Assert
             Assert.Throws<NullReferenceException>(() => warehouseRepresentation.AddBooks(null));
@@ -449,7 +449,7 @@ namespace WarehouseAITest
             // Act
             idb.ImportItems(itemPath);
             warehouseRepresentation.ItemDatabase = idb;
-            warehouseRepresentation.Inintialize();
+            warehouseRepresentation.Initialize();
 
             // Assert
             Assert.Throws<ArgumentException>(() => warehouseRepresentation.AddBooks(new Item(234,"Nonexisting book")));
@@ -467,7 +467,7 @@ namespace WarehouseAITest
             // Act
             idb.ImportItems(itemPath);
             warehouseRepresentation.ItemDatabase = idb;
-            warehouseRepresentation.Inintialize();
+            warehouseRepresentation.Initialize();
 
             // Assert
             Assert.Throws<ArgumentException>(() => warehouseRepresentation.AddBooks(idb.Items.First(b => b.Id == 0), new Item(234, "Nonexisting book")));
@@ -486,7 +486,7 @@ namespace WarehouseAITest
             // Act
             idb.ImportItems(itemPath);
             warehouseRepresentation.ItemDatabase = idb;
-            warehouseRepresentation.Inintialize();
+            warehouseRepresentation.Initialize();
 
             // Assert
             Assert.Throws<ArgumentException>(() => warehouseRepresentation.AddBooks(new Item(234, "Nonexisting book"), new Item(2342, "Nonexisting book2")));
@@ -506,7 +506,7 @@ namespace WarehouseAITest
             rep.AddNode(new Shelf { Id = 1, X = 1, Y = 1 }, 0);
             rep.AddNode(new Shelf { Id = 2, X = 2, Y = 5 }, 1);
             int expected = 1;
-            rep.Inintialize();
+            rep.Initialize();
 
 
             // Assert
@@ -529,7 +529,7 @@ namespace WarehouseAITest
             rep.AddNode(new Shelf { Id = 1, X = 1, Y = 1 }, 0);
             rep.AddNode(new Shelf { Id = 2, X = 2, Y = 5 }, 1);
             int expected = 1;
-            rep.Inintialize();
+            rep.Initialize();
 
             // Assert
             Assert.DoesNotThrow(() => rep.AddBook(idb.Items.First(b => b.Id == 0)));
@@ -575,7 +575,7 @@ namespace WarehouseAITest
             rep.AddNode(new Shelf { Id = 7, X = 2, Y = 1 }, 1, 4, 6);
             rep.AddNode(new Shelf { Id = 8, X = 2, Y = 2 }, 2, 5, 6, 7);
             int expected = expectedItemsAdded;
-            rep.Inintialize();
+            rep.Initialize();
             int actual = 0;
 
             // Assert
@@ -626,7 +626,7 @@ namespace WarehouseAITest
             // Act
             idb.ImportItems(itemPath);
             warehouseRepresentation.ItemDatabase = idb;
-            warehouseRepresentation.Inintialize();
+            warehouseRepresentation.Initialize();
 
             // Assert
             Assert.Throws<ArgumentException>(() => warehouseRepresentation.AddBook(new Item(234, "Nonexisting book")));
@@ -645,7 +645,7 @@ namespace WarehouseAITest
             // Act
             idb.ImportItems(itemPath);
             warehouseRepresentation.ItemDatabase = idb;
-            warehouseRepresentation.Inintialize();
+            warehouseRepresentation.Initialize();
 
             // Assert
             Assert.Throws<NullReferenceException>(() => warehouseRepresentation.AddBook(null));

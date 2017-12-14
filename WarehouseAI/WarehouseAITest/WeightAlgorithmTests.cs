@@ -89,7 +89,7 @@ namespace WarehouseAITest
             
 
             // Act
-            rep.Inintialize();
+            rep.Initialize();
             Algorithms.InitializeCache(idb);
             ((Shelf)rep.Nodes.First(n => n.Id == 2)).AddBook(items[0]);
             ((Shelf)rep.Nodes.First(n => n.Id == 1)).AddBook(items[1]);
@@ -193,7 +193,7 @@ namespace WarehouseAITest
 
 
             // Act
-            rep.Inintialize();
+            rep.Initialize();
             Algorithms.InitializeCache(idb);
             ((Shelf)rep.Nodes.First(n => n.Id == 9)).AddBook(items[0]);
             ((Shelf)rep.Nodes.First(n => n.Id == 9)).AddBook(items[3]);
@@ -258,7 +258,7 @@ namespace WarehouseAITest
 
 
             // Act
-            rep.Inintialize();
+            rep.Initialize();
             ((Shelf)rep.Nodes.First(n => n.Id == 2)).AddBook(items[0]);
             ((Shelf)rep.Nodes.First(n => n.Id == 1)).AddBook(items[1]);
 
@@ -283,7 +283,7 @@ namespace WarehouseAITest
 
 
             // Act
-            rep.Inintialize();
+            rep.Initialize();
             Algorithms.InitializeCache(idb);
             ((Shelf)rep.Nodes.First(n => n.Id == 2)).AddBook(items[0]);
             ((Shelf)rep.Nodes.First(n => n.Id == 1)).AddBook(items[1]);

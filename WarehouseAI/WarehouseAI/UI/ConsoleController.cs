@@ -51,9 +51,17 @@ namespace WarehouseAI.UI
                 {"printlog",  new Command(s => Console.WriteLine(WarehouseServerIO.GetMessageLogs()), "Prints the serverlogs between client and server.")},
                 {"clearlog",  new Command(s => WarehouseServerIO.ClearMessageLog(), "Clears the serverlogs between client and server.")},
                 {"showip", new Command(s => Console.WriteLine(WarehouseServerIO.GetIP().ToString()), "Shows the IP-address of the server.")},
-                {"orderbooks", new Command(OrderBooks, "Sends an order of bought books to the warehouse, expects the id of each bought book.")}
+                {"orderbooks", new Command(OrderBooks, "Sends an order of bought books to the warehouse, expects the id of each bought book.")},
+                {"init", new Command(s => InitCache(), "Initializes the cache. Need to do this after importing.")}
             };
             WarehouseServerIO.MessageRecievedEvent += WarehouseServerIOOnMessageRecievedEvent;
+        }
+
+        private void InitCache()
+        {
+            Console.WriteLine("Initializing cache...");
+            Warehouse.Initialize();
+            Console.WriteLine("Done!");
         }
 
         /// <summary>
@@ -129,6 +137,7 @@ namespace WarehouseAI.UI
             Console.WriteLine("Please enter a command.\nFor a list of all commands type: help");
             while (true) //Run until termination by Quit()
             {
+                Console.Write("> ");
                 Command(Console.ReadLine());
             }
         }
@@ -148,6 +157,7 @@ namespace WarehouseAI.UI
             {
                 c.Action(inputStrings.Skip(1).ToArray());
             }
+            Console.WriteLine();
         }
 
         /// <summary>

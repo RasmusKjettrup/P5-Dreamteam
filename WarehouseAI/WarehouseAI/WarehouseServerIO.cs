@@ -76,7 +76,7 @@ namespace WarehouseAI {
             string content = state.Sb.ToString();
             if (content.EndsWith("<EOF>")) {
                 MessageLog.Add($"Read {content.Length} chars from socket. \n Data : {content}");
-                if (content == "@req")
+                if (content == "@req<EOF>")
                     if (DataQueue.Count <= 0)
                         Send(handler, "No routes available");
                     else

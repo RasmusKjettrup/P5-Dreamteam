@@ -132,7 +132,7 @@ namespace WarehouseAI.Representation
         /// <summary>
         /// Initializes the variables in the warehouse representation. Run this before taking any actions on the warehouse.
         /// </summary>
-        public void Inintialize()
+        public void Initialize()
         {
             if (ItemDatabase == null)
             {
