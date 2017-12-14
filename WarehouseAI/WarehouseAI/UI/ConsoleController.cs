@@ -8,6 +8,9 @@ using WarehouseAI.Representation;
 
 namespace WarehouseAI.UI
 {
+    /// <summary>
+    /// This class handles interaction with the server. Commands must be defined here.
+    /// </summary>
     public class ConsoleController : IController
     {
         public WarehouseRepresentation warehouse { get; set; }
