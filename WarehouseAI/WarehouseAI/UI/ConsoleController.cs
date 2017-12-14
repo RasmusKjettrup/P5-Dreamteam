@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using WarehouseAI.Representation;
+using WarehouseAI.ShortestPathGraph;
 
 namespace WarehouseAI.UI
 {
@@ -28,11 +29,12 @@ namespace WarehouseAI.UI
         /// A private dictionary containing all of the commands in the controller
         /// </summary>
         private readonly Dictionary<string, Command> _commands;
-        
+
         /// <summary>
         /// Initializes all commands of the controller.
         /// </summary>
-        public ConsoleController() {
+        public ConsoleController()
+        {
             _commands = new Dictionary<string, Command> {
                 {"importwarehouse", new Command(ImportWarehouse, "Imports a warehouse from a file, expects the path to a file")},
                 {"importitems", new Command(ImportItems, "Imports items from a file, expects the path to a file.")},
@@ -61,6 +63,7 @@ namespace WarehouseAI.UI
         {
             Console.WriteLine("Initializing cache...");
             Warehouse.Initialize();
+            Algorithms.InitializeCache(ItemDatabase);
             Console.WriteLine("Done!");
         }
 
@@ -77,14 +80,16 @@ namespace WarehouseAI.UI
             }
             /*Adds item to idb if books contains item id*/
             Item[] idb = ItemDatabase.Items.Where(item => books.Contains(item.Id.ToString())).ToArray();
+            ShortestPathGraph<ShelfShortestPathGraphNode> shortestPathGraph = new ShortestPathGraph<ShelfShortestPathGraphNode>(
+                Warehouse.Nodes.ToArray(), n => n is Shelf,
+                s => new ShelfShortestPathGraphNode((Shelf)s));
             try
             {
                 Node[] nodes;
-                Algorithms.Weight(Warehouse.Nodes, idb, out nodes);
+                Algorithms.Weight(shortestPathGraph.AllNodes.Cast<Node>().ToArray(), idb, out nodes);
                 StringBuilder sb = new StringBuilder();
-                foreach (Node node in nodes)
+                foreach (Shelf shelf in nodes.Where(n => n is ShelfShortestPathGraphNode).Cast<ShelfShortestPathGraphNode>().Select(n => (Shelf)n.Parent))
                 {
-                    Shelf shelf = node as Shelf;
                     if (shelf == null) continue;
                     sb.Append(shelf.Id);
                     foreach (Item item in shelf.Items)
@@ -436,7 +441,7 @@ namespace WarehouseAI.UI
                         newNode = new Node();
                         relationalIndex--;
                         break;
-                    
+
                 }
                 // Parse any float format with current culture
                 newNode.X = float.Parse(args[relationalIndex + 1], NumberStyles.Any, c);
@@ -446,7 +451,9 @@ namespace WarehouseAI.UI
 
                 PrintWarehouse();
                 Console.WriteLine("Node added.");
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 Console.WriteLine("Node was not added...");
                 Console.WriteLine("Error: " + e.Message);
             }
@@ -523,7 +530,7 @@ namespace WarehouseAI.UI
                 Console.WriteLine($"{node.Id} {typ} ({node.X + " " + node.Y}) [{neighbours}]");
             }
         }
-        
+
         /// <summary>
         /// Prints all commands available
         /// </summary>

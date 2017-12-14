@@ -39,7 +39,7 @@ namespace WarehouseAI.Representation
         public void RemoveBook(Item book)
         {
             ItemInstance instance = _itemInstances.Find(i => i.item.Equals(book));
-            if (instance != null && instance.instances > 1)
+            if (instance != null && instance.instances > 0)
                 instance.instances--;
             else
                 throw new ArgumentException($"Shelf {Id} did not contain an instance of {book.Id}");
