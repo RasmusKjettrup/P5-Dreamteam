@@ -13,11 +13,25 @@ namespace WarehouseAI.UI
     /// </summary>
     public class ConsoleController : IController
     {
-        public WarehouseRepresentation warehouse { get; set; }
-        public ItemDatabase itemDatabase { get; set; }
+        /// <summary>
+        /// The representation of the warehouse.
+        /// This must be instantiated before calling Start()
+        /// </summary>
+        public WarehouseRepresentation Warehouse { get; set; }
+        /// <summary>
+        /// The ItemDatabase used for the warehouse.
+        /// This must be instantiated before calling Start()
+        /// </summary>
+        public ItemDatabase ItemDatabase { get; set; }
 
+        /// <summary>
+        /// A private dictionary containing all of the commands in the controller
+        /// </summary>
         private readonly Dictionary<string, Command> _commands;
-
+        
+        /// <summary>
+        /// Initializes all commands of the controller.
+        /// </summary>
         public ConsoleController() {
             _commands = new Dictionary<string, Command> {
                 {"importwarehouse", new Command(ImportWarehouse, "Imports a warehouse from a file, expects the path to a file")},
@@ -42,19 +56,23 @@ namespace WarehouseAI.UI
             WarehouseServerIO.MessageRecievedEvent += WarehouseServerIOOnMessageRecievedEvent;
         }
 
+        /// <summary>
+        /// Creates a new Book order for the system, removing the book instances from the warehouse and sending the path to the WarehouseIO.
+        /// </summary>
+        /// <param name="books">The Ids of the books in the book order expected to be in numeral form.</param>
         private void OrderBooks(string[] books)
         {
-            if (itemDatabase.Items.Length <= 0 || warehouse.Nodes == null)
+            if (ItemDatabase.Items.Length <= 0 || Warehouse.Nodes == null)
             {
                 Console.WriteLine("Error: no items in the database or warehouse did not contain any nodes");
                 return;
             }
             /*Adds item to idb if books contains item id*/
-            Item[] idb = itemDatabase.Items.Where(item => books.Contains(item.Id.ToString())).ToArray();
+            Item[] idb = ItemDatabase.Items.Where(item => books.Contains(item.Id.ToString())).ToArray();
             try
             {
                 Node[] nodes;
-                Algorithms.Weight(warehouse.Nodes, idb, out nodes);
+                Algorithms.Weight(Warehouse.Nodes, idb, out nodes);
                 StringBuilder sb = new StringBuilder();
                 foreach (Node node in nodes)
                 {
@@ -79,11 +97,21 @@ namespace WarehouseAI.UI
             }
         }
 
+        /// <summary>
+        /// This event occurs whenever the server recieves an input from a client that tries to add a new book instance to the warehouse.
+        /// </summary>
+        /// <param name="message">The message recieved from the event.</param>
         private void WarehouseServerIOOnMessageRecievedEvent(string message)
         {
             AddBook(new[] { message });
         }
 
+        /// <summary>
+        /// This starts the controller and enables the UI in the form of console commands.
+        /// The server will be set up in a seperate thread to prevent disruptions in the UI.
+        /// Start accepts an amount of arguments on the form: -arg1 -arg2.
+        /// </summary>
+        /// <param name="args">The commands that will be run before any other user input.</param>
         public void Start(params string[] args)
         {
             string arg = "";
@@ -105,6 +133,11 @@ namespace WarehouseAI.UI
             }
         }
 
+        /// <summary>
+        /// Invokes the expected method given a command string.
+        /// The first part of the input must always be the Command key  while all of the following parts are expected to be arguments.
+        /// </summary>
+        /// <param name="input">The inputstring given to the command. Expects a space between each seperate input in the string.</param>
         private void Command(string input)
         {
             string[] inputStrings = input.Split(' ').Where(s => s != "").ToArray();
@@ -117,6 +150,10 @@ namespace WarehouseAI.UI
             }
         }
 
+        /// <summary>
+        /// Imports the WarehouseRepresentation from a file.
+        /// </summary>
+        /// <param name="args">Expects the path to the expected file as the first argument. Ignores any additional arguments given.</param>
         private void ImportWarehouse(string[] args)
         {
             if (args == null || args.Length < 1)
@@ -127,7 +164,7 @@ namespace WarehouseAI.UI
             Console.WriteLine("Now importing warehouse...");
             try
             {
-                warehouse.ImportWarehouse(args[0]);
+                Warehouse.ImportWarehouse(args[0]);
                 PrintWarehouse();
 
                 Console.WriteLine("Import complete.");
@@ -140,6 +177,10 @@ namespace WarehouseAI.UI
 
         }
 
+        /// <summary>
+        /// Imports the ItemDatabase from a file.
+        /// </summary>
+        /// <param name="args">Expects the path to the expected file as the first argument. Ignores any additional arguments given.</param>
         private void ImportItems(string[] args)
         {
             if (args == null || args.Length < 1)
@@ -150,8 +191,8 @@ namespace WarehouseAI.UI
             Console.WriteLine("Importing items...");
             try
             {
-                itemDatabase.ImportItems(args[0]);
-                foreach (Item item in itemDatabase.Items)
+                ItemDatabase.ImportItems(args[0]);
+                foreach (Item item in ItemDatabase.Items)
                 {
                     Console.WriteLine($"{item.Id}: {item.Name}");
                 }
@@ -164,6 +205,10 @@ namespace WarehouseAI.UI
             }
         }
 
+        /// <summary>
+        /// Imports the Relations between books from a file.
+        /// </summary>
+        /// <param name="args">Expects the path to the expected file as the first argument. Ignores any additional arguments given.</param>
         private void ImportRelations(string[] args)
         {
             if (args == null || args.Length < 1)
@@ -174,8 +219,8 @@ namespace WarehouseAI.UI
             Console.WriteLine("Importing relations on items...");
             try
             {
-                itemDatabase.ImportRelations(args[0]);
-                foreach (Item item in itemDatabase.Items)
+                ItemDatabase.ImportRelations(args[0]);
+                foreach (Item item in ItemDatabase.Items)
                 {
                     string neighbours = "";
                     for (int i = 0; i < item.Neighbours().Length; i++)
@@ -197,12 +242,15 @@ namespace WarehouseAI.UI
             }
         }
 
+        /// <summary>
+        /// Evaluates the current configuration of the warehouse.
+        /// </summary>
         private void EvaluateWarehouse()
         {
             Console.WriteLine("Evaulating warehouse state...");
             try
             {
-                double result = warehouse.Evaluate();
+                double result = Warehouse.Evaluate();
                 Console.WriteLine("Result: " + result);
                 Console.WriteLine("Evaluation finished.");
             }
@@ -213,13 +261,19 @@ namespace WarehouseAI.UI
             }
         }
 
+        /// <summary>
+        /// Adds a book instance to the warehouse or to a specific shelf in the warehouse.
+        /// </summary>
+        /// <param name="args">Expects the first part of the input to be the ID of a book. 
+        /// If additional arguments are given the second argument must be ID of a shelf in the warehouse.
+        /// Any additional arguments will be ignored.</param>
         private void AddBook(string[] args)
         {
             Console.WriteLine("Adding item...");
             Item item;
             try
             {
-                item = itemDatabase.Items.First(i => i.Id == int.Parse(args[0]));
+                item = ItemDatabase.Items.First(i => i.Id == int.Parse(args[0]));
             }
             catch
             {
@@ -228,14 +282,14 @@ namespace WarehouseAI.UI
             }
             if (args.Length == 1)
             {
-                warehouse.AddBook(item);
+                Warehouse.AddBook(item);
             }
             else
             {
                 Shelf shelf;
                 try
                 {
-                    shelf = (Shelf)warehouse.Nodes.First(n => n.Id == int.Parse(args[1]));
+                    shelf = (Shelf)Warehouse.Nodes.First(n => n.Id == int.Parse(args[1]));
                 }
                 catch
                 {
@@ -249,6 +303,10 @@ namespace WarehouseAI.UI
             Console.WriteLine("Book added.");
         }
 
+        /// <summary>
+        /// Add a number of books to the warehouse.
+        /// </summary>
+        /// <param name="args">Expects the ID's of the book instances to be added to the warehouse.</param>
         private void AddBooks(string[] args)
         {
             Console.WriteLine("Adding items...");
@@ -257,7 +315,7 @@ namespace WarehouseAI.UI
             {
                 try
                 {
-                    Item item = itemDatabase.Items.First(i => i.Id == int.Parse(s));
+                    Item item = ItemDatabase.Items.First(i => i.Id == int.Parse(s));
                     items.Add(item);
                 }
                 catch
@@ -268,7 +326,7 @@ namespace WarehouseAI.UI
             }
             try
             {
-                warehouse.AddBooks(items.ToArray());
+                Warehouse.AddBooks(items.ToArray());
 
                 PrintItemsOnShelves();
                 Console.WriteLine("Books added.");
@@ -279,6 +337,11 @@ namespace WarehouseAI.UI
             }
         }
 
+        /// <summary>
+        /// Places a number of books randomly in the warehouse.
+        /// Primarily used for showcasing and testing purposes.
+        /// </summary>
+        /// <param name="args">The ID's of the books to be added to the warehouse.</param>
         private void RandomAddBooks(string[] args)
         {
             Console.WriteLine("Adding books at random places...");
@@ -287,7 +350,7 @@ namespace WarehouseAI.UI
             {
                 try
                 {
-                    Item item = itemDatabase.Items.First(i => i.Id == int.Parse(s));
+                    Item item = ItemDatabase.Items.First(i => i.Id == int.Parse(s));
                     items.Add(item);
                 }
                 catch
@@ -298,7 +361,7 @@ namespace WarehouseAI.UI
             }
             try
             {
-                warehouse.RandomlyAddBooks(items.ToArray());
+                Warehouse.RandomlyAddBooks(items.ToArray());
 
                 PrintItemsOnShelves();
                 Console.WriteLine("Done adding books.");
@@ -311,9 +374,12 @@ namespace WarehouseAI.UI
 
         }
 
+        /// <summary>
+        /// Prints each shelf in the warehouse and what books are contained in it.
+        /// </summary>
         private void PrintItemsOnShelves()
         {
-            foreach (Node node in warehouse.Nodes)
+            foreach (Node node in Warehouse.Nodes)
             {
                 Shelf shelf = node as Shelf;
                 if (shelf != null)
@@ -332,6 +398,12 @@ namespace WarehouseAI.UI
             }
         }
 
+        /// <summary>
+        /// Adds a node to the warehouse and prints the warehouse afterwards.
+        /// </summary>
+        /// <param name="args">Expects the first argument to be Either "Node" or "Shelf" but will default to Node.
+        /// Expects the second argument to be the nodes placement on the X axis.
+        /// Expects the second argument to be the nodes placement on the Y axis.</param>
         private void AddNode(string[] args)
         {
             Console.WriteLine("Adding node...");
@@ -360,7 +432,7 @@ namespace WarehouseAI.UI
                 newNode.X = float.Parse(args[relationalIndex + 1], NumberStyles.Any, c);
                 newNode.Y = float.Parse(args[relationalIndex + 2], NumberStyles.Any, c);
 
-                warehouse.AddNode(newNode, args.Skip(relationalIndex + 3).Select(s => int.Parse(s)).ToArray());
+                Warehouse.AddNode(newNode, args.Skip(relationalIndex + 3).Select(s => int.Parse(s)).ToArray());
 
                 PrintWarehouse();
                 Console.WriteLine("Node added.");
@@ -371,12 +443,18 @@ namespace WarehouseAI.UI
 
         }
 
+        /// <summary>
+        /// Calculates the distance between two nodes
+        /// </summary>
+        /// <param name="args">Expects two arguments in the form o Node ID's; 
+        /// The node to calculate the distance from, And the node to calculate the distance to.
+        /// Any additional arguments will be discarded.</param>
         private void Distance(string[] args)
         {
             try
             {
-                Node from = warehouse.Nodes.First(n => n.Id == int.Parse(args[0]));
-                Node to = warehouse.Nodes.First(n => n.Id == int.Parse(args[1]));
+                Node from = Warehouse.Nodes.First(n => n.Id == int.Parse(args[0]));
+                Node to = Warehouse.Nodes.First(n => n.Id == int.Parse(args[1]));
                 //AStarAlgorithm aStar = new AStarAlgorithm();
                 //float weight = aStar.FindPath(warehouse.Nodes, from, to);
                 float weight = from.Edges.First(e => e.to == to).weight;
@@ -400,15 +478,21 @@ namespace WarehouseAI.UI
             }
         }
 
+        /// <summary>
+        /// Exits the application.
+        /// </summary>
         private static void Quit()
         {
             Console.WriteLine("Now quitting...");
             Environment.Exit(0);
         }
 
+        /// <summary>
+        /// Prints each node in the warehouse by ID Type Placement & [Neighbours].
+        /// </summary>
         private void PrintWarehouse()
         {
-            foreach (Node node in warehouse.Nodes)
+            foreach (Node node in Warehouse.Nodes)
             {
                 string typ = "Node";
                 if (node is Shelf)

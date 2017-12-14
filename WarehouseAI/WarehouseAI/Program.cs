@@ -11,8 +11,8 @@ namespace WarehouseAI
             WarehouseRepresentation warehouse = new WarehouseRepresentation();
             ItemDatabase itemDatabase = new ItemDatabase();
 
-            consoleController.warehouse = warehouse;
-            consoleController.itemDatabase = itemDatabase;
+            consoleController.Warehouse = warehouse;
+            consoleController.ItemDatabase = itemDatabase;
             warehouse.ItemDatabase = itemDatabase;
 
             warehouse.Inintialize();
