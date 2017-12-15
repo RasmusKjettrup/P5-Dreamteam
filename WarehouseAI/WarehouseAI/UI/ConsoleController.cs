@@ -95,11 +95,11 @@ namespace WarehouseAI.UI
                 foreach (Shelf shelf in nodes.Where(n => n is ShelfShortestPathGraphNode).Cast<ShelfShortestPathGraphNode>().Select(n => (Shelf)n.Parent))
                 {
                     if (shelf == null) continue;
-                    sb.Append(shelf.Id);
                     foreach (Item item in shelf.Items)
                     {
                         if (books.Contains(item.Id.ToString()))
                         {
+                            sb.Append(shelf.Id);
                             sb.AppendLine(item.Name);
                             shelf.RemoveBook(item);
                             books[Array.IndexOf(books, item.Id.ToString())] = null;
