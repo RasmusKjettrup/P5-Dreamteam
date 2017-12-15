@@ -161,15 +161,25 @@ namespace WarehouseAI.UI
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
 
                         int numberOfCommands = 0;
+                        string currCommand = "";
                         foreach (var ck in _commands.Keys)
                         {
                             if (ck.StartsWith(sb.ToString()))
                             {
-                                numberOfCommands++;
+                                numberOfCommands++; //This is so stupid...
+                                currCommand = ck;
                                 Console.WriteLine(ck);
                             }
                         }
                         Console.ForegroundColor = previousColour;
+                        if (numberOfCommands == 1)
+                        {
+                            Console.SetCursorPosition(Console.CursorLeft, row);
+                            Prompt(append: currCommand);
+                            sb.Clear();
+                            sb.Append(currCommand);
+                            break;
+                        }
 
                         Console.SetCursorPosition(Console.CursorLeft, row);
                         Prompt(append: sb.ToString());
