@@ -141,11 +141,60 @@ namespace WarehouseAI.UI
                 Console.WriteLine(s);
                 Command(s);
             }
+
             Console.WriteLine("Please enter a command.\nFor a list of all commands type: help");
-            while (true) //Run until termination by Quit()
-            {
-                Console.Write("> ");
-                Command(Console.ReadLine());
+            StringBuilder sb = new StringBuilder();
+
+            Console.Write("> ");
+            int row = Console.CursorTop;
+            while (true) {//Run until termination by Quit()
+                var key = Console.ReadKey(true).Key;
+
+                if (char.IsLetterOrDigit((char) key) || (char)key == ' ') {
+                    sb.Append(char.ToLower((char) key));
+                    Console.Write(char.ToLower((char) key));
+                }
+                else {
+                    switch (key) {
+                        case ConsoleKey.Tab:
+                            Console.WriteLine();
+                            ClearBelowLines(row);
+                            Console.SetCursorPosition(Console.CursorLeft, row + 1);
+
+                            foreach (var ck in _commands.Keys) {
+                                if (ck.StartsWith(sb.ToString())) {
+                                    Console.WriteLine(ck);
+                                }
+                            }
+
+                            Console.SetCursorPosition(Console.CursorLeft, row);
+                            Console.Write("> " + sb);
+                            break;
+
+                        case ConsoleKey.Backspace:
+                            if (sb.Length > 0) {
+                                sb.Remove(sb.Length - 1, 1);
+                                Console.Write("\r" + new string(' ', Console.WindowWidth - 1) + "\r");
+                                Console.Write("> " + sb);
+                            }
+                            break;
+
+                        case ConsoleKey.Enter:
+                            ClearBelowLines(row);
+                            Console.SetCursorPosition(Console.CursorLeft, row);
+                            Command(sb.ToString());
+                            sb.Clear();
+                            row = Console.CursorTop;
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void ClearBelowLines(int row) {
+            for (int i = 0; i < _commands.Count + 2; i++) {
+                Console.Write(new string(' ', Console.WindowWidth));
+                Console.SetCursorPosition(Console.CursorLeft, row + i);
             }
         }
 
@@ -157,14 +206,18 @@ namespace WarehouseAI.UI
         private void Command(string input)
         {
             string[] inputStrings = input.Split(' ').Where(s => s != "").ToArray();
-
+            Console.WriteLine();
             Command c;
             if (input.Length <= 0) return;
             if (_commands.TryGetValue(inputStrings[0].ToLower(), out c))
             {
                 c.Action(inputStrings.Skip(1).ToArray());
             }
-            Console.WriteLine();
+            else
+            {
+                Console.WriteLine("Command not found.");
+            }
+            Console.Write("\n> ");
         }
 
         /// <summary>
