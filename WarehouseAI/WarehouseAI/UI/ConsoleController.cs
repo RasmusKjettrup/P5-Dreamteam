@@ -76,7 +76,7 @@ namespace WarehouseAI.UI
             Console.WriteLine("Ordering books...");
             if (ItemDatabase.Items.Length <= 0 || Warehouse.Nodes == null)
             {
-                Console.WriteLine("Error: no items in the database or warehouse did not contain any nodes");
+                ShowError("Error: no items in the database or warehouse did not contain any nodes");
                 return;
             }
             /*Adds item to idb if books contains item id*/
@@ -108,7 +108,7 @@ namespace WarehouseAI.UI
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error: " + e.Message);
+                ShowError("Error: " + e.Message);
             }
         }
 
@@ -145,52 +145,87 @@ namespace WarehouseAI.UI
             Console.WriteLine("Please enter a command.\nFor a list of all commands type: help");
             StringBuilder sb = new StringBuilder();
 
-            Console.Write("> ");
+            Prompt();
             int row = Console.CursorTop;
+
             while (true) {//Run until termination by Quit()
-                var key = Console.ReadKey(true).Key;
+                ConsoleKey key = Console.ReadKey(true).Key;
+                switch (key)
+                {
+                    case ConsoleKey.Tab:
+                        Console.WriteLine();
+                        ClearBelowLines(row);
+                        Console.SetCursorPosition(Console.CursorLeft, row + 1);
 
-                if (char.IsLetterOrDigit((char) key) || (char)key == ' ') {
-                    sb.Append(char.ToLower((char) key));
-                    Console.Write(char.ToLower((char) key));
-                }
-                else {
-                    switch (key) {
-                        case ConsoleKey.Tab:
-                            Console.WriteLine();
-                            ClearBelowLines(row);
-                            Console.SetCursorPosition(Console.CursorLeft, row + 1);
+                        ConsoleColor previousColour = Console.ForegroundColor;
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
 
-                            foreach (var ck in _commands.Keys) {
-                                if (ck.StartsWith(sb.ToString())) {
-                                    Console.WriteLine(ck);
-                                }
+                        int numberOfCommands = 0;
+                        foreach (var ck in _commands.Keys)
+                        {
+                            if (ck.StartsWith(sb.ToString()))
+                            {
+                                numberOfCommands++;
+                                Console.WriteLine(ck);
                             }
+                        }
+                        Console.ForegroundColor = previousColour;
 
-                            Console.SetCursorPosition(Console.CursorLeft, row);
-                            Console.Write("> " + sb);
-                            break;
+                        Console.SetCursorPosition(Console.CursorLeft, row);
+                        Prompt(append: sb.ToString());
+                        break;
 
-                        case ConsoleKey.Backspace:
-                            if (sb.Length > 0) {
-                                sb.Remove(sb.Length - 1, 1);
-                                Console.Write("\r" + new string(' ', Console.WindowWidth - 1) + "\r");
-                                Console.Write("> " + sb);
-                            }
-                            break;
+                    case ConsoleKey.Backspace:
+                        if (sb.Length > 0)
+                        {
+                            sb.Remove(sb.Length - 1, 1);
+                            Console.Write("\b \b");
+                        }
+                        break;
 
-                        case ConsoleKey.Enter:
-                            ClearBelowLines(row);
-                            Console.SetCursorPosition(Console.CursorLeft, row);
-                            Command(sb.ToString());
-                            sb.Clear();
-                            row = Console.CursorTop;
-                            break;
-                    }
+                    case ConsoleKey.Enter:
+                        ClearBelowLines(row);
+                        Console.SetCursorPosition(Console.CursorLeft, row);
+                        Command(sb.ToString());
+                        sb.Clear();
+                        row = Console.CursorTop;
+                        break;
+
+                    case ConsoleKey.OemPeriod:
+                    case ConsoleKey.OemComma:
+                    case ConsoleKey.OemMinus:
+                        char c = ConvertOem(key);
+                        sb.Append(c);
+                        Console.Write(c);
+                        break;
+
+                    default:
+                        sb.Append(char.ToLower((char) key));
+                        Console.Write(char.ToLower((char)key));
+                        break;
                 }
+
             }
         }
 
+        private char ConvertOem(ConsoleKey key)
+        {
+            switch (key)
+            {
+                case ConsoleKey.OemPeriod:
+                    return '.';
+                case ConsoleKey.OemComma:
+                    return ',';
+                case ConsoleKey.OemMinus:
+                    return '-';
+            }
+            return '?';
+        }
+
+        /// <summary>
+        /// Clears console lines below the current cursor line/>
+        /// </summary>
+        /// <param name="row">The row to place the cursor after the clearing</param>
         private void ClearBelowLines(int row) {
             for (int i = 0; i < _commands.Count + 2; i++) {
                 Console.Write(new string(' ', Console.WindowWidth));
@@ -215,9 +250,22 @@ namespace WarehouseAI.UI
             }
             else
             {
-                Console.WriteLine("Command not found.");
+                ShowError("Command not found.");
             }
-            Console.Write("\n> ");
+            Prompt(true);
+        }
+
+        private void ShowError(string message)
+        {
+            ConsoleColor previousColour = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(message);
+            Console.ForegroundColor = previousColour;
+        }
+
+        private void Prompt(bool newline = false, string append = "")
+        {
+            Console.Write(newline ? "\n> " + append : "> " + append);
         }
 
         /// <summary>
@@ -228,7 +276,7 @@ namespace WarehouseAI.UI
         {
             if (args == null || args.Length < 1)
             {
-                Console.WriteLine("Import warehouse expects a path to a warehouse database");
+                ShowError("Import warehouse expects a path to a warehouse database");
                 return;
             }
             Console.WriteLine("Now importing warehouse...");
@@ -241,8 +289,8 @@ namespace WarehouseAI.UI
             }
             catch (Exception e)
             {
-                Console.WriteLine("Import failed...");
-                Console.WriteLine("Error: " + e.Message);
+                ShowError("Import failed...");
+                ShowError("Error: " + e.Message);
             }
 
         }
@@ -255,7 +303,7 @@ namespace WarehouseAI.UI
         {
             if (args == null || args.Length < 1)
             {
-                Console.WriteLine("Import items expects a path to a item database");
+                ShowError("Import items expects a path to a item database");
                 return;
             }
             Console.WriteLine("Importing items...");
@@ -270,8 +318,8 @@ namespace WarehouseAI.UI
             }
             catch (Exception e)
             {
-                Console.WriteLine("Import failed...");
-                Console.WriteLine("Error: " + e.Message);
+                ShowError("Import failed...");
+                ShowError("Error: " + e.Message);
             }
         }
 
@@ -283,7 +331,7 @@ namespace WarehouseAI.UI
         {
             if (args == null || args.Length < 1)
             {
-                Console.WriteLine("Import relations expects a path to a relation database");
+                ShowError("Import relations expects a path to a relation database");
                 return;
             }
             Console.WriteLine("Importing relations on items...");
@@ -307,8 +355,8 @@ namespace WarehouseAI.UI
             }
             catch (Exception e)
             {
-                Console.WriteLine("Import failed...");
-                Console.WriteLine("Error: " + e.Message);
+                ShowError("Import failed...");
+                ShowError("Error: " + e.Message);
             }
         }
 
@@ -326,8 +374,8 @@ namespace WarehouseAI.UI
             }
             catch (Exception e)
             {
-                Console.WriteLine("Evaluation failed...");
-                Console.WriteLine("Error: " + e.Message);
+                ShowError("Evaluation failed...");
+                ShowError("Error: " + e.Message);
             }
         }
 
@@ -347,7 +395,7 @@ namespace WarehouseAI.UI
             }
             catch
             {
-                Console.WriteLine("Error: The book with the specified ID was not found in the database.");
+                ShowError("Error: The book with the specified ID was not found in the database.");
                 return;
             }
             if (args.Length == 1)
@@ -363,7 +411,7 @@ namespace WarehouseAI.UI
                 }
                 catch
                 {
-                    Console.WriteLine("Error: The specified shelf ID was not found in the database.");
+                    ShowError("Error: The specified shelf ID was not found in the database.");
                     return;
                 }
                 shelf.AddBook(item);
@@ -390,7 +438,7 @@ namespace WarehouseAI.UI
                 }
                 catch
                 {
-                    Console.WriteLine("Error: One or more of the specified ID's was not found in the database, or in the wrong format");
+                    ShowError("Error: One or more of the specified ID's was not found in the database, or in the wrong format");
                     return;
                 }
             }
@@ -403,7 +451,7 @@ namespace WarehouseAI.UI
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error: " + e.Message);
+                ShowError("Error: " + e.Message);
             }
         }
 
@@ -425,7 +473,7 @@ namespace WarehouseAI.UI
                 }
                 catch
                 {
-                    Console.WriteLine("Error: One or more of the specified ID's was not found in the database, or in the wrong format");
+                    ShowError("Error: One or more of the specified ID's was not found in the database, or in the wrong format");
                     return;
                 }
             }
@@ -438,8 +486,8 @@ namespace WarehouseAI.UI
             }
             catch (Exception e)
             {
-                Console.WriteLine("Adding books failed...");
-                Console.WriteLine("Error: " + e.Message);
+                ShowError("Adding books failed...");
+                ShowError("Error: " + e.Message);
             }
 
         }
@@ -511,8 +559,8 @@ namespace WarehouseAI.UI
             }
             catch (Exception e)
             {
-                Console.WriteLine("Node was not added...");
-                Console.WriteLine("Error: " + e.Message);
+                ShowError("Node was not added...");
+                ShowError("Error: " + e.Message);
             }
 
         }
@@ -536,19 +584,19 @@ namespace WarehouseAI.UI
             }
             catch (FormatException)
             {
-                Console.WriteLine("Error: The supplied arguments was not in the correct format.");
+                ShowError("Error: The supplied arguments was not in the correct format.");
             }
             catch (IndexOutOfRangeException)
             {
-                Console.WriteLine("Error: Not enough arguments was supplied.");
+                ShowError("Error: Not enough arguments was supplied.");
             }
             catch (InvalidOperationException)
             {
-                Console.WriteLine("Error: The specified node id's was not found in the database.");
+                ShowError("Error: The specified node id's was not found in the database.");
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error: " + e.Message);
+                ShowError("Error: " + e.Message);
             }
         }
 
