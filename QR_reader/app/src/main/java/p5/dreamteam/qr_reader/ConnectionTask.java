@@ -89,7 +89,7 @@ public class ConnectionTask extends AsyncTask<Void, Void, String> {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-                response.append(line + "\n");
+                response.append(line);
             }
         } catch (IOException e) {
             return null;

@@ -18,7 +18,7 @@ public class VisualRepresentationActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_visual_representation);
         ListView _view = findViewById(R.id.list);
-        String[] _strings = getIntent().getStringExtra("RepresentationData").split("\n");
+        String[] _strings = getIntent().getStringExtra("RepresentationData").split("¤");
         ArrayAdapter<String> _adapter = new ArrayAdapter<>(this, R.layout.list_item, _strings);
 
         _view.setAdapter(_adapter);
