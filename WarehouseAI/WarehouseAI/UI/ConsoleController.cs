@@ -59,6 +59,9 @@ namespace WarehouseAI.UI
             WarehouseServerIO.MessageRecievedEvent += WarehouseServerIOOnMessageRecievedEvent;
         }
 
+        /// <summary>
+        /// Initializes the Cache, must be invoked before many commands commands are called
+        /// </summary>
         private void InitCache()
         {
             Console.WriteLine("Initializing cache...");
@@ -529,9 +532,11 @@ namespace WarehouseAI.UI
         /// <summary>
         /// Adds a node to the warehouse and prints the warehouse afterwards.
         /// </summary>
-        /// <param name="args">Expects the first argument to be Either "Node" or "Shelf" but can also be left out to create a Node.
-        /// Expects the second argument to be the nodes placement on the X axis.
-        /// Expects the second argument to be the nodes placement on the Y axis.
+        /// <param name="args">
+        /// Expects the first argument to be an unique ID numeral.
+        /// Expects the second argument to be Either "Node" or "Shelf" but can also be left out to create a Node.
+        /// Expects the third argument to be the nodes placement on the X axis.
+        /// Expects the fourth argument to be the nodes placement on the Y axis.
         /// </param>
         private void AddNode(string[] args)
         {
@@ -543,26 +548,28 @@ namespace WarehouseAI.UI
             try
             {
                 Node newNode;
+                int id = int.Parse(args[relationalIndex++]);
                 switch (args[relationalIndex].ToLower())
                 {
                     case "node":
                         newNode = new Node();
+                        relationalIndex++;
                         break;
                     case "shelf":
                         newNode = new Shelf();
+                        relationalIndex++;
                         break;
                     default:
                         newNode = new Node();
-                        relationalIndex--;
                         break;
-
                 }
+                newNode.Id = id;
                 // Parse any float format with current culture
-                newNode.X = float.Parse(args[relationalIndex + 1], NumberStyles.Any, c);
-                newNode.Y = float.Parse(args[relationalIndex + 2], NumberStyles.Any, c);
-                newNode.Id = Warehouse.Nodes.Length;
+                newNode.X = float.Parse(args[relationalIndex++], NumberStyles.Any, c);
+                newNode.Y = float.Parse(args[relationalIndex++], NumberStyles.Any, c);
+                
 
-                Warehouse.AddNode(newNode, args.Skip(relationalIndex + 3).Select(s => int.Parse(s)).ToArray());
+                Warehouse.AddNode(newNode, args.Skip(relationalIndex).Select(s => int.Parse(s)).ToArray());
 
                 PrintWarehouse();
                 Console.WriteLine("Node added.");
