@@ -100,7 +100,7 @@ namespace WarehouseAI.UI
                         if (books.Contains(item.Id.ToString()))
                         {
                             sb.Append(shelf.Id);
-                            sb.AppendLine(item.Name);
+                            sb.Append(item.Name + "¤");
                             shelf.RemoveBook(item);
                             books[Array.IndexOf(books, item.Id.ToString())] = null;
                         }
