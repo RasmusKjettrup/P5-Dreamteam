@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -54,9 +55,29 @@ namespace WarehouseAI.UI
                 {"clearlog",  new Command(s => WarehouseServerIO.ClearMessageLog(), "Clears the serverlogs between client and server.")},
                 {"showip", new Command(s => Console.WriteLine(WarehouseServerIO.GetIP().ToString()), "Shows the IP-address of the server.")},
                 {"orderbooks", new Command(OrderBooks, "Sends an order of bought books to the warehouse, expects the id of each bought book.")},
-                {"init", new Command(s => InitCache(), "Initializes the cache. Need to do this after importing.")}
+                {"init", new Command(s => InitCache(), "Initializes the cache. Need to do this after importing.")},
+                {"importisbn", new Command(ImportISBN, "Test")}
             };
             WarehouseServerIO.MessageRecievedEvent += WarehouseServerIOOnMessageRecievedEvent;
+        }
+
+        private void ImportISBN(string[] args)
+        {
+            if (args == null || args.Length < 1)
+            {
+                ShowError("Import warehouse expects a path to an ISBN database.");
+                return;
+            }
+            Console.WriteLine("Importing ISBNs...");
+
+            string[] lines = File.ReadAllLines(args[0]);
+
+            for (int i = 0; i < ItemDatabase.Items.Length; i++)
+            {
+                string s = lines[i].Split(' ')[1];
+                ItemDatabase.Items[i].ISBN = s;
+                Console.WriteLine($"{ItemDatabase.Items[i].Id} {ItemDatabase.Items[i].ISBN} {ItemDatabase.Items[i].Name}");
+            }
         }
 
         /// <summary>
@@ -100,7 +121,7 @@ namespace WarehouseAI.UI
                         if (books.Contains(item.Id.ToString()))
                         {
                             sb.Append(shelf.Id);
-                            sb.Append(item.Name + "¤");
+                            sb.Append(item.Name + "Â¤");
                             shelf.RemoveBook(item);
                             books[Array.IndexOf(books, item.Id.ToString())] = null;
                         }
@@ -152,72 +173,72 @@ namespace WarehouseAI.UI
             int row = Console.CursorTop;
 
             while (true) {//Run until termination by Quit()
-                ConsoleKey key = Console.ReadKey(true).Key;
-                switch (key)
-                {
-                    case ConsoleKey.Tab:
-                        Console.WriteLine();
-                        ClearBelowLines(row);
-                        Console.SetCursorPosition(Console.CursorLeft, row + 1);
-
-                        ConsoleColor previousColour = Console.ForegroundColor;
-                        Console.ForegroundColor = ConsoleColor.DarkYellow;
-
-                        int numberOfCommands = 0;
-                        string currCommand = "";
-                        foreach (var ck in _commands.Keys)
-                        {
-                            if (ck.StartsWith(sb.ToString()))
-                            {
-                                numberOfCommands++; //This is so stupid...
-                                currCommand = ck;
-                                Console.WriteLine(ck);
-                            }
-                        }
-                        Console.ForegroundColor = previousColour;
-                        if (numberOfCommands == 1)
-                        {
-                            Console.SetCursorPosition(Console.CursorLeft, row);
-                            Prompt(append: currCommand);
-                            sb.Clear();
-                            sb.Append(currCommand);
-                            break;
-                        }
-
-                        Console.SetCursorPosition(Console.CursorLeft, row);
-                        Prompt(append: sb.ToString());
-                        break;
-
-                    case ConsoleKey.Backspace:
-                        if (sb.Length > 0)
-                        {
-                            sb.Remove(sb.Length - 1, 1);
-                            Console.Write("\b \b");
-                        }
-                        break;
-
-                    case ConsoleKey.Enter:
-                        ClearBelowLines(row);
-                        Console.SetCursorPosition(Console.CursorLeft, row);
-                        Command(sb.ToString());
-                        sb.Clear();
-                        row = Console.CursorTop;
-                        break;
-
-                    case ConsoleKey.OemPeriod:
-                    case ConsoleKey.OemComma:
-                    case ConsoleKey.OemMinus:
-                        char c = ConvertOem(key);
-                        sb.Append(c);
-                        Console.Write(c);
-                        break;
-
-                    default:
-                        sb.Append(char.ToLower((char) key));
-                        Console.Write(char.ToLower((char)key));
-                        break;
-                }
-
+//                ConsoleKey key = Console.ReadKey(true).Key;
+//                switch (key)
+//                {
+//                    case ConsoleKey.Tab:
+//                        Console.WriteLine();
+//                        ClearBelowLines(row);
+//                        Console.SetCursorPosition(Console.CursorLeft, row + 1);
+//
+//                        ConsoleColor previousColour = Console.ForegroundColor;
+//                        Console.ForegroundColor = ConsoleColor.DarkYellow;
+//
+//                        int numberOfCommands = 0;
+//                        string currCommand = "";
+//                        foreach (var ck in _commands.Keys)
+//                        {
+//                            if (ck.StartsWith(sb.ToString()))
+//                            {
+//                                numberOfCommands++; //This is so stupid...
+//                                currCommand = ck;
+//                                Console.WriteLine(ck);
+//                            }
+//                        }
+//                        Console.ForegroundColor = previousColour;
+//                        if (numberOfCommands == 1)
+//                        {
+//                            Console.SetCursorPosition(Console.CursorLeft, row);
+//                            Prompt(append: currCommand);
+//                            sb.Clear();
+//                            sb.Append(currCommand);
+//                            break;
+//                        }
+//
+//                        Console.SetCursorPosition(Console.CursorLeft, row);
+//                        Prompt(append: sb.ToString());
+//                        break;
+//
+//                    case ConsoleKey.Backspace:
+//                        if (sb.Length > 0)
+//                        {
+//                            sb.Remove(sb.Length - 1, 1);
+//                            Console.Write("\b \b");
+//                        }
+//                        break;
+//
+//                    case ConsoleKey.Enter:
+//                        ClearBelowLines(row);
+//                        Console.SetCursorPosition(Console.CursorLeft, row);
+//                        Command(sb.ToString());
+//                        sb.Clear();
+//                        row = Console.CursorTop;
+//                        break;
+//
+//                    case ConsoleKey.OemPeriod:
+//                    case ConsoleKey.OemComma:
+//                    case ConsoleKey.OemMinus:
+//                        char c = ConvertOem(key);
+//                        sb.Append(c);
+//                        Console.Write(c);
+//                        break;
+//
+//                    default:
+//                        sb.Append(char.ToLower((char) key));
+//                        Console.Write(char.ToLower((char)key));
+//                        break;
+//                }
+                Command(Console.ReadLine());
             }
         }
 
