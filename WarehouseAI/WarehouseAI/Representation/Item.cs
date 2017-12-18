@@ -5,6 +5,10 @@ namespace WarehouseAI.Representation
     public class Item
     {
         /// <summary>
+        /// ISBN of a book. Assigned by calling ImportISBN in ConsoleController.
+        /// </summary>
+        public string ISBN { get; set; }
+        /// <summary>
         /// The ID of the item.
         /// </summary>
         public int Id { get; set; }
