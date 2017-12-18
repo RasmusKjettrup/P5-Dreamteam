@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters;
 using System.Text;
 using System.Threading;
 using WarehouseAI.Representation;
@@ -56,7 +57,8 @@ namespace WarehouseAI.UI
                 {"showip", new Command(s => Console.WriteLine(WarehouseServerIO.GetIP().ToString()), "Shows the IP-address of the server.")},
                 {"orderbooks", new Command(OrderBooks, "Sends an order of bought books to the warehouse, expects the id of each bought book.")},
                 {"init", new Command(s => InitCache(), "Initializes the cache. Need to do this after importing.")},
-                {"importisbn", new Command(ImportISBN, "Test")}
+                {"importisbn", new Command(ImportISBN, "Test")},
+                {"printshelves", new Command(s => PrintItemsOnShelves(), "Test12")}
             };
             WarehouseServerIO.MessageRecievedEvent += WarehouseServerIOOnMessageRecievedEvent;
         }
@@ -142,7 +144,22 @@ namespace WarehouseAI.UI
         /// <param name="message">The message recieved from the event.</param>
         private void WarehouseServerIOOnMessageRecievedEvent(string message)
         {
-            AddBook(new[] { message });
+            string[] splits = message.Split(' ');
+            if (splits.Length < 2)
+            {
+                AddBook(new[] {message});
+            }
+            else
+            {
+                if (splits[0].StartsWith("@isbn"))
+                {
+                    AddBooksByISBN(splits.Skip(1).ToArray());
+                }
+                else
+                {
+                    AddBooks(splits);
+                }
+            }
         }
 
         /// <summary>
@@ -173,72 +190,67 @@ namespace WarehouseAI.UI
             int row = Console.CursorTop;
 
             while (true) {//Run until termination by Quit()
-//                ConsoleKey key = Console.ReadKey(true).Key;
-//                switch (key)
-//                {
-//                    case ConsoleKey.Tab:
-//                        Console.WriteLine();
-//                        ClearBelowLines(row);
-//                        Console.SetCursorPosition(Console.CursorLeft, row + 1);
-//
-//                        ConsoleColor previousColour = Console.ForegroundColor;
-//                        Console.ForegroundColor = ConsoleColor.DarkYellow;
-//
-//                        int numberOfCommands = 0;
-//                        string currCommand = "";
-//                        foreach (var ck in _commands.Keys)
-//                        {
-//                            if (ck.StartsWith(sb.ToString()))
-//                            {
-//                                numberOfCommands++; //This is so stupid...
-//                                currCommand = ck;
-//                                Console.WriteLine(ck);
-//                            }
-//                        }
-//                        Console.ForegroundColor = previousColour;
-//                        if (numberOfCommands == 1)
-//                        {
-//                            Console.SetCursorPosition(Console.CursorLeft, row);
-//                            Prompt(append: currCommand);
-//                            sb.Clear();
-//                            sb.Append(currCommand);
-//                            break;
-//                        }
-//
-//                        Console.SetCursorPosition(Console.CursorLeft, row);
-//                        Prompt(append: sb.ToString());
-//                        break;
-//
-//                    case ConsoleKey.Backspace:
-//                        if (sb.Length > 0)
-//                        {
-//                            sb.Remove(sb.Length - 1, 1);
-//                            Console.Write("\b \b");
-//                        }
-//                        break;
-//
-//                    case ConsoleKey.Enter:
-//                        ClearBelowLines(row);
-//                        Console.SetCursorPosition(Console.CursorLeft, row);
-//                        Command(sb.ToString());
-//                        sb.Clear();
-//                        row = Console.CursorTop;
-//                        break;
-//
-//                    case ConsoleKey.OemPeriod:
-//                    case ConsoleKey.OemComma:
-//                    case ConsoleKey.OemMinus:
-//                        char c = ConvertOem(key);
-//                        sb.Append(c);
-//                        Console.Write(c);
-//                        break;
-//
-//                    default:
-//                        sb.Append(char.ToLower((char) key));
-//                        Console.Write(char.ToLower((char)key));
-//                        break;
-//                }
-                Command(Console.ReadLine());
+                ConsoleKey key = Console.ReadKey(true).Key;
+                switch (key) {
+                    case ConsoleKey.Tab:
+                        Console.WriteLine();
+                        ClearBelowLines(row);
+                        Console.SetCursorPosition(Console.CursorLeft, row + 1);
+
+                        ConsoleColor previousColour = Console.ForegroundColor;
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
+
+                        int numberOfCommands = 0;
+                        string currCommand = "";
+                        foreach (var ck in _commands.Keys) {
+                            if (ck.StartsWith(sb.ToString())) {
+                                numberOfCommands++; //This is so stupid...
+                                currCommand = ck;
+                                Console.WriteLine(ck);
+                            }
+                        }
+                        Console.ForegroundColor = previousColour;
+                        if (numberOfCommands == 1) {
+                            Console.SetCursorPosition(Console.CursorLeft, row);
+                            Prompt(append: currCommand);
+                            sb.Clear();
+                            sb.Append(currCommand);
+                            break;
+                        }
+
+                        Console.SetCursorPosition(Console.CursorLeft, row);
+                        Prompt(append: sb.ToString());
+                        break;
+
+                    case ConsoleKey.Backspace:
+                        if (sb.Length > 0) {
+                            sb.Remove(sb.Length - 1, 1);
+                            Console.Write("\b \b");
+                        }
+                        break;
+
+                    case ConsoleKey.Enter:
+                        ClearBelowLines(row);
+                        Console.SetCursorPosition(Console.CursorLeft, row);
+                        Command(sb.ToString());
+                        sb.Clear();
+                        row = Console.CursorTop;
+                        break;
+
+                    case ConsoleKey.OemPeriod:
+                    case ConsoleKey.OemComma:
+                    case ConsoleKey.OemMinus:
+                        char c = ConvertOem(key);
+                        sb.Append(c);
+                        Console.Write(c);
+                        break;
+
+                    default:
+                        sb.Append(char.ToLower((char)key));
+                        Console.Write(char.ToLower((char)key));
+                        break;
+                }
+                //Command(Console.ReadLine());
             }
         }
 
@@ -467,12 +479,11 @@ namespace WarehouseAI.UI
             {
                 try
                 {
-                    Item item = ItemDatabase.Items.First(i => i.Id == int.Parse(s));
-                    items.Add(item);
+                    items.Add(ItemDatabase.Items.First(i => i.Id == int.Parse(s)));
                 }
                 catch
                 {
-                    ShowError("Error: One or more of the specified ID's was not found in the database, or in the wrong format");
+                    ShowError("Error: One or more of the specified IDs were not found in the database, or in the wrong format");
                     return;
                 }
             }
@@ -483,9 +494,39 @@ namespace WarehouseAI.UI
                 PrintItemsOnShelves();
                 Console.WriteLine("Books added.");
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                ShowError("Error: " + e.Message);
+                ShowError("Error: Shelves likely full. Added as many books as possible.");
+            }
+        }
+
+        private void AddBooksByISBN(string[] args)
+        {
+            Console.WriteLine("Adding books...");
+            List<Item> items = new List<Item>();
+
+            foreach (string s in args)
+            {
+                try
+                {
+                    items.Add(ItemDatabase.Items.First(i => i.ISBN == s));
+                }
+                catch
+                {
+                    ShowError(
+                        "Error: One or more of the specified IDs were not found in the database, or in the wrong format");
+                    return;
+                }
+            }
+            try
+            {
+                Warehouse.AddBooks(items.ToArray());
+                PrintItemsOnShelves();
+                Console.WriteLine("Books added.");
+            }
+            catch (Exception)
+            {
+                ShowError("Shelves likely full. Added as many books as possible.");
             }
         }
 

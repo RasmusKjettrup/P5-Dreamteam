@@ -125,9 +125,8 @@ namespace WarehouseAI {
             return null;
         }
 
-
         private class StateObject {
-            public Socket WorkSocket = null;
+            public Socket WorkSocket;
             public const int BufferSize = 1024;
             public byte[] Buffer = new byte[BufferSize];
             public StringBuilder Sb = new StringBuilder();
