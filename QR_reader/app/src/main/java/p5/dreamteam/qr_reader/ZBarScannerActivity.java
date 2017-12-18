@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import net.sourceforge.zbar.Config;
 import net.sourceforge.zbar.Image;
@@ -200,6 +201,12 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
             SymbolSet syms = _scanner.getResults();
             for (Symbol sym : syms) { // Should only be 1 symbol
                 String symData = sym.getData(); // Actually decode the barcode to get the data
+                if (!symData.startsWith("978")) {
+                    Toast.makeText(this, "Error on scan", Toast.LENGTH_LONG);
+                    setResult(Activity.RESULT_CANCELED);
+                    finish();
+                    break;
+                }
                 if (!TextUtils.isEmpty(symData)) {
                     Intent dataIntent = new Intent();
                     dataIntent.putExtra(SCAN_RESULT, symData);
