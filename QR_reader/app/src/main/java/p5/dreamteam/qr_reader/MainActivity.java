@@ -126,11 +126,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             String dataToSend = data.getStringExtra(ZBarConstants.SCAN_RESULT);
+            String isbnTag = data.getStringExtra("ISBNTAG");
             if (_swcSendImmediately.isChecked()) {
-                sendDataToServer(dataToSend);
+                sendDataToServer(isbnTag + " " + dataToSend);
             } else {
                 if (TextUtils.isEmpty(_editTextToSend.getText())) {
-                    _editTextToSend.setText(dataToSend);
+                    _editTextToSend.setText(isbnTag + " " + dataToSend);
                 } else {
                     _editTextToSend.append(" " + dataToSend);
                 }
@@ -175,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (_serverResponse.equals("")) {
                 return 2;
             } else if(_serverResponse.endsWith("<EOF>")) {
+                _serverResponse = _serverResponse.replaceAll("<EOF>", "");
                 return 0;
             } else
             {
@@ -213,7 +215,8 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "No data to send", Toast.LENGTH_LONG).show();
             return;
         }
-        showToastFromSendDataErrorCode(sendDataToServer(_editTextToSend.getText().toString()));
+        String dataToSend = _editTextToSend.getText().toString();
+        showToastFromSendDataErrorCode(sendDataToServer(dataToSend));
     }
 
     /**

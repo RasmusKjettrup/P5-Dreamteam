@@ -200,13 +200,11 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
             SymbolSet syms = _scanner.getResults();
             for (Symbol sym : syms) { // Should only be 1 symbol
                 String symData = sym.getData(); // Actually decode the barcode to get the data
-
-//                long end = System.nanoTime();
-//                Log.e(TAG, String.valueOf((end-start)/1000000)); // In milliseconds
                 if (!TextUtils.isEmpty(symData)) {
                     Intent dataIntent = new Intent();
                     dataIntent.putExtra(SCAN_RESULT, symData);
                     dataIntent.putExtra(SCAN_RESULT_TYPE, sym.getType());
+                    dataIntent.putExtra("ISBNTAG", "@isbn");
                     setResult(Activity.RESULT_OK, dataIntent);
                     finish(); // We have decoded, terminate activity
                     break;
