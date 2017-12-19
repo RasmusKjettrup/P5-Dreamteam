@@ -72,13 +72,16 @@ namespace WarehouseAI.UI
             }
             Console.WriteLine("Importing ISBNs...");
 
-            string[] lines = File.ReadAllLines(args[0]);
+            try {
+                string[] lines = File.ReadAllLines(args[0]);
 
-            for (int i = 0; i < ItemDatabase.Items.Length; i++)
-            {
-                string s = lines[i].Split(' ')[1];
-                ItemDatabase.Items[i].ISBN = s;
-                Console.WriteLine($"{ItemDatabase.Items[i].Id} {ItemDatabase.Items[i].ISBN} {ItemDatabase.Items[i].Name}");
+                for (int i = 0; i < ItemDatabase.Items.Length; i++) {
+                    string s = lines[i].Split(' ')[1];
+                    ItemDatabase.Items[i].ISBN = s;
+                    Console.WriteLine($"{ItemDatabase.Items[i].Id} {ItemDatabase.Items[i].ISBN} {ItemDatabase.Items[i].Name}");
+                }
+            } catch (Exception e) {
+                ShowError("Error: Cannot import isbns. Please check if the file is correct.");
             }
         }
 
