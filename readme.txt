@@ -2,6 +2,7 @@
 
 WarehouseAI (C#):	Open CSDoc/html/index.html in a browser.
 QR_reader (Android):	Open AndroidDoc/index.html and ignore R.*.
+Crawler:		Only code in amazon-related crawler. Can possibly execute using Python 3 and Scrapy.
 
 
 #Execution
